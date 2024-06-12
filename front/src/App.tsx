@@ -1,27 +1,32 @@
-import type { Component } from 'solid-js';
+import type { JSXElement } from 'solid-js';
+import { Router, Routes, Route } from "solid-app-router";
+import Layout from './Layout'
 
-import logo from './logo.svg';
-import styles from './App.module.css';
+type PageWithLayoutProps = {
+  component: () => JSXElement;
+};
 
-const App: Component = () => {
+// Not all routes will have the Full App Layout
+function PageWithLayout(props: PageWithLayoutProps): JSXElement {
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          class={styles.link}
-          href="https://github.com/solidjs/solid"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Solid
-        </a>
-      </header>
-    </div>
+    <Layout>
+      <props.component />
+    </Layout>
   );
 };
 
-export default App;
+
+function HomePage(): JSXElement {
+  return (
+    <h1 class=' text-red-400'>Test homePage</h1>
+  )
+}
+
+export default function App(): JSXElement {
+  return (
+    <Router>
+        <Route path="/" component={HomePage} />
+    </Router>
+  );
+};
+

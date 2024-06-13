@@ -1,15 +1,15 @@
 import { JSXElement } from "solid-js";
+import Navbar from "./components/core/navbar";
 
 type LayoutProps = {
   children: JSXElement
+  variant?: 'loggedin' | 'loggedout'
 }
 
 export default function Layout(props: LayoutProps): JSXElement {
   return (
     <>
-      <header class="pt-5 pb-5">
-        This is header
-      </header>
+      <Navbar />
       <main>
         {props.children}
       </main>

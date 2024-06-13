@@ -1,7 +1,5 @@
-import { JSXElement } from "solid-js";
-import Layout from "../../Layout";
-import { Button } from "../../components/ui/button";
-import Navbar from "../../components/core/navbar";
+import { JSXElement } from 'solid-js';
+import Layout from '../../Layout';
 
 export default function HomePage(): JSXElement {
   return (

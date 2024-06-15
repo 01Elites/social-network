@@ -1,5 +1,6 @@
 import { JSXElement } from 'solid-js';
 import Layout from '../../Layout';
+import 'solid-devtools';
 
 export default function HomePage(): JSXElement {
   return (

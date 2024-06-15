@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@suid/icons-material": "^0.7.0",
+    "@suid/material": "^0.16.0"
+  }
+}

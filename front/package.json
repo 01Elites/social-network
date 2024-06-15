@@ -22,8 +22,13 @@
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@kobalte/core": "^0.13.3",
+    "@mui/icons-material": "^5.15.20",
+    "@mui/material": "^5.15.20",
     "@solidjs/router": "^0.13.5",
+    "@suid/material": "^0.16.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "solid-js": "^1.8.11",

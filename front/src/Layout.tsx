@@ -1,5 +1,6 @@
 import { JSXElement } from 'solid-js';
 import Navbar from './components/core/navbar';
+import SideBar from './components/core/sidebar';
 
 type LayoutProps = {
   children: JSXElement;
@@ -10,7 +11,9 @@ export default function Layout(props: LayoutProps): JSXElement {
   return (
     <>
       <Navbar />
-      <main>{props.children}</main>
+      <SideBar>
+        <main>{props.children}</main>
+      </SideBar>
     </>
   );
 }

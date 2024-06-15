@@ -11,7 +11,6 @@ export default function Layout(props: LayoutProps): JSXElement {
     <>
       <Navbar />
       <main>{props.children}</main>
-      <footer>this is footer</footer>
     </>
   );
 }

@@ -4,7 +4,7 @@
 chmod +x $0
 
 # Navigate to the directory containing the Docker Compose file
-cd backend/database
+cd internal/database
 
 # Start Docker containers
 sudo docker-compose up --build -d
@@ -16,5 +16,5 @@ cd ../../
 go run cmd/socialNetwork/main.go 
 
 # When the Go application exits, stop Docker containers
-cd backend/database
+cd internal/database
 sudo docker-compose down

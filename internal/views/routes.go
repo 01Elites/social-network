@@ -1,7 +1,14 @@
 package views
 
+import "net/http"
+
 // SetupRoutes sets up the routes for the web application.
 func SetupRoutes() {
+	// test Handle the root route and return a simple message "postman"
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello, World!"))
+	})
+
 	// http.HandleFunc("/", RootHandler)
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 

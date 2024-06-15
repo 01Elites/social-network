@@ -20,6 +20,6 @@ func main() {
 	views.SetupRoutes()
 
 	// Print a message indicating that the server is live
-	log.Println("\033[1;33mServer is Live at http://localhost:8080...\033[0m")
-	log.Fatalln(http.ListenAndServe(":8080", nil))
+	log.Println("\033[1;33mServer is Live at http://localhost:8081...\033[0m")
+	log.Fatalln(http.ListenAndServe(":8081", nil))
 }

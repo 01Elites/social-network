@@ -17,8 +17,19 @@ type Create_Post struct {
 	Title    string `json:"title"`
 	Content  string `json:"content"`
 	Category string `json:"category"`
+	Privacy  string `json:"post_privacy"`
+	GroupID  int    `json:"group_id"`
 }
 
+type PostFeed struct {
+	ID            int    `json:"post_id"`
+	User          User   `json:"user"`
+	Title         string `json:"title"`
+	Content       string `json:"content,omitempty"`
+	Image         string `json:"image"`
+	GroupID       int    `json:"group_id"`
+	CreationDate  string `json:"creation_date"`
+}
 type User struct {
 	ID           int    `json:"id"`
 	UserName     string `json:"username"`

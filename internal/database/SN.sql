@@ -4,6 +4,8 @@ CREATE TYPE public.provider_type AS ENUM ('google', 'github', 'password', 'reboo
 
 CREATE TYPE public.user_type AS ENUM ('private','public');
 
+CREATE TYPE public.gender_type AS ENUM ('male', 'female');
+
 CREATE TYPE public.status_type AS ENUM ('pending', 'accepted', 'rejected');
 
 CREATE TYPE post_privacy AS ENUM ('public', 'private', 'almost_private', 'group');
@@ -26,7 +28,7 @@ CREATE TABLE public.user (
     user_name      VARCHAR(100),
     email          VARCHAR NOT NULL,
     "password"     VARCHAR,
-    provider       public.provider_type NOT NULL,
+    provider       public.provider_type,
     CONSTRAINT unq_user UNIQUE (user_name, email)
 );
 
@@ -34,10 +36,10 @@ CREATE  TABLE public.profile (
     user_id        UUID NOT NULL, 
     first_name     VARCHAR(100),
     last_name      VARCHAR(100),
-    gender         VARCHAR,
+    gender         public.gender_type,
     date_of_birth  DATE,
     image          VARCHAR,
-    "type"           public.user_type DEFAULT 'public'::user_type NOT NULL,
+    "type"         public.user_type DEFAULT 'public'::user_type NOT NULL,
     FOREIGN KEY (user_id) REFERENCES public.user (user_id)
 );
  

@@ -54,7 +54,7 @@ func InsertDummyData() {
 		Email     string
 		Password  string
 		Provider string
-		}{
+	}{
 			{"123e4567-e89b-12d3-a456-426614174000", "Alice", "alice@example.com", "password123", "password"},
 			{"123e4567-e89b-12d3-a456-426614174001", "Bob", "bob@example.com", "password123", "google"},
 			{"123e4567-e89b-12d3-a456-426614174002", "Charlie", "charlie@example.com", "password123", "github"},
@@ -63,7 +63,7 @@ func InsertDummyData() {
 	// Prepare the insert statement with the provider field
 	stmt := `INSERT INTO public.user (user_id, user_name, email, password, provider) 
 					 VALUES ($1, $2, $3, $4, $5)
-					 ON CONFLICT (user_name, email) DO NOTHING`
+					 ON CONFLICT (user_name) DO NOTHING`
 
 	// Insert the dummy data
 	for _, user := range dummyUsers {

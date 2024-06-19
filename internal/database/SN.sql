@@ -2,6 +2,8 @@ CREATE SCHEMA IF NOT EXISTS "public";
 
 CREATE TYPE public.provider_type AS ENUM ('google', 'github', 'password', 'reboot');
 
+CREATE TYPE public.interaction_type AS ENUM ('like', 'dislike');
+
 CREATE TYPE public.user_type AS ENUM ('private','public');
 
 CREATE TYPE public.gender_type AS ENUM ('male', 'female');
@@ -25,11 +27,10 @@ CREATE TYPE public.notification_type AS ENUM (
 
 CREATE TABLE public.user (
     user_id        UUID PRIMARY KEY,
-    user_name      VARCHAR(100),
+    user_name      VARCHAR(100) UNIQUE,
     email          VARCHAR NOT NULL,
     "password"     VARCHAR,
-    provider       public.provider_type,
-    CONSTRAINT unq_user UNIQUE (user_name, email)
+    provider       public.provider_type
 );
 
 CREATE  TABLE public.profile ( 
@@ -137,6 +138,15 @@ CREATE TABLE public.comment (
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES public.post(post_id),
     FOREIGN KEY (user_id) REFERENCES public.user(user_id)
+);
+CREATE TABLE public.post_interaction (
+    post_id      INTEGER NOT NULL,
+    user_id      UUID NOT NULL,
+    interaction_type  public.interaction_type NOT NULL,
+    created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (post_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES public.post (post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES public.user (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE public.chat (

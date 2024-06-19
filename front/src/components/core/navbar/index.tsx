@@ -2,7 +2,6 @@ import { JSXElement } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import logo from '../../../logo.svg';
 import { TextField, TextFieldInput } from '../../../components/ui/text-field';
-import Logout from '../../../lib/logout';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +29,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
   const navigate = useNavigate();
 
   return (
-    <header class='mx-5 mt-5 flex justify-between gap-10 align-middle'>
+    <header class='mx-5 mt-5 flex justify-between gap-4 align-middle'>
       <img
         src={logo}
         alt='Elite Logo'
@@ -40,7 +39,10 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         class='w-20 cursor-pointer'
       />
       <TextField class='basis-1/2'>
-        <TextFieldInput type='search' placeholder='Search anything...' />
+        <TextFieldInput
+          type='search'
+          placeholder='Search friends, groups, posts...'
+        />
       </TextField>
       <DropdownMenu>
         <DropdownMenuTrigger class='flex flex-row items-center gap-2'>
@@ -53,9 +55,23 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         <DropdownMenuContent>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              navigate('/profile');
+            }}
+          >
+            Profile
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              fetch('/api/auth/logout', { method: 'DELETE' }).finally(() => {
+                navigate('/');
+              });
+            }}
+          >
+            Logout
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

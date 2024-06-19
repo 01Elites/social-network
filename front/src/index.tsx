@@ -27,6 +27,7 @@ render(
     <Router>
       <Route path='/' component={HomePage} />
       <Route path='/login' component={HomePage} />
+      <Route path='/profile' />
     </Router>
   ),
   root!,

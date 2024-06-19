@@ -49,26 +49,25 @@ func Init() {
 func InsertDummyData() {
 	// Define the dummy user data
 	dummyUsers := []struct {
+		UserID		string
 		UserName  string
 		Email     string
 		Password  string
-		FirstName string
-		LastName  string
-		Gender    string
-	}{
-		{"Alice", "alice@example.com", "password123", "Alice", "Smith", "Female"},
-		{"Bob", "bob@example.com", "password123", "Bob", "Johnson", "Male"},
-		{"Charlie", "charlie@example.com", "password123", "Charlie", "Brown", "Male"},
+		Provider string
+		}{
+			{"123e4567-e89b-12d3-a456-426614174000", "Alice", "alice@example.com", "password123", "password"},
+			{"123e4567-e89b-12d3-a456-426614174001", "Bob", "bob@example.com", "password123", "google"},
+			{"123e4567-e89b-12d3-a456-426614174002", "Charlie", "charlie@example.com", "password123", "github"},
 	}
 
-	// Prepare the insert statement
-	stmt := `INSERT INTO public.user (user_name, email, password, first_name, last_name, gender) 
-					 VALUES ($1, $2, $3, $4, $5, $6)
+	// Prepare the insert statement with the provider field
+	stmt := `INSERT INTO public.user (user_id, user_name, email, password, provider) 
+					 VALUES ($1, $2, $3, $4, $5)
 					 ON CONFLICT (user_name, email) DO NOTHING`
 
 	// Insert the dummy data
 	for _, user := range dummyUsers {
-		_, err := DB.Exec(context.Background(), stmt, user.UserName, user.Email, user.Password, user.FirstName, user.LastName, user.Gender)
+		_, err := DB.Exec(context.Background(), stmt, user.UserID, user.UserName, user.Email, user.Password, user.Provider)
 		if err != nil {
 			log.Fatalf("Error inserting dummy data: %v\n", err)
 		}

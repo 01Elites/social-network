@@ -22,7 +22,7 @@ func SetupRoutes() {
 	// http.HandleFunc("GET /api/posts", GetPostsHandler)
 	// http.HandleFunc("GET /api/post/{id}", GetPostByIDHandler)
 	// http.HandleFunc("GET /api/post/{id}/comments", GetPostCommentsHandler)
-	// http.HandleFunc("POST /api/create_post", CreatePostHandler)
+	http.HandleFunc("POST /api/create_post", CreatePostHandler)
 	// http.HandleFunc("POST /api/create_comment", CreateCommentHandler)
 	// http.HandleFunc("POST /api/create_like/{post_id}", CreateLikeHandler)
 

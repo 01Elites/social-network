@@ -7,7 +7,7 @@ chmod +x $0
 cd internal/database
 
 # Start Docker containers
-sudo docker-compose up --build -d
+docker-compose up --build -d
 
 # Navigate back to the project root directory to run the Go application
 cd ../../
@@ -17,4 +17,4 @@ go run cmd/socialNetwork/main.go
 
 # When the Go application exits, stop Docker containers
 cd internal/database
-sudo docker-compose down
+docker-compose down

@@ -29,6 +29,7 @@
     "@mui/material": "^5.15.20",
     "@solidjs/router": "^0.13.5",
     "@suid/material": "^0.16.0",
+    "@suid/icons-material": "^0.7.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "solid-js": "^1.8.11",

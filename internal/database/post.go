@@ -1,18 +1,22 @@
 package database
 
-import ("social-network/internal/events"
-				"log"
-			"context")
+import (
+	"context"
+	"fmt"
+	"log"
+	"social-network/internal/events"
+)
 
 func CreatePostInDB(userID string, post events.Create_Post) error{
 	query := `
     INSERT INTO 
-        post (title, post, user_id, privacy_type) 
+        post (title, content, privacy_type, user_id) 
     VALUES 
-        (?, ?, ?, ?)
-    RETURNING p_id`
+        ($1, $2, $3, $4)
+    RETURNING post_id`
 		var post_id int // Assuming p_id is of type int
 	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, userID).Scan(&post_id)
+	fmt.Println(post_id)
 	if err != nil {
 		log.Printf("database: Failed to insert post into database: %v", err)
 		return err // Return error if failed to insert post
@@ -20,37 +24,32 @@ func CreatePostInDB(userID string, post events.Create_Post) error{
 	return nil
 }
 
-func GetPostsFeed(userID, page, catID int) ([]events.PostFeed, error) {
+func GetPostsFeed(userID string) ([]events.PostFeed, error) {
 	// Query the database
 	query := `
     SELECT 
         post.post_id, 
         post.title,
 				post.content, 
-        post.creation_date,
-				post.group_id, 
         post.user_id, 
-        user.user_name, 
-        user.first_name, 
-        user.last_name, 
-        user.gender,
+        user.user_name
     FROM 
         post 
     INNER JOIN 
         user ON post.user_id = user.user_id
 		IF post.privacy_type = 'group'
 		INNER JOIN
-				group_member ON group_member.user_id = ? AND group_member.group_id = post.group_id
+				group_member ON group_member.user_id = $1 AND group_member.group_id = post.group_id
 		INNER JOIN
 				group ON group.group_id = post.group_id
 		ELSE
 		BEGIN
 		IF post.privacy_type = 'almost_private'
 		INNER JOIN 
-			post_user ON post_user.post_id = post.post_id AND post_user.allowed_user_id = ?
+			post_user ON post_user.post_id = post.post_id AND post_user.allowed_user_id = $2
 		ELSE
 			INNER JOIN 
-						follower ON follower.followed_id = ? OR follower.follower_id = ?
+						follower ON follower.followed_id = $3 OR follower.follower_id = $4
 		END`
 
 	query += `
@@ -75,13 +74,8 @@ func GetPostsFeed(userID, page, catID int) ([]events.PostFeed, error) {
 			&p.ID,
 			&p.Title,
 			&p.Content,
-			&p.CreationDate,
-			&p.GroupID,
 			&p.User.ID,
 			&p.User.UserName,
-			&p.User.FirstName,
-			&p.User.LastName,
-			&p.User.Gender,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err

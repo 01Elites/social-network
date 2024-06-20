@@ -2,10 +2,9 @@ package database
 
 import ("social-network/internal/events"
 				"log"
-			"context"
-			"fmt")
+			"context")
 
-func CreatePostInDB(userID int, post events.Create_Post) error{
+func CreatePostInDB(userID string, post events.Create_Post) error{
 	query := `
     INSERT INTO 
         post (title, post, user_id, privacy_type) 
@@ -25,9 +24,11 @@ func GetPostsFeed(userID, page, catID int) ([]events.PostFeed, error) {
 	// Query the database
 	query := `
     SELECT 
-        post.p_id, 
-        post.title, 
-        post.creation_date, 
+        post.post_id, 
+        post.title,
+				post.content, 
+        post.creation_date,
+				post.group_id, 
         post.user_id, 
         user.user_name, 
         user.first_name, 
@@ -37,19 +38,20 @@ func GetPostsFeed(userID, page, catID int) ([]events.PostFeed, error) {
         post 
     INNER JOIN 
         user ON post.user_id = user.user_id
-    INNER JOIN 
-        follower ON post.user_id = follower.followed_id AND user.user_id = follower.follower_id
-    LEFT JOIN 
-        category ON threads.cat_id = category.cat_id
-    LEFT JOIN 
-        posts_interaction AS likes ON post.p_id = likes.post_id AND likes.user_id = ?
-    WHERE 
-        post.comment_of = 0 `
-
-	// Conditionally add WHERE clause to filter by category
-	if catID != 0 {
-		query += fmt.Sprintf("AND category.cat_id = %d", catID)
-	}
+		IF post.privacy_type = 'group'
+		INNER JOIN
+				group_member ON group_member.user_id = ? AND group_member.group_id = post.group_id
+		INNER JOIN
+				group ON group.group_id = post.group_id
+		ELSE
+		BEGIN
+		IF post.privacy_type = 'almost_private'
+		INNER JOIN 
+			post_user ON post_user.post_id = post.post_id AND post_user.allowed_user_id = ?
+		ELSE
+			INNER JOIN 
+						follower ON follower.followed_id = ? OR follower.follower_id = ?
+		END`
 
 	query += `
 	GROUP BY
@@ -57,7 +59,7 @@ func GetPostsFeed(userID, page, catID int) ([]events.PostFeed, error) {
 	ORDER BY 
 		post.p_id DESC`
 
-	rows, err := DB.Query(query, userID, page*10)
+	rows, err := DB.Query(context.Background(), query, userID, userID, userID, userID)
 	if err != nil {
 		log.Printf("database failed to scan post: %v\n", err)
 		return nil, err
@@ -72,17 +74,14 @@ func GetPostsFeed(userID, page, catID int) ([]events.PostFeed, error) {
 		if err := rows.Scan(
 			&p.ID,
 			&p.Title,
+			&p.Content,
 			&p.CreationDate,
+			&p.GroupID,
 			&p.User.ID,
 			&p.User.UserName,
 			&p.User.FirstName,
 			&p.User.LastName,
 			&p.User.Gender,
-			&p.Category,
-			&p.PostLikes,
-			&p.IsLiked,
-			&p.CommentsCount,
-			&p.ViewsCount,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err

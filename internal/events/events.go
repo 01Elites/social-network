@@ -16,7 +16,6 @@ type Post struct {
 type Create_Post struct {
 	Title    string `json:"title"`
 	Content  string `json:"content"`
-	Category string `json:"category"`
 	Privacy  string `json:"post_privacy"`
 	GroupID  int    `json:"group_id"`
 }
@@ -31,7 +30,7 @@ type PostFeed struct {
 	CreationDate  string `json:"creation_date"`
 }
 type User struct {
-	ID           int    `json:"id"`
+	ID           string    `json:"id"`
 	UserName     string `json:"username"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`

@@ -2,11 +2,11 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5"
@@ -89,17 +89,37 @@ func ApplyMigrations() error {
 	// Create the PostgreSQL connection string
 	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	m, err := migrate.New(
-		"file://internal/database/migrations",
-		dbURL)
+	// m, err := migrate.New(
+	// 	"file://internal/database/migrations",
+	// 	dbURL)
+	// if err != nil {
+	// 	fmt.Println("Error in migration")
+	// 	return err
+	// }
+	// if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+	// 	fmt.Println("Error in migration")
+	// 	return err
+	// }
+	// log.Println("Migrations applied successfully")
+
+	fmt.Println("Database Host:", dbHost)
+	fmt.Println("Database Port:", dbPort)
+	fmt.Println("Database User:", dbUser)
+	fmt.Println("Database Password:", dbPassword) // Consider security implications before printing sensitive information
+	fmt.Println("Database Name:", dbName)
+
+	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		fmt.Println("Error in migration")
-		return err
+		log.Fatalf("Could not connect to database: %v", err)
 	}
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		fmt.Println("Error in migration")
-		return err
+	defer db.Close()
+
+	// Test the connection
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
 	}
-	log.Println("Migrations applied successfully")
+
+	log.Println("Connected to database successfully")
 	return nil
 }

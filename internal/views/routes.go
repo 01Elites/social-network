@@ -13,9 +13,9 @@ func SetupRoutes() {
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 
 	// /********************* Authentication ************************/
-	// http.HandleFunc("POST /signup", SignUp)    // Handle signup
-	// http.HandleFunc("POST /login", LogIn)      // Handle login
-	// http.HandleFunc("DELETE /logout", LogOut)  //  Handle logout
+	http.HandleFunc("POST /api/auth/signup", SignUp)
+	http.HandleFunc("POST /api/auth/signin", SignIn)
+	http.HandleFunc("DELETE /api/auth/logout", LogOut)
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/

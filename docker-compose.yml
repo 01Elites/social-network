@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    image: node:latest
+    working_dir: /app
+    volumes:
+      - ./front:/app
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  backend:
+    image: golang:latest
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: go run cmd/socialNetwork/main.go
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

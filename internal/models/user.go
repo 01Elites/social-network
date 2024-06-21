@@ -13,7 +13,7 @@ var Provider = struct {
 	Reboot: "reboot",
 }
 
-var UserType = struct {
+var ProfilePrivacy = struct {
 	Private string
 	Public  string
 }{

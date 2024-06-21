@@ -74,6 +74,10 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 			log.Printf("User already exists: %v", err)
 			http.Error(w, "User already exists", http.StatusConflict)
 			return
+		} else if strings.Contains(err.Error(), "SQLSTATE 22P02") {
+			log.Printf("Invalid data format: %v", err)
+			http.Error(w, "Invalid data format", http.StatusBadRequest)
+			return
 		}
 		log.Printf("Error signing up user: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -158,24 +162,23 @@ func validateSession(w http.ResponseWriter, r *http.Request) (*models.User, erro
 	// Extract the session token from the cookie
 	cookie, err := r.Cookie("SN_SESSION")
 	if err != nil {
-			return nil, err // No cookie means no session
+		return nil, err // No cookie means no session
 	}
 	// Validate the session token in the database
 	userID, err := database.ValidateSessionToken(cookie.Value)
 	if err != nil {
-			return nil, err // Invalid or expired session token
+		return nil, err // Invalid or expired session token
 	}
 
 	// Retrieve user details based on userID
 	user, err := database.GetUserByID(userID)
 	if err != nil {
-			return nil, err
+		return nil, err
 	}
 
 	setSessionCookie(w, cookie.Value)
 	return user, nil
 }
-
 
 /********************* Session Cookie ************************/
 
@@ -202,7 +205,7 @@ func setSessionCookie(w http.ResponseWriter, sessionToken string) {
 		Path:     "/",
 		SameSite: http.SameSiteStrictMode,
 		Secure:   true,
-		HttpOnly: true,  
+		HttpOnly: true,
 	}
 	http.SetCookie(w, &updatedCookie)
 }
@@ -240,6 +243,7 @@ func ValidateSignUpData(data *SignUpRequst) error {
 	if checkPassWS(data.Password) {
 		return errors.New("password cannot contain whitespaces")
 	}
+
 	if len(data.Password) < 6 || len(data.Password) > 20 {
 		return errors.New("password should be between 6 and 20 characters long")
 	}
@@ -247,6 +251,14 @@ func ValidateSignUpData(data *SignUpRequst) error {
 	// Validate Date of Birth to check if user is at least 18 years old
 	if err := validateAge(data.DateOfBirth); err != nil {
 		return err
+	}
+
+	// Validate privacy
+	switch data.ProfilePrivacy {
+	case models.ProfilePrivacy.Private, models.ProfilePrivacy.Public:
+		// valid
+	default:
+		return fmt.Errorf("invalid profile privacy: %v", data.ProfilePrivacy)
 	}
 
 	return nil

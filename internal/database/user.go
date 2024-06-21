@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"social-network/internal/models"
@@ -12,6 +13,9 @@ import (
 func SignUpUser(user models.User, userProfile models.UserProfile) error {
 	// Generate UUID if provider is "manual"
 	if user.Provider == models.Provider.Manual {
+		if user.Password == "" {
+			return errors.New("password is required for manual registration")
+		}
 		uuid, err := uuid.NewV4()
 		if err != nil {
 			log.Printf("Failed to generate UUID: %v\n", err)

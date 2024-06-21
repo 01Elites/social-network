@@ -10,7 +10,7 @@ CREATE TYPE public.gender_type AS ENUM ('male', 'female');
 
 CREATE TYPE public.status_type AS ENUM ('pending', 'accepted', 'rejected');
 
-CREATE TYPE post_privacy AS ENUM ('public', 'private', 'almost_private', 'group');
+CREATE TYPE public.post_privacy AS ENUM ('public', 'private', 'almost_private', 'group');
 
 CREATE TYPE public.role_type AS ENUM ('admin', 'member');
 

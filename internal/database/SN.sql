@@ -1,16 +1,16 @@
 CREATE SCHEMA IF NOT EXISTS "public";
 
-CREATE TYPE public.provider_type AS ENUM ('google', 'github', 'password', 'reboot');
+CREATE TYPE public.provider_type AS ENUM ('google', 'github', 'manual', 'reboot');
 
 CREATE TYPE public.interaction_type AS ENUM ('like', 'dislike');
 
-CREATE TYPE public.user_type AS ENUM ('private','public');
+CREATE TYPE public.profile_privacy AS ENUM ('private','public');
 
 CREATE TYPE public.gender_type AS ENUM ('male', 'female');
 
 CREATE TYPE public.status_type AS ENUM ('pending', 'accepted', 'rejected');
 
-CREATE TYPE post_privacy AS ENUM ('public', 'private', 'almost_private', 'group');
+CREATE TYPE public.post_privacy AS ENUM ('public', 'private', 'almost_private', 'group');
 
 CREATE TYPE public.role_type AS ENUM ('admin', 'member');
 
@@ -30,7 +30,8 @@ CREATE TABLE public.user (
     user_name      VARCHAR(100) UNIQUE,
     email          VARCHAR NOT NULL,
     "password"     VARCHAR,
-    provider       public.provider_type
+    provider       public.provider_type,
+    UNIQUE (email, provider)
 );
 
 CREATE  TABLE public.profile ( 
@@ -40,7 +41,7 @@ CREATE  TABLE public.profile (
     gender         public.gender_type,
     date_of_birth  DATE,
     image          VARCHAR,
-    "type"         public.user_type DEFAULT 'public'::user_type NOT NULL,
+    privacy        public.profile_privacy DEFAULT 'public'::profile_privacy NOT NULL,
     FOREIGN KEY (user_id) REFERENCES public.user (user_id)
 );
  

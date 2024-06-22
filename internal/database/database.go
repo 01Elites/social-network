@@ -58,9 +58,9 @@ func InsertDummyData() {
 		Password string
 		Provider string
 	}{
-		{"123e4567-e89b-12d3-a456-426614174000", "Alice", "alice@example.com", "password123", "password"},
-		{"123e4567-e89b-12d3-a456-426614174001", "Bob", "bob@example.com", "password123", "google"},
-		{"123e4567-e89b-12d3-a456-426614174002", "Charlie", "charlie@example.com", "password123", "github"},
+			{"123e4567-e89b-12d3-a456-426614174000", "Alice", "alice@example.com", "password123", "manual"},
+			{"123e4567-e89b-12d3-a456-426614174001", "Bob", "bob@example.com", "password123", "google"},
+			{"123e4567-e89b-12d3-a456-426614174002", "Charlie", "charlie@example.com", "password123", "github"},
 	}
 
 	// Prepare the insert statement with the provider field

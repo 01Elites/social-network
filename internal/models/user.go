@@ -32,7 +32,6 @@ var Gender = struct {
 // User struct defines the structure for storing user information
 type User struct {
 	UserID   string `db:"user_id"`
-	UserName string `db:"user_name"`
 	Email    string `db:"email"`
 	Password string `db:"password"`
 	Provider string `db:"provider"`
@@ -41,6 +40,7 @@ type User struct {
 // UserProfile struct defines the structure for storing user profile information
 type UserProfile struct {
 	UserID      string `db:"user_id"`
+	NickName    string `db:"nick_name"`
 	FirstName   string `db:"first_name"`
 	LastName    string `db:"last_name"`
 	Gender      string `db:"gender"`

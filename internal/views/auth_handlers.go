@@ -24,7 +24,7 @@ type SignUpRequst struct {
 	LastName       string `json:"last_name"`
 	DateOfBirth    string `json:"date_of_birth"`
 	Gender         string `json:"gender"`
-	UserName       string `json:"nickname"`
+	NickName       string `json:"nick_name"`
 	ProfilePrivacy string `json:"profile_privacy"`
 }
 
@@ -56,12 +56,12 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	data.Password = hash
 	user := models.User{
-		UserName: data.UserName,
 		Email:    data.Email,
 		Password: data.Password,
 		Provider: models.Provider.Manual,
 	}
 	userProfile := models.UserProfile{
+		NickName:    data.NickName,
 		FirstName:   data.FirstName,
 		LastName:    data.LastName,
 		Gender:      data.Gender,
@@ -216,17 +216,17 @@ func setSessionCookie(w http.ResponseWriter, sessionToken string) {
 func ValidateSignUpData(data *SignUpRequst) error {
 	// Trim spaces and check for empty required fields
 	data.Email = strings.TrimSpace(data.Email)
-	data.UserName = strings.TrimSpace(data.UserName)
+	data.NickName = strings.TrimSpace(data.NickName)
 	data.FirstName = strings.TrimSpace(data.FirstName)
 	data.LastName = strings.TrimSpace(data.LastName)
 
-	if data.Email == "" || data.UserName == "" || data.FirstName == "" || data.LastName == "" {
+	if data.Email == "" || data.NickName == "" || data.FirstName == "" || data.LastName == "" {
 		return errors.New("all fields must be filled out")
 	}
 
 	// Check the length of the username
-	if len(data.UserName) > 20 {
-		return errors.New("username should be up to 20 characters long")
+	if len(data.NickName) > 20 {
+		return errors.New("nickname should be up to 20 characters long")
 	}
 
 	// Check the length of the first name and last name

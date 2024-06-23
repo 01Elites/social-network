@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-    
+
   caddy:
     build:
       context: .
       dockerfile: Dockerfile.caddy
     ports:
-      - "80:80"
+      - "8080:8080"
     networks:
       - app-network
     extra_hosts:
@@ -68,6 +68,6 @@ networks:
   app-network:
     name: app-network
     driver: bridge
-    
+
 volumes:
   pgdata:

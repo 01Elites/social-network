@@ -64,7 +64,7 @@ func InsertDummyData() {
 	}
 
 	// Prepare the insert statement with the provider field
-	stmt := `INSERT INTO public.user (user_id, user_name, email, password, provider) 
+	stmt := `INSERT INTO public.user (user_id, user_name, email, password, provider)
 					 VALUES ($1, $2, $3, $4, $5)
 					 ON CONFLICT (user_name) DO NOTHING`
 

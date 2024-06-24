@@ -158,28 +158,6 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 	io.WriteString(w, "LogOut success")
 }
 
-func validateSession(w http.ResponseWriter, r *http.Request) (*models.User, error) {
-	// Extract the session token from the cookie
-	cookie, err := r.Cookie("SN_SESSION")
-	if err != nil {
-		return nil, err // No cookie means no session
-	}
-	// Validate the session token in the database
-	userID, err := database.ValidateSessionToken(cookie.Value)
-	if err != nil {
-		return nil, err // Invalid or expired session token
-	}
-
-	// Retrieve user details based on userID
-	user, err := database.GetUserByID(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	setSessionCookie(w, cookie.Value)
-	return user, nil
-}
-
 /********************* Session Cookie ************************/
 
 func clearSessionCookie(w http.ResponseWriter) {

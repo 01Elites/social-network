@@ -1,32 +1,41 @@
 package views
 
 import (
+	"context"
 	"net/http"
 
 	"social-network/internal/database"
 )
 
+type contextKey string
+		
+const userIDKey contextKey = "userID"
+
 func validateSessionMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := validateSession(w, r); err != nil {
+		userID, err := validateSession(w, r)
+		if err != nil {
 			http.Error(w, "Invalid session token", http.StatusUnauthorized)
 			return
 		}
-		next(w, r)
+		
+		ctx := context.WithValue(r.Context(), userIDKey, userID)
+		next(w, r.WithContext(ctx))
 	}
 }
 
-func validateSession(w http.ResponseWriter, r *http.Request) error {
+func validateSession(w http.ResponseWriter, r *http.Request) (string, error) {
 	// Extract the session token from the cookie
 	cookie, err := r.Cookie("SN_SESSION")
 	if err != nil {
-		return err // No cookie means no session
+		return "", err // No session token, user is not logged in
 	}
 	// Validate the session token in the database
-	if _, err = database.ValidateSessionToken(cookie.Value); err != nil {
-		return err // Invalid or expired session token
+	userID, err := database.ValidateSessionToken(cookie.Value)
+	if err != nil {
+		return "", err
 	}
 
 	setSessionCookie(w, cookie.Value)
-	return nil
+	return userID, nil
 }

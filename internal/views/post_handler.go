@@ -1,8 +1,10 @@
-package views 
+package views
 
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+
 	// "log"
 	"net/http"
 	"strconv"
@@ -12,18 +14,18 @@ import (
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	// user := ValidateSession(w, r)
-// if user == nil {
-// 	return
-// }
+	userID, ok := r.Context().Value(userIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
 	var post models.Create_Post
 	err := json.NewDecoder(r.Body).Decode(&post)
 	if err != nil {
 		http.Error(w, "Failed to decode post", http.StatusBadRequest)
 		return
 	}
-	err = database.CreatePostInDB(user.UserID, post)
+	err = database.CreatePostInDB(userID, post)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
@@ -32,8 +34,21 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request){
-	var dummyUser models.User
-	posts, _ := database.GetPostsFeed(dummyUser)
+	userID, ok := r.Context().Value(userIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
+	user, err := database.GetUserByID(userID);if err != nil {
+		log.Print(err)
+	}
+	user.Following, err = database.GetUsersFollowingByID(userID);if err != nil {
+		log.Print(err)
+	}
+	user.Groups, err = database.GetUserGroups(userID);if err != nil {
+		log.Print(err)
+	}
+	posts, _ := database.GetPostsFeed(*user)
 	fmt.Println(posts)
 }
 

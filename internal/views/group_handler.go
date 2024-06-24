@@ -8,18 +8,18 @@ import (
 )
 
 func CreateGroupHandler(w http.ResponseWriter, r *http.Request){
-	var user models.User
-		// user := ValidateSession(w, r)
-	// if user == nil {
-	// 	return
-	// }
+	userID, ok := r.Context().Value(userIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
 	var group models.Create_Group
 	err := json.NewDecoder(r.Body).Decode(&group)
 	if err != nil {
 		http.Error(w, "Failed to decode group", http.StatusBadRequest)
 		return
 	}
-	err = database.CreateGroup(user.UserID, group)
+	err = database.CreateGroup(userID, group)
 	if err != nil {
 		http.Error(w, "Failed to create group", http.StatusInternalServerError)
 		return

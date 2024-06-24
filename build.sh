@@ -3,18 +3,16 @@
 # Make this script executable
 chmod +x $0
 
-# Navigate to the directory containing the Docker Compose file
-cd internal/database
+# Ensure the script stops Docker containers on exit
+trap cleanup EXIT
+
+# Function to stop Docker containers
+cleanup() {
+    echo "Stopping Docker containers..."
+    sudo docker-compose down
+    echo "Docker containers stopped."
+}
 
 # Start Docker containers
-docker-compose up --build -d
-
-# Navigate back to the project root directory to run the Go application
-cd ../../
-
-# Run Go application
-go run cmd/socialNetwork/main.go 
-
-# When the Go application exits, stop Docker containers
-cd internal/database
-docker-compose down
+echo "Starting Docker containers..."
+sudo docker-compose up 

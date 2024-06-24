@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"social-network/internal/events"
+	"social-network/internal/models"
 )
 
-func CreatePostInDB(userID string, post events.Create_Post) error{
+func CreatePostInDB(userID string, post models.Create_Post) error{
 	query := `
     INSERT INTO 
         post (title, content, privacy_type, group_id, user_id) 
@@ -24,7 +24,7 @@ func CreatePostInDB(userID string, post events.Create_Post) error{
 	return nil
 }
 
-func GetPostsFeed(loggeduser events.User) ([]events.Post, error) {
+func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 	// Query the database
 	query := `
     SELECT 
@@ -49,15 +49,15 @@ func GetPostsFeed(loggeduser events.User) ([]events.Post, error) {
 	defer rows.Close()
 
 	// Create a slice to hold the results
-	posts := make([]events.Post, 0)
+	posts := make([]models.Post, 0)
 	// Iterate through the rows
 	for rows.Next() {
-		var p events.Post
+		var p models.Post
 		if err := rows.Scan(
 			&p.ID,
 			&p.Title,
 			&p.Content,
-			&p.User.ID,
+			&p.User.UserID,
 			&p.User.UserName,
 			&p.PostPrivacy,
 			&p.GroupID,
@@ -80,12 +80,12 @@ func GetPostsFeed(loggeduser events.User) ([]events.Post, error) {
 				log.Printf("database failed to scan allowed_user: %v\n", err)
 			return nil, err
 			}
-			if allowed_userid == loggeduser.ID {
+			if allowed_userid == loggeduser.UserID {
 				posts = append(posts, p)
 				break
 			}
 		}
-		} else if loggeduser.Following[p.User.ID]{
+		} else if loggeduser.Following[p.User.UserID]{
 			posts = append(posts, p)
 	} 
 	}
@@ -93,7 +93,7 @@ func GetPostsFeed(loggeduser events.User) ([]events.Post, error) {
 }
 
 
-func GetPostByID(postID int) (events.PostFeed, error) {
+func GetPostByID(postID int) (models.PostFeed, error) {
 	// Query the database
 	query := `
     SELECT 
@@ -114,19 +114,19 @@ func GetPostByID(postID int) (events.PostFeed, error) {
 	row := DB.QueryRow(context.Background(), query, postID)
 
 	// Create a Post object to hold the result
-	var post events.PostFeed
+	var post models.PostFeed
 
 	// Scan the row into the Post object
 	err := row.Scan(
 		&post.ID,
 		&post.Title,
 		&post.Content,
-		&post.User.ID,
+		&post.User.UserID,
 		&post.User.UserName,
 	)
 	if err != nil {
 		log.Printf("database: Failed to scan row: %v", err)
-		return events.PostFeed{}, err
+		return models.PostFeed{}, err
 	}
 	return post, nil
 }

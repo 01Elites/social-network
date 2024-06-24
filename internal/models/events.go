@@ -1,4 +1,4 @@
-package events
+package models
 
 type Post struct {
 	ID            int    `json:"post_id"`
@@ -30,18 +30,6 @@ type PostFeed struct {
 	Image         string `json:"image"`
 	GroupID       int    `json:"group_id"`
 	CreationDate  string `json:"creation_date"`
-}
-type User struct {
-	ID           string    `json:"id"`
-	UserName     string `json:"username"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	Gender       string `json:"gender"`
-	Following    map[string]bool `json:"following"`
-	Groups       map[int]bool `json:"groups"`
-	// ViewsCount   int    `json:"views_count"`
-	// PostsCount   int    `json:"posts_count"`
-	// RepliesCount int    `json:"replies_count"`
 }
 
 type Create_Comment struct {

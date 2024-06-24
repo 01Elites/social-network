@@ -12,9 +12,15 @@ func main() {
 	// Load environment variables from .env file
 	helpers.LoadEnv("internal/database/.env")
 
+	// Apply database migrations
+	err := database.ApplyMigrations()
+	if err != nil {
+		log.Fatalf("Could not apply migrations: %v", err)
+	}
+
 	// Initiate the database connection
 	database.Init()
-	database.InsertDummyData() // Insert dummy data for testing
+	// database.InsertDummyData() // Insert dummy data for testing
 
 	// Setup the routes for the views
 	views.SetupRoutes()

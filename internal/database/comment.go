@@ -3,10 +3,10 @@ package database
 import (
 	"context"
 	"log"
-	"social-network/internal/events"
+	"social-network/internal/models"
 )
 
-func Create_Comment_in_db(userID string, comment events.Create_Comment) error {
+func Create_Comment_in_db(userID string, comment models.Create_Comment) error {
 	// Insert the comment into the database
 	query := `
     INSERT INTO 
@@ -23,14 +23,13 @@ func Create_Comment_in_db(userID string, comment events.Create_Comment) error {
 	return nil
 }
 
-func Get_PostComments_from_db(userID string, postID, page int) ([]events.Comment, error) {
+func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment, error) {
 	// Query the database
 	query := `
     SELECT 
         comment_id, 
 				content, 
         user_id, 
-        user_name, 
     FROM 
         comment 
     INNER JOIN 
@@ -47,16 +46,15 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]events.Comment
 	defer rows.Close()
 
 	// Create a slice to hold the results
-	var comments []events.Comment
+	var comments []models.Comment
 
 	// Iterate through the rows
 	for rows.Next() {
-		var comment events.Comment
+		var comment models.Comment
 		if err := rows.Scan(
 			&comment.ID,
 			&comment.Content,
-			&comment.User.ID,
-			&comment.User.UserName,
+			&comment.User.UserID,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err

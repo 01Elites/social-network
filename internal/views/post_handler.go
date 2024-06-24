@@ -1,26 +1,29 @@
 package views 
 
 import (
-	// "encoding/json"
+	"encoding/json"
 	"fmt"
 	// "log"
 	"net/http"
 	"strconv"
 
 	"social-network/internal/database"
-	"social-network/internal/events"
+	"social-network/internal/models"
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	// err := json.NewDecoder(r.Body).Decode(&post)
-	// if err != nil {
-	// 	http.Error(w, "Failed to decode post", http.StatusBadRequest)
-	// 	return
-	// }
-	fmt.Println("Stestse")
-	post := events.Create_Post{"Test1", "To check feed", "public", 1}
-	user := events.User{"123e4567-e89b-12d3-a456-426614174000", "Alice", "alice@example.com", "password123", "password", nil, nil}
-	err := database.CreatePostInDB(user.ID, post)
+	var user models.User
+	// user := ValidateSession(w, r)
+// if user == nil {
+// 	return
+// }
+	var post models.Create_Post
+	err := json.NewDecoder(r.Body).Decode(&post)
+	if err != nil {
+		http.Error(w, "Failed to decode post", http.StatusBadRequest)
+		return
+	}
+	err = database.CreatePostInDB(user.UserID, post)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
@@ -29,7 +32,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request){
-	var dummyUser events.User
+	var dummyUser models.User
 	posts, _ := database.GetPostsFeed(dummyUser)
 	fmt.Println(posts)
 }

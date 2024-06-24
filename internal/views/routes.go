@@ -6,6 +6,10 @@ import "net/http"
 func SetupRoutes() {
 	// test Handle the root route and return a simple message "postman"
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
 		w.Write([]byte("Hello, World!"))
 	})
 
@@ -13,9 +17,13 @@ func SetupRoutes() {
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 
 	// /********************* Authentication ************************/
-	// http.HandleFunc("POST /signup", SignUp)    // Handle signup
-	// http.HandleFunc("POST /login", LogIn)      // Handle login
-	// http.HandleFunc("DELETE /logout", LogOut)  //  Handle logout
+	http.HandleFunc("POST /api/auth/signup", SignUp)
+	http.HandleFunc("POST /api/auth/signin", SignIn)
+	http.HandleFunc("DELETE /api/auth/logout", LogOut)
+
+
+	/********************* User ************************/
+	http.HandleFunc("GET /api/profile", validateSessionMiddleware(ProfileHandler))
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/

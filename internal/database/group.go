@@ -3,10 +3,10 @@ package database
 import (
 	"context"
 	"log"
-	"social-network/internal/events"
+	"social-network/internal/models"
 )
 
-func CreateGroup(userID string, group events.Create_Group) error{
+func CreateGroup(userID string, group models.Create_Group) error{
 	query := `
     INSERT INTO 
         "group" (title, description, creator_id) 

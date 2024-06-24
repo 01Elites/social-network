@@ -19,11 +19,12 @@ func SetupRoutes() {
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/
+	http.HandleFunc("/create_group", CreateGroupHandler)
 	http.HandleFunc("/posts", GetPostsHandler)
-	// http.HandleFunc("GET /api/post/{id}", GetPostByIDHandler)
+	http.HandleFunc("GET /api/post/{id}", GetPostByIDHandler)
 	// http.HandleFunc("GET /api/post/{id}/comments", GetPostCommentsHandler)
 	http.HandleFunc("/create_post", CreatePostHandler)
-	// http.HandleFunc("POST /api/create_comment", CreateCommentHandler)
+	http.HandleFunc("/create_comment", CreateCommentHandler)
 	// http.HandleFunc("POST /api/create_like/{post_id}", CreateLikeHandler)
 
 	// /********************* Categories ************************/

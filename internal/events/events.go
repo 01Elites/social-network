@@ -7,7 +7,9 @@ type Post struct {
 	Content       string `json:"content,omitempty"`
 	Category      string `json:"category"`
 	CreationDate  string `json:"creation_date"`
+	PostPrivacy   string `json:"post_privacy"`
 	PostLikes     int    `json:"post_likes"`
+	GroupID       int    `json:"group_id"`
 	IsLiked       bool   `json:"isLiked"`
 	CommentsCount int    `json:"comments_count"`
 	ViewsCount    int    `json:"views_count"` 
@@ -35,7 +37,28 @@ type User struct {
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
 	Gender       string `json:"gender"`
+	Following    map[string]bool `json:"following"`
+	Groups       map[int]bool `json:"groups"`
 	// ViewsCount   int    `json:"views_count"`
 	// PostsCount   int    `json:"posts_count"`
 	// RepliesCount int    `json:"replies_count"`
+}
+
+type Create_Comment struct {
+	ParentID int    `json:"parent_id"`
+	Content  string `json:"content"`
+}
+
+type Comment struct {
+	ID           int    `json:"comment_id"`
+	User         User   `json:"user"`
+	Content      string `json:"content"`
+	CreationDate string `json:"creation_date"`
+	CommentLikes int    `json:"comment_likes"`
+	IsLiked      bool   `json:"isLiked"`
+}
+
+type Create_Group struct {
+	Title 			string
+	Description string
 }

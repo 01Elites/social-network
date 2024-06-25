@@ -8,6 +8,10 @@ import (
 )
 
 func CreatePostInDB(userID string, post models.Create_Post) error{
+	if post.Privacy == "group" {
+		if post.GroupID == 0 {
+			return fmt.Errorf("invalid group ID")
+		}
 	query := `
     INSERT INTO 
         post (title, content, privacy_type, group_id, user_id) 
@@ -21,6 +25,21 @@ func CreatePostInDB(userID string, post models.Create_Post) error{
 		log.Printf("database: Failed to insert post into database: %v", err)
 		return err // Return error if failed to insert post
 	}
+} else {
+	query := `
+    INSERT INTO 
+        post (title, content, privacy_type, user_id) 
+    VALUES 
+        ($1, $2, $3, $4)
+    RETURNING post_id`
+		var post_id int // Assuming p_id is of type int
+	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, userID).Scan(&post_id)
+	fmt.Println(post_id)
+	if err != nil {
+		log.Printf("database: Failed to insert post into database: %v", err)
+		return err // Return error if failed to insert post
+	}
+}
 	return nil
 }
 
@@ -33,8 +52,7 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 				content, 
         user_id, 
         nick_name,
-				privacy_type,
-				group_id
+				privacy_type
     FROM 
         post 
     INNER JOIN 
@@ -58,16 +76,13 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			&p.Title,
 			&p.Content,
 			&p.User.UserID,
-			&p.User.UserName,
+			&p.User.NickName,
 			&p.PostPrivacy,
-			&p.GroupID,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
-		if p.PostPrivacy == "group" && loggeduser.Groups[p.GroupID]{
-			posts = append(posts, p)
-		} else if p.PostPrivacy == "almost_private" {
+	 if p.PostPrivacy == "almost_private" {
 			query = `Select allowed_user_id FROM post_user WHERE post_id = $1`
 			rows, err := DB.Query(context.Background(), query)
 	if err != nil {
@@ -107,7 +122,7 @@ func GetPostByID(postID int) (models.PostFeed, error) {
     INNER JOIN 
         profile USING (user_id)
     WHERE 
-        post_id = ?
+        post_id = $1
 `
 
 	// Execute the query and retrieve the row
@@ -122,7 +137,7 @@ func GetPostByID(postID int) (models.PostFeed, error) {
 		&post.Title,
 		&post.Content,
 		&post.User.UserID,
-		&post.User.UserName,
+		&post.User.NickName,
 	)
 	if err != nil {
 		log.Printf("database: Failed to scan row: %v", err)

@@ -2,10 +2,12 @@ package views
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
-	"strconv"
 	"social-network/internal/database"
 	"social-network/internal/models"
+	"strconv"
 )
 
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +28,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
+	io.WriteString(w, "create comment successful")
 }
 
 func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
@@ -46,10 +49,13 @@ func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get comment", http.StatusBadRequest)
 		return
 	}
+	fmt.Println(comments)
 	commentsCapsul := struct {
 		CommentsFeed []models.Comment `json:"comments"`
 	}{
 		CommentsFeed: comments,
 	}
 	json.NewEncoder(w).Encode(commentsCapsul)
+	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "get comments successful")
 }

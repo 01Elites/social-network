@@ -29,13 +29,14 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
     SELECT 
         comment_id, 
 				content, 
-        user_id 
+        user_id,
+				nick_name
     FROM 
-        comment 
-    INNER JOIN 
-        post USING (post_id)
+        comment
+		INNER JOIN 
+        profile USING (user_id)
     WHERE 
-        post_id = ?`
+        post_id = $1`
 
 	// Execute the query and retrieve the rows
 	rows, err := DB.Query(context.Background(), query, postID)
@@ -55,12 +56,12 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
 			&comment.ID,
 			&comment.Content,
 			&comment.User.UserID,
+			&comment.User.NickName,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
 		comments = append(comments, comment)
 	}
-
 	return comments, nil
 }

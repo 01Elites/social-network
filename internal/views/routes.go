@@ -25,14 +25,14 @@ func SetupRoutes() {
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/
-	http.HandleFunc("/posts", validateSessionMiddleware(GetPostsHandler))
+	http.HandleFunc("GET /api/posts", validateSessionMiddleware(GetPostsHandler))
 	http.HandleFunc("GET /api/post/{id}", validateSessionMiddleware(GetPostByIDHandler))
 	http.HandleFunc("GET /api/post/{id}/comments", validateSessionMiddleware(GetPostCommentsHandler))
-	http.HandleFunc("/create_post", validateSessionMiddleware(CreatePostHandler))
-	http.HandleFunc("/create_comment", validateSessionMiddleware(CreateCommentHandler))
+	http.HandleFunc("POST /api/create_post", validateSessionMiddleware(CreatePostHandler))
+	http.HandleFunc("POST /api/create_comment", validateSessionMiddleware(CreateCommentHandler))
 
 	// /********************* Group ************************/
-	http.HandleFunc("/create_group", validateSessionMiddleware(CreateGroupHandler))
+	http.HandleFunc("POST /api/create_group", validateSessionMiddleware(CreateGroupHandler))
 	// http.HandleFunc("/invite_user", m(InvitationHandler))
 	// http.HandleFunc("/group_request", m(RequestHandler))
 	// http.HandleFunc("/search_group", m(SearchGroupHandler))

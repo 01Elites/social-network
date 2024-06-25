@@ -3,12 +3,10 @@ package views
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
-
-	// "log"
 	"net/http"
 	"strconv"
-
 	"social-network/internal/database"
 	"social-network/internal/models"
 )
@@ -31,25 +29,28 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusCreated)
+	io.WriteString(w, "create post successful")
 }
 
-func GetPostsHandler(w http.ResponseWriter, r *http.Request){
+func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(userIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	user, err := database.GetUserByID(userID);if err != nil {
+	user, err := database.GetUserByID(userID)
+	if err != nil {
 		log.Print(err)
 	}
-	user.Following, err = database.GetUsersFollowingByID(userID);if err != nil {
-		log.Print(err)
-	}
-	user.Groups, err = database.GetUserGroups(userID);if err != nil {
+	user.Following, err = database.GetUsersFollowingByID(userID)
+	if err != nil {
 		log.Print(err)
 	}
 	posts, _ := database.GetPostsFeed(*user)
 	fmt.Println(posts)
+	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "get post feed successful")
 }
 
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,4 +72,6 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	// 	log.Printf("Failed to insert post view: %v", err)
 	// }
 	// json.NewEncoder(w).Encode(post)
+	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "get post successful")
 }

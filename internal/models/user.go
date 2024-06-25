@@ -35,9 +35,8 @@ type User struct {
 	Email     string          `db:"email"`
 	Password  string          `db:"password"`
 	Provider  string          `db:"provider"`
-	UserName  string					`db:"user_name"`
+	NickName  string					`db:"user_name"`
 	Following map[string]bool `json:"following"`
-	Groups    map[int]bool    `json:"groups"`
 }
 
 // UserProfile struct defines the structure for storing user profile information

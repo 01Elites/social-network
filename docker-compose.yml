@@ -14,11 +14,12 @@ services:
       - "host.docker.internal:host-gateway"
 
   frontend:
-    image: node:latest
+    image: node:22
     working_dir: /app
     volumes:
       - ./front:/app
-    command: npm run dev
+    command: >
+      sh -c "npm install && npm run build && npm run dev"
     ports:
       - "3000:3000"
     networks:

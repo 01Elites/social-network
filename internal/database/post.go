@@ -32,13 +32,13 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
         title,
 				content, 
         user_id, 
-        user_name,
+        nick_name,
 				privacy_type,
 				group_id
     FROM 
         post 
     INNER JOIN 
-        "user" USING (user_id)`
+        profile USING (user_id)`
 
 
 	rows, err := DB.Query(context.Background(), query)
@@ -101,13 +101,13 @@ func GetPostByID(postID int) (models.PostFeed, error) {
         title,
 				content, 
         user_id, 
-        user_name,
+        nick_name
     FROM 
         post 
     INNER JOIN 
-        user USING (user_id)
+        profile USING (user_id)
     WHERE 
-        post.p_id = ? AND post.comment_of = 0
+        post_id = ?
 `
 
 	// Execute the query and retrieve the row

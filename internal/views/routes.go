@@ -12,7 +12,6 @@ func SetupRoutes() {
 		}
 		w.Write([]byte("Hello, World!"))
 	})
-	m := validateSessionMiddleware
 	// http.HandleFunc("/", RootHandler)
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 
@@ -22,23 +21,23 @@ func SetupRoutes() {
 	http.HandleFunc("DELETE /api/auth/logout", LogOut)
 
 	/********************* User ************************/
-	http.HandleFunc("GET /api/profile", m(ProfileHandler))
+	http.HandleFunc("GET /api/profile", validateSessionMiddleware(ProfileHandler))
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/
-	http.HandleFunc("/posts", m(GetPostsHandler))
-	http.HandleFunc("GET /api/post/{id}", m(GetPostByIDHandler))
-	http.HandleFunc("GET /api/post/{id}/comments", m(GetPostCommentsHandler))
-	http.HandleFunc("/create_post", m(CreatePostHandler))
-	http.HandleFunc("/create_comment", m(CreateCommentHandler))
+	http.HandleFunc("/posts", validateSessionMiddleware(GetPostsHandler))
+	http.HandleFunc("GET /api/post/{id}", validateSessionMiddleware(GetPostByIDHandler))
+	http.HandleFunc("GET /api/post/{id}/comments", validateSessionMiddleware(GetPostCommentsHandler))
+	http.HandleFunc("/create_post", validateSessionMiddleware(CreatePostHandler))
+	http.HandleFunc("/create_comment", validateSessionMiddleware(CreateCommentHandler))
 
 	// /********************* Group ************************/
-	http.HandleFunc("/create_group", m(CreateGroupHandler))
-	http.HandleFunc("/invite_user", m(InvitationHandler))
-	http.HandleFunc("/group_request", m(RequestHandler))
-	http.HandleFunc("/search_group", m(SearchGroupHandler))
-	http.HandleFunc("/create_event", m(CreateEventHandler))
-	http.HandleFunc("/event_response", m(EventResponseHandler))
+	http.HandleFunc("/create_group", validateSessionMiddleware(CreateGroupHandler))
+	// http.HandleFunc("/invite_user", m(InvitationHandler))
+	// http.HandleFunc("/group_request", m(RequestHandler))
+	// http.HandleFunc("/search_group", m(SearchGroupHandler))
+	// http.HandleFunc("/create_event", m(CreateEventHandler))
+	// http.HandleFunc("/event_response", m(EventResponseHandler))
 	// http.HandleFunc("POST /api/create_like/{post_id}", CreateLikeHandler)
 
 	// /********************* Categories ************************/

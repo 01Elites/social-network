@@ -29,11 +29,11 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
     SELECT 
         comment_id, 
 				content, 
-        user_id, 
+        user_id 
     FROM 
         comment 
     INNER JOIN 
-        user USING (user_id)
+        post USING (post_id)
     WHERE 
         post_id = ?`
 

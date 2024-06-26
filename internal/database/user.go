@@ -36,10 +36,10 @@ func SignUpUser(user models.User, userProfile models.UserProfile) error {
 
 func CreateUser(user models.User) error {
 	// Prepare SQL statement
-	query := `INSERT INTO public.user (user_id, user_name, email, "password", provider)
-	        VALUES ($1, $2, $3, $4, $5)`
+	query := `INSERT INTO public.user (user_id, email, "password", provider)
+	        VALUES ($1, $2, $3, $4)`
 	// Execute SQL statement
-	_, err := DB.Exec(context.Background(), query, user.UserID, user.UserName, user.Email, user.Password, user.Provider)
+	_, err := DB.Exec(context.Background(), query, user.UserID, user.Email, user.Password, user.Provider)
 	if err != nil {
 		log.Printf("Failed to insert user: %v\n", err)
 		return err
@@ -49,11 +49,11 @@ func CreateUser(user models.User) error {
 
 func CreateUserProfile(userProfile models.UserProfile) error {
 	// Prepare SQL statement
-	query := `INSERT INTO public.profile (user_id, first_name, last_name, gender, date_of_birth, image, privacy)
-	        VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	query := `INSERT INTO public.profile (user_id, first_name, last_name, gender, date_of_birth, image, privacy, nick_name)
+	        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	// Execute SQL statement
 	_, err := DB.Exec(context.Background(), query, userProfile.UserID, userProfile.FirstName, userProfile.LastName,
-		userProfile.Gender, userProfile.DateOfBirth, userProfile.Image, userProfile.Type)
+		userProfile.Gender, userProfile.DateOfBirth, userProfile.Image, userProfile.Type, userProfile.NickName)
 	if err != nil {
 		log.Printf("Failed to insert user profile: %v\n", err)
 		return err
@@ -69,8 +69,8 @@ func UpdateUserProfile(userProfile models.UserProfile) error {
 func GetManualUser(email string) (*models.User, error) {
 	// Fetch user password hash from database
 	var user models.User
-	query := `SELECT user_id, user_name, email, password, provider FROM public.user WHERE email = $1 AND provider = 'manual'`
-	err := DB.QueryRow(context.Background(), query, email).Scan(&user.UserID, &user.UserName, &user.Email, &user.Password, &user.Provider)
+	query := `SELECT user_id, email, password, provider FROM public.user WHERE email = $1 AND provider = 'manual'`
+	err := DB.QueryRow(context.Background(), query, email).Scan(&user.UserID, &user.Email, &user.Password, &user.Provider)
 	if err != nil {
 		log.Printf("Failed to fetch manual user: %v\n", err)
 		return &user, err
@@ -115,11 +115,49 @@ func ValidateSessionToken(sessionID string) (string, error) {
 func GetUserByID(userID string) (*models.User, error) {
 	// Fetch user by user ID
 	var user models.User
-	query := `SELECT user_id, user_name, email, provider FROM public.user WHERE user_id = $1`
-	err := DB.QueryRow(context.Background(), query, userID).Scan(&user.UserID, &user.UserName, &user.Email, &user.Provider)
+	query := `SELECT user_id, email, provider FROM public.user WHERE user_id = $1`
+	err := DB.QueryRow(context.Background(), query, userID).Scan(&user.UserID, &user.Email, &user.Provider)
 	if err != nil {
 		log.Printf("Failed to fetch user by ID: %v\n", err)
 		return &user, err
 	}
 	return &user, nil
+}
+
+func GetUsersFollowingByID(userID string)(map[string]bool, error){
+	var Following map[string]bool
+	query := `SELECT followed_id FROM follower WHERE follower_id = $1`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("database failed to scan followed user: %v\n", err)
+		return nil, err
+	} 
+	for rows.Next(){
+		var followedUserID string
+		if err = rows.Scan(&followedUserID);err != nil {
+			log.Printf("database failed to scan followed user: %v\n", err)
+			return nil, err
+		}
+		Following[followedUserID] = true
+	}
+	return Following, nil
+}
+
+func GetUserGroups(userID string)(map[int]bool, error){
+	var Groups map[int]bool
+	query := `SELECT group_id FROM group_member WHERE user_id = $1`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("database failed to scan followed user: %v\n", err)
+		return nil, err
+	} 
+	for rows.Next(){
+		var groupID int
+		if err = rows.Scan(&groupID);err != nil {
+			log.Printf("database failed to scan followed user: %v\n", err)
+			return nil, err
+		}
+		Groups[groupID] = true
+	}
+	return Groups, nil
 }

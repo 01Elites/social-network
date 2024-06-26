@@ -6,9 +6,14 @@ import "net/http"
 func SetupRoutes() {
 	// test Handle the root route and return a simple message "postman"
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
 		w.Write([]byte("Hello, World!"))
 	})
 
+	m := validateSessionMiddleware
 	// http.HandleFunc("/", RootHandler)
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 
@@ -16,14 +21,19 @@ func SetupRoutes() {
 	http.HandleFunc("POST /api/auth/signup", SignUp)
 	http.HandleFunc("POST /api/auth/signin", SignIn)
 	http.HandleFunc("DELETE /api/auth/logout", LogOut)
+
+
+	/********************* User ************************/
+	http.HandleFunc("GET /api/profile", m(ProfileHandler))
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/
-	// http.HandleFunc("GET /api/posts", GetPostsHandler)
-	// http.HandleFunc("GET /api/post/{id}", GetPostByIDHandler)
-	// http.HandleFunc("GET /api/post/{id}/comments", GetPostCommentsHandler)
-	// http.HandleFunc("POST /api/create_post", CreatePostHandler)
-	// http.HandleFunc("POST /api/create_comment", CreateCommentHandler)
+	http.HandleFunc("/create_group", m(CreateGroupHandler))
+	http.HandleFunc("/posts", m(GetPostsHandler))
+	http.HandleFunc("GET /api/post/{id}", m(GetPostByIDHandler))
+	http.HandleFunc("GET /api/post/{id}/comments", m(GetPostCommentsHandler))
+	http.HandleFunc("/create_post", m(CreatePostHandler))
+	http.HandleFunc("/create_comment", m(CreateCommentHandler))
 	// http.HandleFunc("POST /api/create_like/{post_id}", CreateLikeHandler)
 
 	// /********************* Categories ************************/

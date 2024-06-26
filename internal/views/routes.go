@@ -26,6 +26,7 @@ func SetupRoutes() {
 
 	// /********************* Posts ************************/
 	http.HandleFunc("GET /api/posts", validateSessionMiddleware(GetPostsHandler))
+	http.HandleFunc("GET /api/group/{id}", (GetGroupPageHandler))
 	http.HandleFunc("GET /api/post/{id}", validateSessionMiddleware(GetPostByIDHandler))
 	http.HandleFunc("GET /api/post/{id}/comments", validateSessionMiddleware(GetPostCommentsHandler))
 	http.HandleFunc("POST /api/create_post", validateSessionMiddleware(CreatePostHandler))

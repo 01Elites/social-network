@@ -19,7 +19,7 @@ services:
     volumes:
       - ./front:/app
     command: >
-      sh -c "npm install && npm run build && npm run dev"
+      sh -c "npm install && npm run build"
     ports:
       - "3000:3000"
     networks:

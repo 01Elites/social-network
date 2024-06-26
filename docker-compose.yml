@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   caddy:
     build:
       context: .
@@ -19,7 +18,7 @@ services:
     volumes:
       - ./front:/app
     command: >
-      sh -c "npm install && npm run build"
+      sh -c "npm install && npm run build && npx serve -s dist -l 3000"
     ports:
       - "3000:3000"
     networks:
@@ -37,7 +36,6 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - ./internal/database/migrations:/app/internal/database/migrations
     command: go run cmd/socialNetwork/main.go
     ports:
       - "8081:8081"

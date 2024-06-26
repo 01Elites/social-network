@@ -23,14 +23,14 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to decode post", http.StatusBadRequest)
 		return
 	}
-	err = database.CreatePostInDB(userID, post)
+	postID, err := database.CreatePostInDB(userID, post)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Failed to create post", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, "create post successful")
+	json.NewEncoder(w).Encode(postID)
 }
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {

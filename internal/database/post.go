@@ -2,28 +2,23 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"social-network/internal/models"
 )
 
-func CreatePostInDB(userID string, post models.Create_Post) error{
-	if post.Privacy == "group" {
-		if post.GroupID == 0 {
-			return fmt.Errorf("invalid group ID")
-		}
+func CreatePostInDB(userID string, post models.Create_Post) (int, error){
+	var postID int
+	if post.GroupID != 0 {
 	query := `
     INSERT INTO 
         post (title, content, privacy_type, group_id, user_id) 
     VALUES 
         ($1, $2, $3, $4, $5)
     RETURNING post_id`
-		var post_id int // Assuming p_id is of type int
-	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, post.GroupID, userID).Scan(&post_id)
-	fmt.Println(post_id)
+	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, post.GroupID, userID).Scan(&postID)
 	if err != nil {
 		log.Printf("database: Failed to insert post into database: %v", err)
-		return err // Return error if failed to insert post
+		return 0, err // Return error if failed to insert post
 	}
 } else {
 	query := `
@@ -32,15 +27,27 @@ func CreatePostInDB(userID string, post models.Create_Post) error{
     VALUES 
         ($1, $2, $3, $4)
     RETURNING post_id`
-		var post_id int // Assuming p_id is of type int
-	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, userID).Scan(&post_id)
-	fmt.Println(post_id)
+	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, userID).Scan(&postID)
 	if err != nil {
 		log.Printf("database: Failed to insert post into database: %v", err)
-		return err // Return error if failed to insert post
+		return 0, err // Return error if failed to insert post
+	}
+	if post.Privacy == "almost_private" {
+		for i:=0;i<len(post.UserIDs);i++{
+		query := `
+		INSERT INTO
+			post_user (post_id, allowed_user_id)
+			VALUES
+					($1, $2)`
+		_, err := DB.Query(context.Background(), query, postID, post.UserIDs[i])
+		if err != nil {
+			log.Printf("database: Failed to insert post into database: %v", err)
+			return 0, err // Return error if failed to insert post
+		}
+	}
 	}
 }
-	return nil
+	return postID, nil
 }
 
 func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {

@@ -5,21 +5,22 @@ type Post struct {
 	User          User   `json:"user"`
 	Title         string `json:"title"`
 	Content       string `json:"content,omitempty"`
-	Category      string `json:"category"`
 	CreationDate  string `json:"creation_date"`
 	PostPrivacy   string `json:"post_privacy"`
 	PostLikes     int    `json:"post_likes"`
 	GroupID       int    `json:"group_id"`
 	IsLiked       bool   `json:"isLiked"`
 	CommentsCount int    `json:"comments_count"`
-	ViewsCount    int    `json:"views_count"` 
+	Likers_ids   []string `json:"likers_ids"`
 }
 
 type Create_Post struct {
 	Title    string `json:"title"`
 	Content  string `json:"content"`
-	Privacy  string `json:"post_privacy"`
+	Privacy  string `json:"privacy"`
+	Image    string `json:"image_id"`
 	GroupID  int    `json:"group_id"`
+	UserIDs []string`json:"user_ids"`
 }
 
 type PostFeed struct {

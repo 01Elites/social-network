@@ -17,10 +17,14 @@ export default function Layout(props: LayoutProps): JSXElement {
 
       <div class='flex grow'>
         <div class='w-10'>
-          <div class='fixed h-full w-10'>THIS IS SIDEBAR</div>
+          <div class='h-full w-10'>
+            <SideBar />
+          </div>
         </div>
 
-        <main>{props.children}</main>
+        <main class='overflow-scroll h-screen w-full'>
+          {props.children}
+        </main>
       </div>
 
       {/* <Navbar />

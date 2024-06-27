@@ -63,9 +63,8 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
     FROM 
         post 
     INNER JOIN 
-        profile USING (user_id)`
-
-
+        profile USING (user_id)
+`
 	rows, err := DB.Query(context.Background(), query)
 	if err != nil {
 		log.Printf("database failed to scan post: %v\n", err)
@@ -89,9 +88,19 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
+		p.PostLikes, err = GetPostLikeCountByID(p.ID)
+		if err != nil{
+			log.Printf("database failed to scan likes count: %v\n", err)
+			return nil, err
+		}
+		p.CommentsCount, err = GetCommentsCountByID(p.ID)
+		if err != nil{
+			log.Printf("database failed to scan comments count: %v\n", err)
+			return nil, err
+		}
 	 if p.PostPrivacy == "almost_private" {
 			query = `Select allowed_user_id FROM post_user WHERE post_id = $1`
-			rows, err := DB.Query(context.Background(), query)
+			rows, err := DB.Query(context.Background(), query, p.ID)
 	if err != nil {
 		log.Printf("database failed to scan allowed users: %v\n", err)
 		return nil, err
@@ -115,15 +124,16 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 }
 
 
-func GetPostByID(postID int) (models.PostFeed, error) {
+func GetPostByID(postID int) (models.Post, error) {
 	// Query the database
 	query := `
     SELECT 
-         post_id, 
         title,
 				content, 
         user_id, 
-        nick_name
+				created_at,
+        first_name,
+				last_name
     FROM 
         post 
     INNER JOIN 
@@ -136,19 +146,92 @@ func GetPostByID(postID int) (models.PostFeed, error) {
 	row := DB.QueryRow(context.Background(), query, postID)
 
 	// Create a Post object to hold the result
-	var post models.PostFeed
-
+	var post models.Post
+	var timeBinary []byte 
 	// Scan the row into the Post object
 	err := row.Scan(
-		&post.ID,
 		&post.Title,
 		&post.Content,
+		&timeBinary,
 		&post.User.UserID,
-		&post.User.NickName,
+		// &post.User.Image,
+		&post.User.FirstName,
+		&post.User.LastName,
 	)
 	if err != nil {
 		log.Printf("database: Failed to scan row: %v", err)
-		return models.PostFeed{}, err
+		return models.Post{}, err
+	}
+	err = post.CreationDate.UnmarshalBinary(timeBinary)
+	if err != nil {
+		log.Print(err)
+	}
+	post.PostLikes, err = GetPostLikeCountByID(post.ID)
+	if err != nil{
+		log.Printf("database failed to scan likes count: %v\n", err)
+		return models.Post{}, err
+	}
+	post.CommentsCount, err = GetCommentsCountByID(post.ID)
+	if err != nil{
+		log.Printf("database failed to scan comments count: %v\n", err)
+		return models.Post{}, err
+	}
+	post.Likers_ids, err = GetPostLikers(post.ID)
+	if err != nil {
+		log.Printf("database: Failed to scan likers: %v\n", err)
+		return models.Post{}, err
 	}
 	return post, nil
+}
+
+func GetPostCountByID(postID int) (int, error) {
+	query := "SELECT COUNT(*) FROM post WHERE post_id = $1"
+	var count int
+	if err := DB.QueryRow(context.Background(), query, postID).Scan(&count); err != nil {
+		log.Printf("database: Failed to num of posts: %v\n", err)
+		return 0, err
+	}
+	return count, nil
+}
+
+func GetPostLikeCountByID(postID int) (int, error) {
+	query := "SELECT COUNT(*) FROM post_interaction WHERE post_id = $1"
+	var count int
+	if err := DB.QueryRow(context.Background(), query, postID).Scan(&count); err != nil {
+		log.Printf("database: Failed to num of likes: %v\n", err)
+		return 0, err
+	}
+	return count, nil
+}
+
+func GetCommentsCountByID(postID int)(int, error){
+	query := "SELECT COUNT(*) FROM comment WHERE post_id = $1"
+	var count int
+	if err := DB.QueryRow(context.Background(), query, postID).Scan(&count); err != nil {
+		log.Printf("database: Failed to get number of comments: %v\n", err)
+		return 0, err
+	}
+	return count, nil
+}
+
+func GetPostLikers(postID int)([]string, error){
+	var likers []string
+	query := `SELECT user_id FROM post_interaction WHERE post_id = $1`
+	rows, err := DB.Query(context.Background(), query, postID)
+	if err != nil {
+		log.Printf("database: Failed to scan likers: %v\n", err)
+		return nil, err
+	}
+	for rows.Next(){
+		var liker string
+		err := rows.Scan(
+			&liker,
+		)
+		if err != nil{
+			log.Printf("database: Failed to scan liker: %v\n", err)
+		return nil, err
+		}
+		likers = append(likers, liker)
+	}
+	return likers, nil
 }

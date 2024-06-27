@@ -1,37 +1,41 @@
 package models
 
+import "time"
+
 type Post struct {
-	ID            int    `json:"post_id"`
-	User          User   `json:"user"`
-	Title         string `json:"title"`
-	Content       string `json:"content,omitempty"`
-	CreationDate  string `json:"creation_date"`
-	PostPrivacy   string `json:"post_privacy"`
-	PostLikes     int    `json:"post_likes"`
-	GroupID       int    `json:"group_id"`
-	IsLiked       bool   `json:"isLiked"`
-	CommentsCount int    `json:"comments_count"`
-	Likers_ids   []string `json:"likers_ids"`
+	ID            int         `json:"post_id"`
+	User          UserProfile `json:"user"`
+	Title         string      `json:"title"`
+	Content       string      `json:"content,omitempty"`
+	Image         string      `json:"image"`
+	CreationDate  time.Time   `json:"creation_date"`
+	PostPrivacy   string      `json:"post_privacy"`
+	PostLikes     int         `json:"post_likes"`
+	GroupID       int         `json:"group_id"`
+	IsLiked       bool        `json:"isLiked"`
+	CommentsCount int         `json:"comments_count"`
+	Likers_ids    []string    `json:"likers_ids"`
 }
 
 type Create_Post struct {
-	Title    string `json:"title"`
-	Content  string `json:"content"`
-	Privacy  string `json:"privacy"`
-	Image    string `json:"image_id"`
-	GroupID  int    `json:"group_id"`
-	UserIDs []string`json:"user_ids"`
+	Title   string   `json:"title"`
+	Content string   `json:"content"`
+	Privacy string   `json:"privacy"`
+	Image   string   `json:"image_id"`
+	GroupID int      `json:"group_id"`
+	UserIDs []string `json:"user_ids"`
 }
 
-type PostFeed struct {
-	ID            int    `json:"post_id"`
-	User          User   `json:"user"`
-	Title         string `json:"title"`
-	Content       string `json:"content,omitempty"`
-	Image         string `json:"image"`
-	GroupID       int    `json:"group_id"`
-	CreationDate  string `json:"creation_date"`
-}
+// type PostFeed struct {
+// 	User          User      `json:"user"`
+// 	Title         string    `json:"title"`
+// 	Content       string    `json:"content,omitempty"`
+// 	Image         string    `json:"image"`
+// 	GroupID       int       `json:"group_id"`
+// 	CreationDate  time.Time `json:"creation_date"`
+// 	CommentsCount int       `json:"comments_count"`
+// 	Likers_ids    []string  `json:"likers_ids"`
+// }
 
 type Create_Comment struct {
 	ParentID int    `json:"parent_id"`
@@ -48,6 +52,10 @@ type Comment struct {
 }
 
 type Create_Group struct {
-	Title 			string
+	Title       string
 	Description string
+}
+
+type Error struct {
+	Reason string `json:"reason"`
 }

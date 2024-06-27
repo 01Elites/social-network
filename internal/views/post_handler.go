@@ -3,7 +3,6 @@ package views
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,11 +25,20 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	postID, err := database.CreatePostInDB(userID, post)
 	if err != nil {
 		fmt.Println(err)
-		http.Error(w, "Failed to create post", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+				Reason: err.Error(),
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(postID)
+	postIDjson := struct {
+		ID int `json:"id"`
+	}{
+		ID: postID,
+	}
+	json.NewEncoder(w).Encode(postIDjson)
 }
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,12 +53,19 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Following, err = database.GetUsersFollowingByID(userID)
 	if err != nil {
-		log.Print(err)
+		fmt.Println(err)
+		http.Error(w, "Failed to create post", http.StatusInternalServerError)
+		return
 	}
-	posts, _ := database.GetPostsFeed(*user)
+	posts, err := database.GetPostsFeed(*user)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Failed to get posts", http.StatusInternalServerError)
+		return
+	}
 	fmt.Println(posts)
 	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, "get post feed successful")
+	json.NewEncoder(w).Encode(posts)
 }
 
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,19 +74,22 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	postID := r.PathValue("id")
 	postIDInt, _ := strconv.Atoi(postID)
 	if postIDInt == 0 {
-		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+				Reason: "invalid post id",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	post, err := database.GetPostByID(postIDInt)
 	if err != nil {
-		http.Error(w, "Failed to get post", http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
+		jsonError := models.Error{
+				Reason: "invalid post id",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
-	fmt.Println(post)
-	// if err := database.InsertPostView(postIDInt,user.ID); err != nil {
-	// 	log.Printf("Failed to insert post view: %v", err)
-	// }
-	// json.NewEncoder(w).Encode(post)
+	json.NewEncoder(w).Encode(post)
 	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, "get post successful")
 }

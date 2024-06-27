@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/jackc/pgx/v5"
+	// "github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var (
-	DB *pgx.Conn
+	DB  *pgxpool.Pool
 )
 
 func Init() {
@@ -34,17 +34,16 @@ func Init() {
 		dbHost, dbPort, dbUser, dbPassword, dbName)
 
 	// Connect to the PostgreSQL database
-	conn, err := pgx.Connect(context.Background(), psqlInfo)
+	conn, err := pgxpool.New(context.Background(), psqlInfo)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
-
 	// Ping the database to ensure the connection is established
 	err = conn.Ping(context.Background())
 	if err != nil {
 		log.Fatalf("Unable to ping the database: %v\n", err)
 	}
-
+	
 	// Assign the initialized database connection to the global variable
 	DB = conn
 }

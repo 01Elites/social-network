@@ -31,6 +31,7 @@ func SetupRoutes() {
 	http.HandleFunc("GET /api/post/{id}/comments", validateSessionMiddleware(GetPostCommentsHandler))
 	http.HandleFunc("POST /api/create_post", validateSessionMiddleware(CreatePostHandler))
 	http.HandleFunc("POST /api/create_comment", validateSessionMiddleware(CreateCommentHandler))
+	http.HandleFunc("POST /api/create_like/{post_id}", validateSessionMiddleware(CreateLikeHandler))
 
 	// /********************* Group ************************/
 	http.HandleFunc("POST /api/create_group", validateSessionMiddleware(CreateGroupHandler))
@@ -39,7 +40,6 @@ func SetupRoutes() {
 	// http.HandleFunc("/search_group", m(SearchGroupHandler))
 	// http.HandleFunc("/create_event", m(CreateEventHandler))
 	// http.HandleFunc("/event_response", m(EventResponseHandler))
-	// http.HandleFunc("POST /api/create_like/{post_id}", CreateLikeHandler)
 
 	// /********************* Categories ************************/
 	// http.HandleFunc("GET /api/stats", GetStatsHandler)

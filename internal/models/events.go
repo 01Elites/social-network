@@ -40,15 +40,16 @@ type Create_Post struct {
 type Create_Comment struct {
 	ParentID int    `json:"parent_id"`
 	Content  string `json:"content"`
+	Image    string `json:"image"`
 }
 
 type Comment struct {
-	ID           int    `json:"comment_id"`
-	User         User   `json:"user"`
-	Content      string `json:"content"`
-	CreationDate string `json:"creation_date"`
-	CommentLikes int    `json:"comment_likes"`
-	IsLiked      bool   `json:"isLiked"`
+	ID           int         `json:"comment_id"`
+	User         UserProfile `json:"user"`
+	Content      string      `json:"content"`
+	CreationDate string      `json:"creation_date"`
+	CommentLikes int         `json:"comment_likes"`
+	IsLiked      bool        `json:"isLiked"`
 }
 
 type Create_Group struct {

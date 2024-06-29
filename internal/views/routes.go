@@ -30,7 +30,7 @@ func SetupRoutes() {
 	http.HandleFunc("GET /api/post/{id}", validateSessionMiddleware(GetPostByIDHandler))
 	http.HandleFunc("GET /api/post/{id}/comments", validateSessionMiddleware(GetPostCommentsHandler))
 	http.HandleFunc("POST /api/create_post", validateSessionMiddleware(CreatePostHandler))
-	http.HandleFunc("POST /api/create_comment", validateSessionMiddleware(CreateCommentHandler))
+	http.HandleFunc("POST /api/post/{id}/comments", validateSessionMiddleware(CreateCommentHandler))
 	http.HandleFunc("POST /api/create_like/{post_id}", validateSessionMiddleware(CreateLikeHandler))
 
 	// /********************* Group ************************/

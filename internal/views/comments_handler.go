@@ -2,7 +2,6 @@ package views
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"social-network/internal/database"
@@ -17,14 +16,28 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var comment models.Create_Comment
-	err := json.NewDecoder(r.Body).Decode(&comment)
+	parentID, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		http.Error(w, "Failed to decode comment", http.StatusBadRequest)
+		http.Error(w, "Failed to decode post id", http.StatusBadRequest)
+		return
+	}
+	comment.ParentID = parentID
+	err = json.NewDecoder(r.Body).Decode(&comment)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+				Reason: "failed to decode comment",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	err = database.Create_Comment_in_db(userID, comment)
 	if err != nil {
-		http.Error(w, "Failed to create comment", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
+		jsonError := models.Error{
+				Reason: "invalid post id",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -49,7 +62,6 @@ func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get comment", http.StatusBadRequest)
 		return
 	}
-	fmt.Println(comments)
 	commentsCapsul := struct {
 		CommentsFeed []models.Comment `json:"comments"`
 	}{

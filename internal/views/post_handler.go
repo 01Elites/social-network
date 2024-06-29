@@ -75,8 +75,8 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	postID := r.PathValue("id")
-	postIDInt, _ := strconv.Atoi(postID)
-	if postIDInt == 0 {
+	postIDInt, err := strconv.Atoi(postID)
+	if postIDInt == 0 || err != nil{
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
 				Reason: "invalid post id",

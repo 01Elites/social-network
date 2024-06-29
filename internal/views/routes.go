@@ -27,20 +27,21 @@ func SetupRoutes() {
 
 	// /********************* Posts ************************/
 	http.HandleFunc("GET /api/posts", validateSessionMiddleware(GetPostsHandler))
-	http.HandleFunc("GET /api/group/{id}", (GetGroupPageHandler))
 	http.HandleFunc("GET /api/post/{id}", validateSessionMiddleware(GetPostByIDHandler))
 	http.HandleFunc("GET /api/post/{id}/comments", validateSessionMiddleware(GetPostCommentsHandler))
 	http.HandleFunc("POST /api/create_post", validateSessionMiddleware(CreatePostHandler))
 	http.HandleFunc("POST /api/post/{id}/comments", validateSessionMiddleware(CreateCommentHandler))
 	http.HandleFunc("POST /api/create_like/{post_id}", validateSessionMiddleware(CreateLikeHandler))
-
+	
 	// /********************* Group ************************/
 	http.HandleFunc("POST /api/create_group", validateSessionMiddleware(CreateGroupHandler))
-	// http.HandleFunc("/invite_user", m(InvitationHandler))
-	// http.HandleFunc("/group_request", m(RequestHandler))
-	// http.HandleFunc("/search_group", m(SearchGroupHandler))
-	// http.HandleFunc("/create_event", m(CreateEventHandler))
-	// http.HandleFunc("/event_response", m(EventResponseHandler))
+	http.HandleFunc("GET /api/group/{id}", validateSessionMiddleware(GetGroupPageHandler))
+	http.HandleFunc("POST /api/group/{id}/invite_user", validateSessionMiddleware(CreateInvitationHandler))
+	http.HandleFunc("POST /api/group/{id}/invite_user", validateSessionMiddleware(InvitationResponseHandler))
+	// http.HandleFunc("/group_request", validateSessionMiddleware(RequestHandler))
+	// http.HandleFunc("/search_group", validateSessionMiddleware(SearchGroupHandler))
+	// http.HandleFunc("/create_event", validateSessionMiddleware(CreateEventHandler))
+	// http.HandleFunc("/event_response", validateSessionMiddleware(EventResponseHandler))
 
 	// /********************* Categories ************************/
 	// http.HandleFunc("GET /api/stats", GetStatsHandler)

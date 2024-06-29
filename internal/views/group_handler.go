@@ -16,13 +16,27 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request){
 	var group models.Create_Group
 	err := json.NewDecoder(r.Body).Decode(&group)
 	if err != nil {
-		http.Error(w, "Failed to decode group", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+				Reason: err.Error(),
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
-	err = database.CreateGroup(userID, group)
+	groupID, err := database.CreateGroup(userID, group)
 	if err != nil {
-		http.Error(w, "Failed to create group", http.StatusInternalServerError)
-		return
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+				Reason: err.Error(),
+		}
+		json.NewEncoder(w).Encode(jsonError)
+			return
 	}
+	groupIDjson := struct {
+		ID int `json:"id"`
+	}{
+		ID: groupID,
+	}
+	json.NewEncoder(w).Encode(groupIDjson)
 	w.WriteHeader(http.StatusCreated)
 }

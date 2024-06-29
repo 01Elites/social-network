@@ -12,6 +12,7 @@ func SetupRoutes() {
 		}
 		w.Write([]byte("Hello, World!"))
 	})
+
 	// http.HandleFunc("/", RootHandler)
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 

@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   caddy:
     build:
       context: .
@@ -14,11 +13,12 @@ services:
       - "host.docker.internal:host-gateway"
 
   frontend:
-    image: node:latest
+    image: node:22
     working_dir: /app
     volumes:
       - ./front:/app
-    command: npm run dev
+    command: >
+      sh -c "npm install && npm run build && npx serve -s dist -l 3000"
     ports:
       - "3000:3000"
     networks:
@@ -36,7 +36,6 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - ./internal/database/migrations:/app/internal/database/migrations
     command: go run cmd/socialNetwork/main.go
     ports:
       - "8081:8081"

@@ -1,30 +1,32 @@
 package views
 
-import "net/http"
+import (
+	"net/http"
+	"social-network/internal/views/auth"
+	"social-network/internal/views/middleware"
+	"social-network/internal/views/profile"
+)
 
 // SetupRoutes sets up the routes for the web application.
 func SetupRoutes() {
 	// test Handle the root route and return a simple message "postman"
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
+	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api" {
 			http.NotFound(w, r)
 			return
 		}
 		w.Write([]byte("Hello, World!"))
 	})
 
-	m := validateSessionMiddleware
+	m := middleware.ValidateSessionMiddleware
 	// http.HandleFunc("/", RootHandler)
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 
 	// /********************* Authentication ************************/
-	http.HandleFunc("POST /api/auth/signup", SignUp)
-	http.HandleFunc("POST /api/auth/signin", SignIn)
-	http.HandleFunc("DELETE /api/auth/logout", LogOut)
-
+	auth.SetupAuthRoutes()
 
 	/********************* User ************************/
-	http.HandleFunc("GET /api/profile", m(ProfileHandler))
+	profile.SetupProfileRoutes()
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/

@@ -11,10 +11,11 @@ import (
 
 	"social-network/internal/database"
 	"social-network/internal/models"
+	"social-network/internal/views/middleware"
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
@@ -33,19 +34,22 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPostsHandler(w http.ResponseWriter, r *http.Request){
-	userID, ok := r.Context().Value(userIDKey).(string)
+func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	user, err := database.GetUserByID(userID);if err != nil {
+	user, err := database.GetUserByID(userID)
+	if err != nil {
 		log.Print(err)
 	}
-	user.Following, err = database.GetUsersFollowingByID(userID);if err != nil {
+	user.Following, err = database.GetUsersFollowingByID(userID)
+	if err != nil {
 		log.Print(err)
 	}
-	user.Groups, err = database.GetUserGroups(userID);if err != nil {
+	user.Groups, err = database.GetUserGroups(userID)
+	if err != nil {
 		log.Print(err)
 	}
 	posts, _ := database.GetPostsFeed(*user)
@@ -72,3 +76,4 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	// json.NewEncoder(w).Encode(post)
 }
+

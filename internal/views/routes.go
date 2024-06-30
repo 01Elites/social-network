@@ -2,8 +2,9 @@ package views
 
 import (
 	"net/http"
+
 	"social-network/internal/views/auth"
-	"social-network/internal/views/middleware"
+	"social-network/internal/views/post"
 	"social-network/internal/views/profile"
 )
 
@@ -18,7 +19,6 @@ func SetupRoutes() {
 		w.Write([]byte("Hello, World!"))
 	})
 
-	m := middleware.ValidateSessionMiddleware
 	// http.HandleFunc("/", RootHandler)
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
 
@@ -30,13 +30,16 @@ func SetupRoutes() {
 	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	// /********************* Posts ************************/
-	http.HandleFunc("/create_group", m(CreateGroupHandler))
-	http.HandleFunc("/posts", m(GetPostsHandler))
-	http.HandleFunc("GET /api/post/{id}", m(GetPostByIDHandler))
-	http.HandleFunc("GET /api/post/{id}/comments", m(GetPostCommentsHandler))
-	http.HandleFunc("/create_post", m(CreatePostHandler))
-	http.HandleFunc("/create_comment", m(CreateCommentHandler))
-	// http.HandleFunc("POST /api/create_like/{post_id}", CreateLikeHandler)
+	post.SetupPostRoutes()
+
+	// /********************* Group ************************/
+	http.HandleFunc("POST /api/create_group", CreateGroupHandler)
+	http.HandleFunc("GET /api/group/{id}", GetGroupPageHandler)
+	// http.HandleFunc("/invite_user", m(InvitationHandler))
+	// http.HandleFunc("/group_request", m(RequestHandler))
+	// http.HandleFunc("/search_group", m(SearchGroupHandler))
+	// http.HandleFunc("/create_event", m(CreateEventHandler))
+	// http.HandleFunc("/event_response", m(EventResponseHandler))
 
 	// /********************* Categories ************************/
 	// http.HandleFunc("GET /api/stats", GetStatsHandler)

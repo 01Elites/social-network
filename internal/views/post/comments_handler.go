@@ -1,7 +1,8 @@
-package views
+package post
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"social-network/internal/database"
 	"social-network/internal/models"
@@ -16,17 +17,32 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var comment models.Create_Comment
-	err := json.NewDecoder(r.Body).Decode(&comment)
+	parentID, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		http.Error(w, "Failed to decode comment", http.StatusBadRequest)
+		http.Error(w, "Failed to decode post id", http.StatusBadRequest)
+		return
+	}
+	comment.ParentID = parentID
+	err = json.NewDecoder(r.Body).Decode(&comment)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+				Reason: "failed to decode comment",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	err = database.Create_Comment_in_db(userID, comment)
 	if err != nil {
-		http.Error(w, "Failed to create comment", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
+		jsonError := models.Error{
+				Reason: "invalid post id",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
+	io.WriteString(w, "create comment successful")
 }
 
 func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
@@ -53,4 +69,6 @@ func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 		CommentsFeed: comments,
 	}
 	json.NewEncoder(w).Encode(commentsCapsul)
+	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "get comments successful")
 }

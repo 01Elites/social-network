@@ -6,6 +6,7 @@ import (
 	"social-network/internal/views/auth"
 	"social-network/internal/views/post"
 	"social-network/internal/views/profile"
+	"social-network/internal/views/group"
 )
 
 // SetupRoutes sets up the routes for the web application.
@@ -33,13 +34,7 @@ func SetupRoutes() {
 	post.SetupPostRoutes()
 
 	// /********************* Group ************************/
-	http.HandleFunc("POST /api/create_group", CreateGroupHandler)
-	http.HandleFunc("GET /api/group/{id}", GetGroupPageHandler)
-	// http.HandleFunc("/invite_user", m(InvitationHandler))
-	// http.HandleFunc("/group_request", m(RequestHandler))
-	// http.HandleFunc("/search_group", m(SearchGroupHandler))
-	// http.HandleFunc("/create_event", m(CreateEventHandler))
-	// http.HandleFunc("/event_response", m(EventResponseHandler))
+	group.SetupGroupRoutes()
 
 	// /********************* Categories ************************/
 	// http.HandleFunc("GET /api/stats", GetStatsHandler)

@@ -1,14 +1,15 @@
-package views
+package group
 
 import (
 	"encoding/json"
 	"io"
 	"net/http"
 	"strconv"
+
 	"social-network/internal/database"
 )
 
-func GetGroupPageHandler(w http.ResponseWriter, r *http.Request){
+func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	groupIDstr := r.PathValue("id")
 	groupID, _ := strconv.Atoi(groupIDstr)
 	if groupID == 0 {

@@ -18,5 +18,3 @@ func CreateInvite(groupID int, from string, to string) error {
 	}
 	return nil
 }
-
-func 

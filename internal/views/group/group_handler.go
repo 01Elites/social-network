@@ -1,4 +1,4 @@
-package views
+package group
 
 import (
 	"encoding/json"

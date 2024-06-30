@@ -21,7 +21,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '../../../components/ui/sheet';
-import useUserDetails from '../../../hooks/userDetails';
+// import useUserDetails from '../../../hooks/userDetails';
 
 type NavbarProps = {
   variant?: 'loggedin' | 'loggedout';
@@ -35,10 +35,10 @@ export default function Navbar(prop: NavbarProps): JSXElement {
 
   const navigate = useNavigate();
 
-  const { userDetails, fetchUserDetails, error, updateUserDetails } =
-    useUserDetails();
+  // const { userDetails, fetchUserDetails, error, updateUserDetails } =
+  // useUserDetails();
 
-  updateUserDetails({ email: 'Natheer' });
+  // updateUserDetails({ email: 'Natheer' });
 
   return (
     <>

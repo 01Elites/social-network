@@ -1,16 +1,12 @@
 import { createSignal, onMount } from 'solid-js';
 import config from '../../config';
-import User from '../../types/User';
+import User, { UserDetailsHook } from '../../types/User';
 
 
-function useUserDetails(): {
-  userDetails: () => User | null;
-  error: () => string | null;
-  fetchUserDetails: () => Promise<void>;
-  updateUserDetails: (partialDetails: Partial<User>) => Promise<void>;
-} {
+
+function useUserDetails(): UserDetailsHook {
   const [userDetails, setUserDetails] = createSignal<User | null>(null);
-  const [userDetailsError, setError] = createSignal<string | null>(null);
+  const [userDetailsError, setUserDetailsError] = createSignal<string | null>(null);
 
   async function fetchUserDetails() {
     try {
@@ -21,7 +17,7 @@ function useUserDetails(): {
       const data: User = await response.json();
       setUserDetails(data);
     } catch (err) {
-      setError((err as Error).message);
+      setUserDetailsError((err as Error).message);
     }
   }
 
@@ -40,7 +36,7 @@ function useUserDetails(): {
       const updatedData: User = await response.json();
       setUserDetails(updatedData);
     } catch (err) {
-      setError((err as Error).message);
+      setUserDetailsError((err as Error).message);
     }
   }
 
@@ -48,10 +44,10 @@ function useUserDetails(): {
 
   return {
     userDetails,
-    error: userDetailsError,
+    userDetailsError,
     fetchUserDetails,
     updateUserDetails,
   };
 }
 
-export default useUserDetails;
+export {useUserDetails};

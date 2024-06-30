@@ -1,7 +1,7 @@
 import { JSXElement } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import logo from '../../../logo.svg';
-import { TextField, TextFieldInput } from '../../../components/ui/text-field';
+import logo from '~/logo.svg';
+import { TextField, TextFieldInput } from '~/components/ui/text-field';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,19 +9,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../../components/ui/dropdown-menu';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '../../..//components/ui/avatar';
-import { Button } from '../../../components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '../../../components/ui/sheet';
-// import useUserDetails from '../../../hooks/userDetails';
+} from '~/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Button } from '~/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '~/components/ui/sheet';
 
 type NavbarProps = {
   variant?: 'loggedin' | 'loggedout';

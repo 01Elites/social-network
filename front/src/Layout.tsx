@@ -1,4 +1,4 @@
-import { JSXElement, useContext } from 'solid-js';
+import { JSXElement } from 'solid-js';
 import Navbar from './components/core/navbar';
 import SideBar from './components/core/sidebar';
 import UserDetailsContext from './contexts/UserDetailsContext';
@@ -6,7 +6,6 @@ import { useUserDetails } from './hooks/userDetails';
 
 type LayoutProps = {
   children: JSXElement;
-  variant?: 'loggedin' | 'loggedout';
 };
 
 export default function Layout(props: LayoutProps): JSXElement {

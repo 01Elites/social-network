@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "5cd6f3cb-a775-4c61-9ecb-ad64549daa13",
+		"_postman_id": "90d00a7d-5d02-4f3f-82a8-0d094eeeab1b",
 		"name": "social-network",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33817247"
+		"_exporter_id": "28044592"
 	},
 	"item": [
 		{
@@ -85,10 +85,38 @@
 			"response": []
 		},
 		{
-			"name": "profile",
+			"name": "get profile",
 			"request": {
 				"method": "GET",
 				"header": [],
+				"url": {
+					"raw": "localhost:8081/api/profile",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update profile",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"jane.smith@example.com\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"date_of_birth\": \"1985-05-15T00:00:00Z\",\n  \"nick_name\": \"Janie\",\n  \"profile_privacy\": \"private\"\n  }\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "localhost:8081/api/profile",
 					"host": [

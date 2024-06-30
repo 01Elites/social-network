@@ -6,5 +6,5 @@ import (
 )
 
 func SetupProfileRoutes() {
-	http.HandleFunc("GET /api/profile", middleware.ValidateSessionMiddleware(ProfileHandler))
+	http.HandleFunc("/api/profile", middleware.ValidateSessionMiddleware(ProfileHandler))
 }

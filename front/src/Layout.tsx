@@ -15,13 +15,15 @@ export default function Layout(props: LayoutProps): JSXElement {
       </div>
 
       <div class='flex grow'>
-        <div class='w-10 m-9'>
-          <div class='w-10 h-full'>
+        <div class='m-9 w-10'>
+          <div class='h-full w-10'>
             <SideBar />
           </div>
         </div>
 
-        <main class='h-[90vh] w-full overflow-scroll justify-center self-center items-center'>{props.children}</main>
+        <main class='h-[90vh] w-full items-center justify-center self-center overflow-scroll'>
+          {props.children}
+        </main>
       </div>
 
       {/* <Navbar />

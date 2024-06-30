@@ -19,11 +19,9 @@ import { Button } from '../../../components/ui/button';
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from '../../../components/ui/sheet';
+import userDetails from '../../../hooks/userDetails';
 
 type NavbarProps = {
   variant?: 'loggedin' | 'loggedout';
@@ -36,6 +34,8 @@ export default function Navbar(prop: NavbarProps): JSXElement {
   }
 
   const navigate = useNavigate();
+
+  userDetails();
 
   return (
     <>

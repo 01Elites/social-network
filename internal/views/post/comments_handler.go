@@ -1,4 +1,4 @@
-package views
+package post
 
 import (
 	"encoding/json"
@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"social-network/internal/database"
 	"social-network/internal/models"
+	"social-network/internal/views/middleware"
 	"strconv"
 )
 
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
@@ -45,7 +46,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return

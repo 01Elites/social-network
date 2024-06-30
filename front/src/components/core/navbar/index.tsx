@@ -43,7 +43,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         {/* Mobile Sidemenu, if not wrapped in div will cause hidden padding */}
         <Sheet>
           <SheetTrigger>
-            <Button variant='outline' class='xs:hidden mx-5 mt-5'>
+            <Button variant='outline' class='mx-5 mt-5 xs:hidden'>
               E
             </Button>
           </SheetTrigger>
@@ -98,7 +98,12 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         </Sheet>
       </div>
 
-      <header class='xs:flex mx-5 mt-5 hidden justify-between gap-4 align-middle'>
+      <header
+        style={{
+          width: 'calc(100% - 40px)',
+        }}
+        class='fixed mx-5 hidden h-[70px] justify-between gap-4 align-middle xs:flex'
+      >
         <img
           src={logo}
           alt='Elite Logo'
@@ -107,7 +112,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
           }}
           class='w-20 cursor-pointer'
         />
-        <TextField class='basis-1/2'>
+        <TextField class='flex basis-1/2 items-center'>
           <TextFieldInput
             type='search'
             placeholder='Search friends, groups, posts...'

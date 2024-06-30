@@ -4,6 +4,7 @@ import './index.css';
 import type { JSXElement } from 'solid-js';
 import { Router, Route } from '@solidjs/router';
 import HomePage from './pages/home';
+import AuthGuard from './guards/AuthGuard';
 
 export default function App(): JSXElement {
   return (
@@ -25,9 +26,13 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(
   () => (
     <Router>
+      {/* <AuthGuard> */}
       <Route path='/' component={HomePage} />
+      {/* </AuthGuard> */}
       <Route path='/login' component={HomePage} />
+      {/* <AuthGuard> */}
       <Route path='/profile' />
+      {/* </AuthGuard> */}
     </Router>
   ),
   root!,

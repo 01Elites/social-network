@@ -10,8 +10,7 @@ type LayoutProps = {
 export default function Layout(props: LayoutProps): JSXElement {
   return (
     <div class='flex h-screen w-full flex-col'>
-      <div class='min-h-[70px] w-full'>
-        {/* <div class='fixed flex h-[40px] w-full bg-green-400'>THIS IS NAV</div> */}
+      <div class='flex min-h-[70px] w-full'>
         <Navbar />
       </div>
 
@@ -22,9 +21,7 @@ export default function Layout(props: LayoutProps): JSXElement {
           </div>
         </div>
 
-        <main class='overflow-scroll h-screen w-full'>
-          {props.children}
-        </main>
+        <main class='h-screen w-full overflow-scroll'>{props.children}</main>
       </div>
 
       {/* <Navbar />

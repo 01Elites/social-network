@@ -7,12 +7,12 @@ type Post struct {
 	User          UserProfile `json:"user"`
 	Title         string      `json:"title"`
 	Content       string      `json:"content,omitempty"`
-	Image         string      `json:"image"`
+	Image         string      `json:"image,omitempty"`
 	CreationDate  time.Time   `json:"creation_date"`
 	PostPrivacy   string      `json:"post_privacy"`
 	PostLikes     int         `json:"post_likes"`
-	GroupID       int         `json:"group_id"`
-	IsLiked       bool        `json:"isLiked"`
+	GroupID       int         `json:"group_id,omitempty"`
+	IsLiked       bool        `json:"isLiked,omitempty"`
 	CommentsCount int         `json:"comments_count"`
 	Likers_ids    []string    `json:"likers_ids"`
 }
@@ -47,9 +47,7 @@ type Comment struct {
 	ID           int         `json:"comment_id"`
 	User         UserProfile `json:"user"`
 	Content      string      `json:"content"`
-	CreationDate string      `json:"creation_date"`
-	CommentLikes int         `json:"comment_likes"`
-	IsLiked      bool        `json:"isLiked"`
+	CreationDate time.Time   `json:"creation_date"`
 }
 
 type Create_Group struct {

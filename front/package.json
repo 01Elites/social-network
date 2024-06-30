@@ -11,6 +11,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.14.9",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "prettier": "^3.3.2",
@@ -30,7 +31,6 @@
     "@solidjs/router": "^0.13.5",
     "@suid/icons-material": "^0.7.0",
     "@suid/material": "^0.16.0",
-    "@suid/icons-material": "^0.7.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "solid-js": "^1.8.11",

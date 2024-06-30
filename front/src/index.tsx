@@ -1,19 +1,9 @@
-/* @refresh reload */
 import { render } from 'solid-js/web';
 import './index.css';
-import type { JSXElement } from 'solid-js';
 import { Router, Route } from '@solidjs/router';
 import HomePage from './pages/home';
-import AuthGuard from './guards/AuthGuard';
 
-export default function App(): JSXElement {
-  return (
-    <Router>
-      <Route path='/' component={HomePage} />
-      <Route path='/login' component={HomePage} />
-    </Router>
-  );
-}
+process.env.API_URL = 'http://localhost:8081/api';
 
 const root = document.getElementById('root');
 

@@ -1,11 +1,11 @@
+import config from "~/config";
 import User from "~/types/User/User";
-
 
 
 
 export default async function userDetails(): Promise<User|Error> {
     return new Promise((resolve, reject) => {
-        fetch(process.env.API_URL + '/profile')
+        fetch(config.API_URL + '/profile')
             .then(async (response) => {
                 if (!response.ok) {
                     const body = await response.json();

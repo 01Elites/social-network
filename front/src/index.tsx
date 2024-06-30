@@ -3,8 +3,6 @@ import './index.css';
 import { Router, Route } from '@solidjs/router';
 import HomePage from './pages/home';
 
-process.env.API_URL = 'http://localhost:8081/api';
-
 const root = document.getElementById('root');
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {

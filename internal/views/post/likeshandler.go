@@ -1,16 +1,17 @@
-package views
+package post
 
 import (
 	"fmt"
 	"net/http"
 	"social-network/internal/database"
+	"social-network/internal/views/middleware"
 	"strconv"
 	"encoding/json"
 )
 
 // CreateLikeHandler handles the creation of a like for posts & comments.
 func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return

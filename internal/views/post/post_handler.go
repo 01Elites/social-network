@@ -1,4 +1,4 @@
-package views
+package post
 
 import (
 	"encoding/json"
@@ -8,10 +8,11 @@ import (
 	"strconv"
 	"social-network/internal/database"
 	"social-network/internal/models"
+	"social-network/internal/views/middleware"
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
@@ -46,7 +47,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
@@ -73,7 +74,7 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
@@ -97,12 +98,12 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
-	json.NewEncoder(w).Encode(post)
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(post)
 }
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request){
-	userID, ok := r.Context().Value(userIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return

@@ -1,4 +1,4 @@
-package views
+package auth
 
 import (
 	"encoding/json"
@@ -133,7 +133,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set a cookie with a session token that can be used to authenticate access without logging in
-	setSessionCookie(w, sessionUUID.String())
+	SetSessionCookie(w, sessionUUID.String())
 
 	w.WriteHeader(http.StatusOK)
 	io.WriteString(w, "Signin successful")
@@ -174,7 +174,7 @@ func clearSessionCookie(w http.ResponseWriter) {
 }
 
 // updateSessionCookie updates the session cookie expiration time.
-func setSessionCookie(w http.ResponseWriter, sessionToken string) {
+func SetSessionCookie(w http.ResponseWriter, sessionToken string) {
 	expiration := time.Now().AddDate(1, 0, 0)
 	updatedCookie := http.Cookie{
 		Name:     "SN_SESSION",

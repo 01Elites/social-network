@@ -98,7 +98,12 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         </Sheet>
       </div>
 
-      <header class='fixed hidden h-[70px] w-full justify-between gap-4 align-middle xs:flex'>
+      <header
+        style={{
+          width: 'calc(100% - 40px)',
+        }}
+        class='fixed mx-5 hidden h-[70px] justify-between gap-4 align-middle xs:flex'
+      >
         <img
           src={logo}
           alt='Elite Logo'

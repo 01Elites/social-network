@@ -2,16 +2,15 @@ import { createSignal, onMount } from 'solid-js';
 import config from '../../config';
 import User from '../../types/User';
 
-interface UseUserDetails {
-  userDetailsData: () => User | null;
+
+function useUserDetails(): {
+  userDetails: () => User | null;
   error: () => string | null;
   fetchUserDetails: () => Promise<void>;
   updateUserDetails: (partialDetails: Partial<User>) => Promise<void>;
-}
-
-function useUserDetails(): UseUserDetails {
-  const [userDetailsData, setUserDetailsData] = createSignal<User | null>(null);
-  const [error, setError] = createSignal<string | null>(null);
+} {
+  const [userDetails, setUserDetails] = createSignal<User | null>(null);
+  const [userDetailsError, setError] = createSignal<string | null>(null);
 
   async function fetchUserDetails() {
     try {
@@ -20,7 +19,7 @@ function useUserDetails(): UseUserDetails {
         throw new Error('Failed to fetch user details.');
       }
       const data: User = await response.json();
-      setUserDetailsData(data);
+      setUserDetails(data);
     } catch (err) {
       setError((err as Error).message);
     }
@@ -39,7 +38,7 @@ function useUserDetails(): UseUserDetails {
         throw new Error('Failed to update user details.');
       }
       const updatedData: User = await response.json();
-      setUserDetailsData(updatedData);
+      setUserDetails(updatedData);
     } catch (err) {
       setError((err as Error).message);
     }
@@ -48,8 +47,8 @@ function useUserDetails(): UseUserDetails {
   onMount(fetchUserDetails);
 
   return {
-    userDetailsData,
-    error,
+    userDetails,
+    error: userDetailsError,
     fetchUserDetails,
     updateUserDetails,
   };

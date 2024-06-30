@@ -26,13 +26,13 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(
   () => (
     <Router>
-      <AuthGuard>
-        <Route path='/' component={HomePage} />
-      </AuthGuard>
+      {/* <AuthGuard> */}
+      <Route path='/' component={HomePage} />
+      {/* </AuthGuard> */}
       <Route path='/login' component={HomePage} />
-      <AuthGuard>
-        <Route path='/profile' />
-      </AuthGuard>
+      {/* <AuthGuard> */}
+      <Route path='/profile' />
+      {/* </AuthGuard> */}
     </Router>
   ),
   root!,

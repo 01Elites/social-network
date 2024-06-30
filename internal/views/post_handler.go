@@ -18,8 +18,12 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var post models.Create_Post
 	err := json.NewDecoder(r.Body).Decode(&post)
-	if err != nil {
-		http.Error(w, "Failed to decode post", http.StatusBadRequest)
+	if err != nil || post.Title == "" || post.Content == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+				Reason: "failed to decode post",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	postID, err := database.CreatePostInDB(userID, post)
@@ -75,8 +79,8 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	postID := r.PathValue("id")
-	postIDInt, _ := strconv.Atoi(postID)
-	if postIDInt == 0 {
+	postIDInt, err := strconv.Atoi(postID)
+	if postIDInt == 0 || err != nil{
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
 				Reason: "invalid post id",
@@ -94,5 +98,29 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(post)
+	w.WriteHeader(http.StatusOK)
+}
+
+func DeletePostHandler(w http.ResponseWriter, r *http.Request){
+	userID, ok := r.Context().Value(userIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
+	postID := r.PathValue("id")
+	postIDInt, err := strconv.Atoi(postID)
+	if postIDInt == 0 || err != nil{
+		w.WriteHeader(http.StatusNotFound)
+		jsonError := models.Error{
+				Reason: "invalid post id",
+		}
+		json.NewEncoder(w).Encode(jsonError)
+		return
+	}
+	err = database.DeletePost(postIDInt, userID)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }

@@ -31,7 +31,8 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
 				content, 
         user_id,
 				first_name,
-				last_name
+				last_name,
+				created_at
     FROM 
         comment
 		INNER JOIN 
@@ -59,6 +60,7 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
 			&comment.User.UserID,
 			&comment.User.FirstName,
 			&comment.User.LastName,
+			&comment.CreationDate,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err

@@ -33,7 +33,7 @@ var Gender = struct {
 type User struct {
 	UserID    string          `db:"user_id"`
 	Email     string          `db:"email"`
-	Password  string          `db:"password"`
+	Password  string          `db:"password,omitempty"`
 	Provider  string          `db:"provider"`
 	NickName  string					`db:"user_name"`
 	Following map[string]bool `json:"following"`
@@ -42,12 +42,12 @@ type User struct {
 
 // UserProfile struct defines the structure for storing user profile information
 type UserProfile struct {
-	UserID      string `db:"user_id"`
-	NickName    string `db:"nick_name"`
+	UserID      string `db:"user_id" json:"user_id,omitempty"`
+	NickName    string `db:"nick_name" json:"nick_name,omitempty"`
 	FirstName   string `db:"first_name"`
 	LastName    string `db:"last_name"`
-	Gender      string `db:"gender"`
-	DateOfBirth string `db:"date_of_birth"`
-	Image       string `db:"image"`
-	Type        string `db:"type"`
+	Gender      string `db:"gender" json:"gender,omitempty"`
+	DateOfBirth string `db:"date_of_birth" json:"date_of_birth,omitempty"`
+	Image       string `db:"image" json:"image,omitempty"`
+	Type        string `db:"type,omitempty" json:"type,omitempty"`
 }

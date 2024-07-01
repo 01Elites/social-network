@@ -57,12 +57,12 @@ export default function Navbar(prop: NavbarProps): JSXElement {
               Login to your account below
             </DialogDescription>
           </DialogHeader>
-          <TextField class='grid w-full max-w-sm items-center gap-1.5'>
+          <TextField class='grid w-full items-center gap-1.5'>
             <TextFieldLabel for='email'>Email</TextFieldLabel>
             <TextFieldInput type='email' id='email' placeholder='Email' />
           </TextField>
 
-          <TextField class='grid w-full max-w-sm items-center gap-1.5'>
+          <TextField class='grid w-full items-center gap-1.5'>
             <TextFieldLabel for='password'>Password</TextFieldLabel>
             <TextFieldInput
               type='password'
@@ -72,7 +72,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
           </TextField>
 
           <Button>Login</Button>
-          <p>
+          <p class='text-center'>
             Don't have an account?{' '}
             <Button variant='link' class='p-0 text-base'>
               Sign up for Free

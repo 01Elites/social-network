@@ -31,7 +31,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         style={{
           width: 'calc(100% - 40px)',
         }}
-        class='fixed mx-5 hidden h-[70px] justify-between gap-4 align-middle xs:flex'
+        class='fixed mx-5 hidden h-[70px] items-center justify-between gap-4 align-middle xs:flex'
       >
         <img
           src={logo}
@@ -47,36 +47,43 @@ export default function Navbar(prop: NavbarProps): JSXElement {
             placeholder='Search friends, groups, posts...'
           />
         </TextField>
-        <DropdownMenu>
-          <DropdownMenuTrigger class='flex flex-row items-center gap-2'>
-            <Avatar>
-              <AvatarImage src='https://thispersondoesnotexist.com/'></AvatarImage>
-              <AvatarFallback>N</AvatarFallback>
-            </Avatar>
-            Natheer
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                navigate('/profile');
-              }}
-            >
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                fetch('/api/auth/logout', { method: 'DELETE' }).finally(() => {
-                  navigate('/');
-                });
-              }}
-            >
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* If Logged in show details, else show  */}
+        {userDetails() ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger class='flex flex-row items-center gap-2'>
+              <Avatar>
+                <AvatarImage src='https://thispersondoesnotexist.com/'></AvatarImage>
+                <AvatarFallback>N</AvatarFallback>
+              </Avatar>
+              Natheer
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate('/profile');
+                }}
+              >
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  fetch('/api/auth/logout', { method: 'DELETE' }).finally(
+                    () => {
+                      navigate('/');
+                    },
+                  );
+                }}
+              >
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button variant='ghost'>Login</Button>
+        )}
       </header>
     </>
   );

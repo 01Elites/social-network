@@ -13,18 +13,6 @@ import (
 	"social-network/internal/views/middleware"
 )
 
-// ProfileHandler checks the HTTP method and delegates to the correct function
-func ProfileHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		getProfile(w, r)
-	case "PATCH":
-		patchProfile(w, r)
-	default:
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	}
-}
-
 type profileData struct {
 	Email          string    `json:"email"`
 	NickName       string    `json:"nick_name"`

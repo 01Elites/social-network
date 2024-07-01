@@ -1,11 +1,8 @@
-import { JSXElement, createSignal, useContext } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import logo from '~/logo.svg';
-import {
-  TextField,
-  TextFieldInput,
-  TextFieldLabel,
-} from '~/components/ui/text-field';
+import { JSXElement, createSignal, useContext } from 'solid-js';
+import LoginDialog from '~/components/LoginDialog';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Button } from '~/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,21 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { Button } from '~/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '~/components/ui/sheet';
+import { TextField, TextFieldInput } from '~/components/ui/text-field';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import logo from '~/logo.svg';
 import { UserDetailsHook } from '~/types/User';
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
 
 type NavbarProps = {};
 
@@ -42,45 +28,10 @@ export default function Navbar(prop: NavbarProps): JSXElement {
 
   return (
     <>
-      <Dialog
+      <LoginDialog
         open={loginDialogVisible()}
-        onOpenChange={(isOpen) => setLoginDialogVisible(isOpen)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <div class='flex justify-center'>
-              <img src={logo} alt='Elite Logo' class='w-20' />
-            </div>
-            <DialogTitle class='text-center text-3xl'>Welcome back</DialogTitle>
-            <DialogDescription class='text-center'>
-              Glad to see you again 👋 <br />
-              Login to your account below
-            </DialogDescription>
-          </DialogHeader>
-          <TextField class='grid w-full items-center gap-1.5'>
-            <TextFieldLabel for='email'>Email</TextFieldLabel>
-            <TextFieldInput type='email' id='email' placeholder='Email' />
-          </TextField>
-
-          <TextField class='grid w-full items-center gap-1.5'>
-            <TextFieldLabel for='password'>Password</TextFieldLabel>
-            <TextFieldInput
-              type='password'
-              id='password'
-              placeholder='Password'
-            />
-          </TextField>
-
-          <Button>Login</Button>
-          <p class='text-center'>
-            Don't have an account?{' '}
-            <Button variant='link' class='p-0 text-base'>
-              Sign up for Free
-            </Button>
-          </p>
-        </DialogContent>
-      </Dialog>
-
+        setOpen={setLoginDialogVisible}
+      />
       <header
         style={{
           width: 'calc(100% - 40px)',

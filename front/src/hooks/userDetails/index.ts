@@ -10,7 +10,7 @@ function useUserDetails(): UserDetailsHook {
 
   async function fetchUserDetails(): Promise<void> {
     try {
-      const response = await fetch(config.API_URL + '/api/profile');
+      const response = await fetch(config.API_URL + '/profile');
       
       if (!response.ok) {
         const error = await response.json();

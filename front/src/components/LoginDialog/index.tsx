@@ -17,12 +17,16 @@ import {
 } from '~/components/ui/text-field';
 
 import { Button } from '~/components/ui/button';
-
+import '~/extensions/arrays';
 interface LoginDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
 
+const loginMessages = [
+  'Waste your time here ✨',
+  "Guess it's time to complain aabout your life 🤔",
+];
 export default function LoginDialog(props: LoginDialogProps): JSXElement {
   return (
     <Dialog open={props.open} onOpenChange={(isOpen) => props.setOpen(isOpen)}>
@@ -33,7 +37,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
           </div>
           <DialogTitle class='text-center text-3xl'>Oh, no life?</DialogTitle>
           <DialogDescription class='text-center'>
-            Waste your time here ✨
+            {loginMessages.random()}
           </DialogDescription>
         </DialogHeader>
 

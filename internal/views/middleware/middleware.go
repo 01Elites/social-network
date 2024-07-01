@@ -14,6 +14,7 @@ const UserIDKey contextKey = "userID"
 
 func ValidateSessionMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		userID, err := ValidateSession(w, r)
 		if err != nil {
 			http.Error(w, "Invalid session token", http.StatusUnauthorized)

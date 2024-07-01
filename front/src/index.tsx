@@ -1,5 +1,6 @@
 import { Route, Router } from '@solidjs/router';
 import { render } from 'solid-js/web';
+import '~/extensions/arrays';
 import './index.css';
 import HomePage from './pages/home';
 

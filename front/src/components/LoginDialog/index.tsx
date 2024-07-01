@@ -17,7 +17,6 @@ import {
 } from '~/components/ui/text-field';
 
 import { Button } from '~/components/ui/button';
-import '~/extensions/arrays';
 interface LoginDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;

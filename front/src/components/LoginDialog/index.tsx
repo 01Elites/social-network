@@ -62,7 +62,8 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         <Button>Login</Button>
         <p class='text-center'>
           Don't have an account?{' '}
-          <Button variant='link' class='p-0 text-base'>
+          {/* TODO: remove show underline after we add our acccent */}
+          <Button variant='link' class='p-0 text-base underline'>
             Sign up for Free
           </Button>
         </p>

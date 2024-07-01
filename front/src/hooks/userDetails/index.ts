@@ -8,14 +8,22 @@ function useUserDetails(): UserDetailsHook {
   const [userDetails, setUserDetails] = createSignal<User | null>(null);
   const [userDetailsError, setUserDetailsError] = createSignal<string | null>(null);
 
-  async function fetchUserDetails() {
+  async function fetchUserDetails(): Promise<void> {
     try {
       const response = await fetch(config.API_URL + '/api/profile');
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch user details.');
+        const error = await response.json();
+        if (error.reason) {
+          throw new Error(error.reason);
+        }
+        throw new Error('Failed to fetch user details. Please check your network connection.');
       }
+
       const data: User = await response.json();
+
       setUserDetails(data);
+      setUserDetailsError(null);
     } catch (err) {
       setUserDetailsError((err as Error).message);
     }

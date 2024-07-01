@@ -13,9 +13,9 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 // Example usage of the Login function
-Login('jane.smith@example.com', 'S3cur3P@ss').then((res) => {
-  console.log(res);
-})
+// Login('jane.smith@example.com', 'S3cur3P@ss').then((res) => {
+//   console.log(res);
+// })
 
 render(
   () => (

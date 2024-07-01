@@ -1,8 +1,8 @@
 import { JSXElement } from 'solid-js';
-import Navbar from './components/core/navbar';
-import SideBar from './components/core/sidebar';
-import UserDetailsContext from './contexts/UserDetailsContext';
-import { useUserDetails } from './hooks/userDetails';
+import Navbar from '~/components/core/navbar';
+import SideBar from '~/components/core/sidebar';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { useUserDetails } from '~/hooks/userDetails';
 
 type LayoutProps = {
   children: JSXElement;

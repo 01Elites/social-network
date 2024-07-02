@@ -25,6 +25,7 @@ import {
   TextFieldLabel,
   TextFieldTextArea,
 } from '~/components/ui/text-field';
+import { showToast } from '~/components/ui/toast';
 import config from '~/config';
 interface LoginDialogProps {
   open: boolean;
@@ -60,19 +61,29 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
       body: JSON.stringify({ email: loginEmail(), password: loginPassword() }),
     })
       .then((res) => {
+        setFormProcessing(false);
         if (res.status === 200) {
-          console.log('Logged in successfully');
+          props.setOpen(false);
+          return;
         }
         return res.json();
       })
       .then((data) => {
-        console.log(data);
+        if (data.reason) {
+          showToast({
+            title: 'An error occurred',
+            description: data.reason,
+            variant: 'error',
+          });
+        } else {
+          showToast({
+            title: 'An error occurred',
+            description:
+              'An error occurred while logging in. Please try again.',
+            variant: 'error',
+          });
+        }
       });
-
-    setTimeout(() => {
-      setFormProcessing(false);
-      // props.setOpen(false);
-    }, 5000);
   }
 
   // -------- Signup Dialog --------

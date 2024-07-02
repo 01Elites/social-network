@@ -1,6 +1,7 @@
 import { JSXElement } from 'solid-js';
 import Navbar from '~/components/core/navbar';
 import SideBar from '~/components/core/sidebar';
+import { Toaster } from '~/components/ui/toast';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { useUserDetails } from '~/hooks/userDetails';
 
@@ -34,6 +35,7 @@ export default function Layout(props: LayoutProps): JSXElement {
       
       <SideBar></SideBar> */}
       </div>
+      <Toaster />
     </UserDetailsContext.Provider>
   );
 }

@@ -118,14 +118,15 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     fetch(config.API_URL + '/auth/signup', {
       method: 'POST',
       body: JSON.stringify({
-        firstName: signupFirstName(),
-        lastName: signupLastName(),
+        first_name: signupFirstName(),
+        last_name: signupLastName(),
         email: signupEmail(),
-        dob: signupDOB(),
-        nickname: signupNickname(),
-        privacy: signupPrivacy(),
+        date_of_birth: new Date(signupDOB()).toISOString(),
+        nick_name: signupNickname(),
+        profile_privacy: signupPrivacy(),
         about: signupAbout(),
         password: signupPassword(),
+        gender: "male" // Hardcoded for testing
       }),
     })
       .then((res) => {
@@ -333,7 +334,10 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               >
                 <SelectTrigger aria-label='profile privacy' class='w-full'>
                   <SelectValue<string>>
-                    {(state) => state.selectedOption()}
+                    {(state) => {
+                      setSignupPrivacy(state.selectedOption());
+                      return state.selectedOption()
+                    }}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent />

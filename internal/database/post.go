@@ -258,3 +258,115 @@ func DeletePost(postID int, userID string) error {
 	}
 	return nil
 }
+
+func GetGroupPosts(groupID int) ([]models.Post, error) {
+	query := `
+	SELECT 
+			post_id, 
+			title,
+			content, 
+			user_id, 
+			nick_name,
+			privacy_type
+	FROM 
+			post 
+	INNER JOIN 
+			profile USING (user_id)
+	WHERE
+			group_id = $1`
+	rows, err := DB.Query(context.Background(), query, groupID)
+	if err != nil {
+		log.Printf("database failed to scan post: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []models.Post
+	for rows.Next() {
+		var p models.Post
+		if err := rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.Content,
+			&p.User.UserID,
+			&p.User.NickName,
+			&p.PostPrivacy,
+		); err != nil {
+			log.Printf("database failed to scan post: %v\n", err)
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+	return posts, nil
+}
+
+func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.ProfilePost, error) {
+	// Query the database
+	query := `
+    SELECT 
+				post_id,
+        title,
+				content, 
+        privacy_type,
+				created_at
+    FROM 
+        post 
+    WHERE 
+        user_id = $1
+`
+
+	// Execute the query and retrieve the row
+	rows, err := DB.Query(context.Background(), query, userid)
+	if err != nil {
+		log.Printf("database failed to scan post: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Create a slice to hold the results
+	posts := make([]models.ProfilePost, 0)
+	// Iterate through the rows
+	for rows.Next() {
+		var post models.ProfilePost
+		if err := rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.PostPrivacy,
+			&post.CreationDate,
+		); err != nil {
+			log.Printf("database failed to scan post: %v\n", err)
+			return nil, err
+		}
+		post.CommentsCount, err = GetCommentsCountByID(post.ID)
+		if err != nil{
+			log.Printf("database failed to scan comments count: %v\n", err)
+			return nil, err
+		}
+		post.Likers_ids,post.IsLiked, err = GetPostLikers(post.ID, loggeduser)
+		if err != nil {
+			log.Printf("database: Failed to scan likers: %v\n", err)
+			return []models.ProfilePost{}, err
+		}
+		post.PostLikes = len(post.Likers_ids)
+		if userid == loggeduser {
+			posts = append(posts, post)
+			continue
+		}
+		if post.PostPrivacy == "public"{
+			posts= append(posts, post)
+		} else if post.PostPrivacy == "almost_private" {
+			var count int
+			query = `SELECT COUNT(*) FROM post_user WHERE post_id = $1 AND allowed_user_id = $2`
+			DB.QueryRow(context.Background(), query, post.ID, loggeduser).Scan(&count)
+			if count > 0 {
+				posts = append(posts, post)
+			}
+		} else if post.PostPrivacy == "private" {
+			if followed {
+				posts = append(posts, post)
+			}
+		}
+	}
+	return posts, nil
+
+}

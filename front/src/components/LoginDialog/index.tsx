@@ -49,17 +49,17 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <img src={logo} alt='Elite Logo' class='w-20' />
           </div>
           <DialogTitle
-            class={showLogin() ? 'text-center text-3xl' : 'text-3xl'}
+            class={showLogin() ? 'text-center text-3xl' : 'text-3xl text-left'}
           >
             {showLogin() ? 'Oh, no life?' : 'Sign Up'}
           </DialogTitle>
-          <DialogDescription class={showLogin() ? 'text-center' : ''}>
+          <DialogDescription class={showLogin() ? 'text-center' : 'text-left'}>
             {showLogin() ? loginMessages.random() : signUpMessages.random()}
           </DialogDescription>
         </DialogHeader>
 
         {showLogin() && (
-          <>
+          <form class='flex flex-col gap-4'>
             <Button variant='outline' class='gap-4'>
               <img src={rebootLogo} class='h-5'></img>
               Login with Reboot01
@@ -90,7 +90,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 Sign up for Free
               </Button>
             </p>
-          </>
+          </form>
         )}
 
         {!showLogin() && (
@@ -165,6 +165,13 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <Button class='col-span-2'>Become a Looser</Button>
+            <Button
+              variant='link'
+              class='p-0 text-base underline justify-start'
+              onClick={() => setShowLogin(true)}
+            >
+              I am already a looser
+            </Button>
           </form>
         )}
       </DialogContent>

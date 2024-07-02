@@ -12,6 +12,13 @@ import rebootLogo from '~/reboot_01_logo.png';
 
 import { Button } from '~/components/ui/button';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
+import {
   TextField,
   TextFieldInput,
   TextFieldLabel,
@@ -192,16 +199,30 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            {/* TODO: Solid-ui was down at 1 am, tomorrow when its up switch this to a ComboBox */}
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupPrivacy}
             >
               <TextFieldLabel for='privacy'>Profile Privacy</TextFieldLabel>
-              <select class='border-input border-[1px] h-full p-2 rounded-md'>
-                <option value='public'>Public</option>
-                <option value='private'>Private</option>
-              </select>
+
+              <Select
+                class='w-full col-span-1'
+                placeholder='Profile Privacy'
+                itemComponent={(props) => (
+                  <SelectItem item={props.item}>
+                    {props.item.rawValue}
+                  </SelectItem>
+                )}
+                options={['public', 'private']}
+                defaultValue={'public'}
+              >
+                <SelectTrigger aria-label='profile privacy' class='w-full'>
+                  <SelectValue<string>>
+                    {(state) => state.selectedOption()}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent />
+              </Select>
             </TextField>
 
             <TextField

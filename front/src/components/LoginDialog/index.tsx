@@ -1,4 +1,4 @@
-import { JSXElement, createEffect, createSignal } from 'solid-js';
+import { JSXElement, createEffect, createSignal, useContext } from 'solid-js';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,8 @@ import {
 } from '~/components/ui/text-field';
 import { showToast } from '~/components/ui/toast';
 import config from '~/config';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { UserDetailsHook } from '~/types/User';
 interface LoginDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -43,6 +45,10 @@ const signUpMessages = [
 ];
 
 export default function LoginDialog(props: LoginDialogProps): JSXElement {
+  const { fetchUserDetails } = useContext(
+    UserDetailsContext,
+  ) as UserDetailsHook;
+
   const [showLogin, setShowLogin] = createSignal(true);
 
   const [formProcessing, setFormProcessing] = createSignal(false);
@@ -53,7 +59,6 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
 
   function handleLoginForm(e: SubmitEvent) {
     e.preventDefault();
-
     setFormProcessing(true);
 
     fetch(config.API_URL + '/auth/signin', {
@@ -63,6 +68,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
       .then((res) => {
         setFormProcessing(false);
         if (res.status === 200) {
+          fetchUserDetails();
           props.setOpen(false);
           return;
         }
@@ -84,6 +90,10 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
           });
         }
       });
+  }
+
+  function handleLoginWithReboot() {
+    console.error('Login with Reboot01 is not implemented yet');
   }
 
   // -------- Signup Dialog --------
@@ -151,7 +161,12 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
 
         {showLogin() && (
           <form class='flex flex-col gap-4' onSubmit={handleLoginForm}>
-            <Button variant='outline' class='gap-4' disabled={formProcessing()}>
+            <Button
+              variant='outline'
+              class='gap-4'
+              onClick={handleLoginWithReboot}
+              disabled={formProcessing()}
+            >
               <img src={rebootLogo} class='h-5'></img>
               Login with Reboot01
             </Button>

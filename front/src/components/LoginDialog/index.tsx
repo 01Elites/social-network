@@ -113,6 +113,10 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     'valid' | 'invalid'
   >('valid');
 
+  function handleSignupForm(e: SubmitEvent) {
+    console.error('Signup form is not implemented yet');
+  }
+
   createEffect(() => {
     // if empty, don't show validation
     if (signupConfirmPassword() === '') {
@@ -218,7 +222,10 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         )}
 
         {!showLogin() && (
-          <form class='grid grid-cols-2 gap-4 w-full'>
+          <form
+            class='grid grid-cols-2 gap-4 w-full'
+            onSubmit={handleSignupForm}
+          >
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupFirstName}

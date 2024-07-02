@@ -27,16 +27,16 @@ func GetUsersFollowingByID(userID string) (map[string]bool, error) {
 }
 
 func CreateFollowRequest(request models.Request)(int, error){
+	var requestID int
 	query := `
 	SELECT 
-		 status,
 		 request_id
 		FROM
 			follow_requests
 		WHERE
 		 (sender_id = $1 AND receiver_id = $2) 
 `
-err := DB.QueryRow(context.Background(),query, request.SenderID, request.ReceiverID).Scan(request.Status, request.ID)
+err := DB.QueryRow(context.Background(),query, request.SenderID, request.ReceiverID).Scan(requestID)
 if err != nil && err.Error() != "no rows in result set" {
 	log.Printf("database: Failed check for request: %v", err)
 	return 0, err // Return error if failed to insert post

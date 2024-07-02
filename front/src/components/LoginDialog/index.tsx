@@ -9,6 +9,7 @@ import {
 
 import logo from '~/assets/logo.svg';
 import rebootLogo from '~/assets/reboot_01_logo.png';
+import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -41,6 +42,8 @@ const signUpMessages = [
 
 export default function LoginDialog(props: LoginDialogProps): JSXElement {
   const [showLogin, setShowLogin] = createSignal(true);
+
+  const [formProcessing, setFormProcessing] = createSignal(false);
 
   // -------- Login Dialog --------
   const [loginEmail, setLoginEmail] = createSignal('');
@@ -137,7 +140,14 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            <Button disabled={loginEmail() === '' || loginPassword() === ''}>
+            <Button
+              disabled={
+                loginEmail() === '' ||
+                loginPassword() === '' ||
+                formProcessing()
+              }
+            >
+              {formProcessing() && <img src={tailspin} class='h-full' />}
               Login
             </Button>
             <p class='text-center'>
@@ -147,6 +157,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 variant='link'
                 class='p-0 text-base underline'
                 onClick={() => setShowLogin(false)}
+                disabled={formProcessing()}
               >
                 Sign up for Free
               </Button>
@@ -267,11 +278,15 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            <Button class='col-span-2'>Become a Looser</Button>
+            <Button class='col-span-2 gap-4' disabled={formProcessing()}>
+              {formProcessing() && <img src={tailspin} class='h-full' />}
+              Become a Looser
+            </Button>
             <Button
               variant='link'
               class='p-0 text-base underline justify-start'
               onClick={() => setShowLogin(true)}
+              disabled={formProcessing()}
             >
               I am already a looser
             </Button>

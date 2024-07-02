@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"social-network/internal/database"
+	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
+	"strconv"
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -22,17 +23,25 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil || post.Title == "" || post.Content == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: "failed to decode post",
+			Reason: "failed to decode post",
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
+	if post.Image != "" {
+		post.Image, err = helpers.SaveBase64Image(post.Image)
+		if err != nil {
+
+			fmt.Println("EEErooor:\n", err)
+		}
+	}
+
 	postID, err := database.CreatePostInDB(userID, post)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: err.Error(),
+			Reason: err.Error(),
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return
@@ -81,10 +90,10 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	postID := r.PathValue("id")
 	postIDInt, err := strconv.Atoi(postID)
-	if postIDInt == 0 || err != nil{
+	if postIDInt == 0 || err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: "invalid post id",
+			Reason: "invalid post id",
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return
@@ -93,7 +102,7 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		jsonError := models.Error{
-				Reason: "invalid post id",
+			Reason: "invalid post id",
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return
@@ -102,7 +111,7 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(post)
 }
 
-func DeletePostHandler(w http.ResponseWriter, r *http.Request){
+func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
@@ -110,10 +119,10 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request){
 	}
 	postID := r.PathValue("id")
 	postIDInt, err := strconv.Atoi(postID)
-	if postIDInt == 0 || err != nil{
+	if postIDInt == 0 || err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		jsonError := models.Error{
-				Reason: "invalid post id",
+			Reason: "invalid post id",
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return

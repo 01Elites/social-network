@@ -4,50 +4,40 @@ import "time"
 
 type Post struct {
 	ID            int         `json:"post_id"`
-	User          UserProfile `json:"user"`
+	User          UserProfile `json:"poster"`
 	Title         string      `json:"title"`
 	Content       string      `json:"content,omitempty"`
 	Image         string      `json:"image,omitempty"`
 	CreationDate  time.Time   `json:"creation_date"`
-	PostPrivacy   string      `json:"post_privacy"`
-	PostLikes     int         `json:"post_likes"`
+	PostPrivacy   string      `json:"post_privacy,omitempty"`
+	PostLikes     int         `json:"likes_count"`
 	GroupID       int         `json:"group_id,omitempty"`
-	IsLiked       bool        `json:"isLiked,omitempty"`
+	IsLiked       bool        `json:"is_Liked,omitempty"`
 	CommentsCount int         `json:"comments_count"`
 	Likers_ids    []string    `json:"likers_ids"`
 }
 
 type Create_Post struct {
 	Title   string   `json:"title"`
-	Content string   `json:"content"`
+	Content string   `json:"body"`
 	Privacy string   `json:"privacy"`
 	Image   string   `json:"image_id"`
 	GroupID int      `json:"group_id"`
 	UserIDs []string `json:"user_ids"`
 }
 
-// type PostFeed struct {
-// 	User          User      `json:"user"`
-// 	Title         string    `json:"title"`
-// 	Content       string    `json:"content,omitempty"`
-// 	Image         string    `json:"image"`
-// 	GroupID       int       `json:"group_id"`
-// 	CreationDate  time.Time `json:"creation_date"`
-// 	CommentsCount int       `json:"comments_count"`
-// 	Likers_ids    []string  `json:"likers_ids"`
-// }
-
 type Create_Comment struct {
 	ParentID int    `json:"parent_id"`
-	Content  string `json:"content"`
-	Image    string `json:"image"`
+	Content  string `json:"body"`
+	Image    string `json:"image_id"`
 }
 
 type Comment struct {
 	ID           int         `json:"comment_id"`
-	User         UserProfile `json:"user"`
-	Content      string      `json:"content"`
+	User         UserProfile `json:"commenter"`
+	Content      string      `json:"body"`
 	CreationDate time.Time   `json:"creation_date"`
+	Image        string      `json:"image_id,omitempty"`
 }
 
 type Create_Group struct {

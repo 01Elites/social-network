@@ -39,8 +39,8 @@ func CreateFollowHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		ID: request.ID,
 	}
-	json.NewEncoder(w).Encode(requestIDjson)
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(requestIDjson)
 }
 
 func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,6 +74,6 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		ID: response.ID,
 	}
-	json.NewEncoder(w).Encode(requestIDjson)
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(requestIDjson)
 }

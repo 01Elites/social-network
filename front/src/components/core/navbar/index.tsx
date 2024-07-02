@@ -86,9 +86,8 @@ export default function Navbar(prop: NavbarProps): JSXElement {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          // This is the else
         ) : (
+          // This is the else
           <Button
             variant='secondary'
             onClick={() => {

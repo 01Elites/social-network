@@ -1,5 +1,6 @@
 import { useNavigate } from '@solidjs/router';
 import { JSXElement, createSignal, useContext } from 'solid-js';
+import logo from '~/assets/logo.svg';
 import LoginDialog from '~/components/LoginDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
@@ -13,7 +14,6 @@ import {
 } from '~/components/ui/dropdown-menu';
 import { TextField, TextFieldInput } from '~/components/ui/text-field';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import logo from '~/logo.svg';
 import { UserDetailsHook } from '~/types/User';
 
 type NavbarProps = {};

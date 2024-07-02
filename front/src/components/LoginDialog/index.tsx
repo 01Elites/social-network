@@ -7,8 +7,8 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 
-import logo from '~/logo.svg';
-import rebootLogo from '~/reboot_01_logo.png';
+import logo from '~/assets/logo.svg';
+import rebootLogo from '~/assets/reboot_01_logo.png';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -46,6 +46,8 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
   const [loginEmail, setLoginEmail] = createSignal('');
   const [loginPassword, setLoginPassword] = createSignal('');
 
+  async function handleLogin() {}
+
   // -------- Signup Dialog --------
   const [signupFirstName, setSignupFirstName] = createSignal('');
   const [signupLastName, setSignupLastName] = createSignal('');
@@ -74,17 +76,17 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     }
   });
 
-  createEffect(() => {
-    console.log('firstName', signupFirstName());
-    console.log('lastName', signupLastName());
-    console.log('email', signupEmail());
-    console.log('dob', signupDOB());
-    console.log('nickname', signupNickname());
-    console.log('privacy', signupPrivacy());
-    console.log('about', signupAbout());
-    console.log('password', signupPassword());
-    console.log('confirm password', signupConfirmPassword());
-  });
+  // createEffect(() => {
+  //   console.log('firstName', signupFirstName());
+  //   console.log('lastName', signupLastName());
+  //   console.log('email', signupEmail());
+  //   console.log('dob', signupDOB());
+  //   console.log('nickname', signupNickname());
+  //   console.log('privacy', signupPrivacy());
+  //   console.log('about', signupAbout());
+  //   console.log('password', signupPassword());
+  //   console.log('confirm password', signupConfirmPassword());
+  // });
 
   return (
     <Dialog

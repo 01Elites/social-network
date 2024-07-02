@@ -6,6 +6,6 @@ import (
 )
 
 func SetupNotificationRoutes() {
-	http.HandleFunc("POST /api/followrequest/{id}", middleware.ValidateSessionMiddleware(CreateFollowHandler))
-	http.HandleFunc("POST /api/followresponse/{id}", middleware.ValidateSessionMiddleware(RespondToFollowHandler))
+	http.HandleFunc("POST /api/followrequest", middleware.ValidateSessionMiddleware(CreateFollowHandler))
+	http.HandleFunc("POST /api/followresponse", middleware.ValidateSessionMiddleware(RespondToFollowHandler))
 }

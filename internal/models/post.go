@@ -40,11 +40,6 @@ type Comment struct {
 	Image        string      `json:"image_id,omitempty"`
 }
 
-type Create_Group struct {
-	Title       string
-	Description string
-}
-
 type Error struct {
 	Reason string `json:"reason"`
 }

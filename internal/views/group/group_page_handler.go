@@ -36,7 +36,7 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	group.Posts, err = database.GetGroupPosts(group.ID)
 	if err != nil {
-		http.Error(w, "Failed to get group post", http.StatusBadRequest)
+		http.Error(w, "Failed to get group post", http.StatusNotFound)
 		return
 	}
 	group.Members, err = database.GetGroupMembers(group.ID)
@@ -44,7 +44,7 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(group)
 	w.WriteHeader(http.StatusOK)
 	io.WriteString(w, "get post successful")
+	json.NewEncoder(w).Encode(group)
 }

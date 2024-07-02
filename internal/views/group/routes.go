@@ -7,7 +7,7 @@ import (
 )
 
 func SetupGroupRoutes() {
-	http.HandleFunc("POST /api/create_group", middleware.ValidateSessionMiddleware(CreateGroupHandler))
+	http.HandleFunc("POST /api/group", middleware.ValidateSessionMiddleware(CreateGroupHandler))
 	http.HandleFunc("GET /api/group/{id}", middleware.ValidateSessionMiddleware(GetGroupPageHandler))
 	
 	// http.HandleFunc("/invite_user", m(InvitationHandler))

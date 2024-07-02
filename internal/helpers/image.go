@@ -10,12 +10,12 @@ import (
 )
 
 var (
-	serialFilePath = "/../database/images/serial.txt"
+	serialFilePath = "internal/database/images/serial.txt"
 	serialLock     sync.Mutex
 )
 
-// saveBase64Image decodes the Base64 image and saves it with a unique code as the name.
-func saveBase64Image(base64Image string) (string, error) {
+// SaveBase64Image decodes the Base64 image and saves it with a unique code as the name.
+func SaveBase64Image(base64Image string) (string, error) {
 	// Generate a unique serial number for the image
 	uniqueCode, err := getUniqueNumber()
 	if err != nil {
@@ -30,7 +30,7 @@ func saveBase64Image(base64Image string) (string, error) {
 
 	// Define the file path
 	fileName := uniqueCode + ".webp" // or any other appropriate extension
-	filePath := filepath.Join("/../database/images", fileName)
+	filePath := filepath.Join("internal/database/images", fileName)
 
 	// Ensure the directory exists
 	err = os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
@@ -97,9 +97,9 @@ func getUniqueNumber() (string, error) {
 }
 
 // getImage returns the image in 64bit format.
-func getImage(fileName string) (string, error) {
+func GetImage(fileName string) (string, error) {
 	// Read the image file
-	imageData, err := os.ReadFile(filepath.Join("/../database/images", fileName))
+	imageData, err := os.ReadFile(filepath.Join("internal/database/images", fileName))
 	if err != nil {
 		return "", fmt.Errorf("failed to read image file: %w", err)
 	}

@@ -36,10 +36,6 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
-	if err != nil {
-		http.Error(w, "Failed to decode post", http.StatusBadRequest)
-		return
-	}
 	err = database.CreateInvite(groupID, fromUser, toUser)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)

@@ -2,7 +2,6 @@ package views
 
 import (
 	"net/http"
-
 	"social-network/internal/views/auth"
 	"social-network/internal/views/group"
 	"social-network/internal/views/notifications"

@@ -8,7 +8,7 @@ import (
 
 
 func GetUsersFollowingByID(userID string) (map[string]bool, error) {
-	var Following map[string]bool
+	Following := make(map[string]bool)
 	query := `SELECT followed_id FROM follower WHERE follower_id = $1`
 	rows, err := DB.Query(context.Background(), query, userID)
 	if err != nil {

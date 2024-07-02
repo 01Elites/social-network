@@ -6,22 +6,25 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"social-network/internal/database"
+	"social-network/internal/helpers"
 	"social-network/internal/models"
 
 	"github.com/gofrs/uuid"
 )
 
 type SignUpRequst struct {
-	Email          string `json:"email"`
-	Password       string `json:"password"`
-	FirstName      string `json:"first_name"`
-	LastName       string `json:"last_name"`
-	DateOfBirth    string `json:"date_of_birth"`
-	Gender         string `json:"gender"`
-	NickName       string `json:"nick_name"`
-	ProfilePrivacy string `json:"profile_privacy"`
+	Email          string    `json:"email"`
+	Password       string    `json:"password"`
+	FirstName      string    `json:"first_name"`
+	LastName       string    `json:"last_name"`
+	DateOfBirth    time.Time `json:"date_of_birth"`
+	Gender         string    `json:"gender"`
+	NickName       string    `json:"nick_name"`
+	ProfilePrivacy string    `json:"profile_privacy"`
+	About          string    `json:"about"`
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
@@ -33,13 +36,46 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	// Decode the JSON directly from the request body
 	if err := decoder.Decode(&data); err != nil {
 		log.Printf("Error decoding sign up request: %v", err)
-		SendError(w, "Failed to decode JSON: "+err.Error(), http.StatusBadRequest)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
 
-	if err := ValidateSignUpData(&data); err != nil {
+	if err := ValidatePassword(data.Password); err != nil {
+		log.Printf("Password validation error: %v", err)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := helpers.ValidateEmail(&data.Email); err != nil {
+		log.Printf("Email validation error: %v", err)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if data.ProfilePrivacy == "" {
+		data.ProfilePrivacy = models.ProfilePrivacy.Public
+	}
+
+	userProfile := models.UserProfile{
+		NickName:       data.NickName,
+		FirstName:      data.FirstName,
+		LastName:       data.LastName,
+		Gender:         data.Gender,
+		DateOfBirth:    data.DateOfBirth,
+		ProfilePrivacy: data.ProfilePrivacy,
+		Image:          "",
+		About:          data.About,
+	}
+
+	if err := helpers.ValidateUnemptyFields(&userProfile); err != nil {
 		log.Printf("Validation error: %v", err)
-		SendError(w, err.Error(), http.StatusBadRequest)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := helpers.ValidateUserProfileData(&userProfile); err != nil {
+		log.Printf("Validation error: %v", err)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -47,7 +83,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	hash, err := HashPassword(data.Password)
 	if err != nil {
 		log.Printf("Error hashing password: %v", err)
-		SendError(w, "Internal error", http.StatusInternalServerError)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
 		return
 	}
 	data.Password = hash
@@ -56,27 +92,18 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		Password: data.Password,
 		Provider: models.Provider.Manual,
 	}
-	userProfile := models.UserProfile{
-		NickName:    data.NickName,
-		FirstName:   data.FirstName,
-		LastName:    data.LastName,
-		Gender:      data.Gender,
-		DateOfBirth: data.DateOfBirth,
-		// Image:       "",
-		Type: data.ProfilePrivacy,
-	}
 	if err := database.SignUpUser(user, userProfile); err != nil {
 		if strings.Contains(err.Error(), "SQLSTATE 23505") {
 			log.Printf("User already exists: %v", err)
-			SendError(w, "User already exists", http.StatusConflict)
+			helpers.HTTPError(w, "User already exists", http.StatusConflict)
 			return
 		} else if strings.Contains(err.Error(), "SQLSTATE 22P02") {
 			log.Printf("Invalid data format: %v", err)
-			SendError(w, "Invalid data format", http.StatusBadRequest)
+			helpers.HTTPError(w, "Invalid data format", http.StatusBadRequest)
 			return
 		}
 		log.Printf("Error signing up user: %v", err)
-		SendError(w, "Internal server error", http.StatusInternalServerError)
+		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -99,32 +126,34 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	if err := decoder.Decode(&data); err != nil {
 		log.Printf("Error decoding sign up request: %v", err)
-		SendError(w, "Failed to decode JSON: "+err.Error(), http.StatusBadRequest)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
 
 	user, err := database.GetManualUser(data.Email)
 	if err != nil {
-		log.Printf("Error getting user hash: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("Error getting manual user: %v", err)
+		helpers.HTTPError(w, "User not found", http.StatusBadRequest)
 		return
 	}
 	hashMatched := CheckPasswordHash(data.Password, user.Password)
 	if !hashMatched {
 		log.Printf("Password does not match")
-		SendError(w, "username or password is incorrect", http.StatusUnauthorized)
+		helpers.HTTPError(w, "username or password is incorrect", http.StatusUnauthorized)
 		return
 	}
 	// Create a seesion for this user
 	sessionUUID, err := uuid.NewV4()
 	if err != nil {
-		SendError(w, "Failed to create session", http.StatusInternalServerError)
+		log.Printf("Error creating session UUID: %v", err)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
 		return
 	}
 
 	// Add session to database
 	if err := database.AddUserSession(user.UserID, sessionUUID.String()); err != nil {
-		SendError(w, "Failed to add session", http.StatusInternalServerError)
+		log.Printf("Error adding session: %v", err)
+		helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -145,21 +174,12 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 
 	// Delete the session from the database
 	if err := database.DeleteUserSession(sessionToken); err != nil {
-		SendError(w, "Failed to delete session", http.StatusInternalServerError)
+		log.Printf("Error deleting session: %v", err)
+		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
 		return
 	}
 	// Expire the cookie
 	clearSessionCookie(w)
 	// AddClient(data.UserName)
 	io.WriteString(w, "LogOut success")
-}
-
-type ErrorResponse struct {
-	Reason string `json:"reason"`
-}
-
-func SendError(w http.ResponseWriter, message string, statusCode int) {
-	w.WriteHeader(statusCode)
-	errResponse := ErrorResponse{Reason: message}
-	json.NewEncoder(w).Encode(errResponse)
 }

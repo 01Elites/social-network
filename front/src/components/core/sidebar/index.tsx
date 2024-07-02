@@ -16,9 +16,9 @@ type SidebarProps = {
 
 export default function SideBar(props: SidebarProps) {
   return (
-    <div class='flex flex-col justify-between h-full'>
+    <div class='flex flex-col h-full'>
       {/* This div is for Navigation */}
-      <div class='flex flex-col gap-10'>
+      <div class='flex flex-col justify-center h-full gap-10'>
         <Apps_Icon
           class='h-8 w-8 cursor-pointer self-center'
           onClick={() => {
@@ -44,14 +44,15 @@ export default function SideBar(props: SidebarProps) {
           }}
         />
       </div>
-
       {/* This one will have the settings */}
-      <Settings_Icon
-        class='h-9 w-9 cursor-pointer self-center'
-        onClick={() => {
-          console.log('settings clicked');
-        }}
-      />
+      <div class='flex flex-col justify-end'>
+        <Settings_Icon
+          class='h-9 w-9 cursor-pointer self-center'
+          onClick={() => {
+            console.log('settings clicked');
+          }}
+        />
+      </div>
     </div>
   );
 }

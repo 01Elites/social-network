@@ -25,6 +25,7 @@ import {
   TextFieldLabel,
   TextFieldTextArea,
 } from '~/components/ui/text-field';
+import config from '~/config';
 interface LoginDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -49,7 +50,30 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
   const [loginEmail, setLoginEmail] = createSignal('');
   const [loginPassword, setLoginPassword] = createSignal('');
 
-  async function handleLogin() {}
+  function handleLoginForm(e: SubmitEvent) {
+    e.preventDefault();
+
+    setFormProcessing(true);
+
+    fetch(config.API_URL + '/auth/signin', {
+      method: 'POST',
+      body: JSON.stringify({ email: loginEmail(), password: loginPassword() }),
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log('Logged in successfully');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data);
+      });
+
+    setTimeout(() => {
+      setFormProcessing(false);
+      // props.setOpen(false);
+    }, 5000);
+  }
 
   // -------- Signup Dialog --------
   const [signupFirstName, setSignupFirstName] = createSignal('');
@@ -115,8 +139,8 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         </DialogHeader>
 
         {showLogin() && (
-          <form class='flex flex-col gap-4'>
-            <Button variant='outline' class='gap-4'>
+          <form class='flex flex-col gap-4' onSubmit={handleLoginForm}>
+            <Button variant='outline' class='gap-4' disabled={formProcessing()}>
               <img src={rebootLogo} class='h-5'></img>
               Login with Reboot01
             </Button>
@@ -146,9 +170,11 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 loginPassword() === '' ||
                 formProcessing()
               }
+              type='submit'
+              class='gap-4'
             >
               {formProcessing() && <img src={tailspin} class='h-full' />}
-              Login
+              {formProcessing() ? 'Logging in...' : 'Login'}
             </Button>
             <p class='text-center'>
               Don't have an account?{' '}

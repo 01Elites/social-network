@@ -28,6 +28,8 @@ type SignUpRequst struct {
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+
 	var data SignUpRequst
 
 	// Create a JSON decoder for the request body
@@ -119,6 +121,8 @@ type SignInRequst struct {
 }
 
 func SignIn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+
 	var data SignInRequst
 
 	decoder := json.NewDecoder(r.Body)

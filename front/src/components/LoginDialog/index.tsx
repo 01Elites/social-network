@@ -114,6 +114,48 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
   >('valid');
 
   function handleSignupForm(e: SubmitEvent) {
+    e.preventDefault();
+    fetch(config.API_URL + '/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({
+        firstName: signupFirstName(),
+        lastName: signupLastName(),
+        email: signupEmail(),
+        dob: signupDOB(),
+        nickname: signupNickname(),
+        privacy: signupPrivacy(),
+        about: signupAbout(),
+        password: signupPassword(),
+      }),
+    })
+      .then((res) => {
+        if (res.status === 201) {
+          showToast({
+            title: 'Account created',
+            description: 'Your account has been created successfully',
+            variant: 'success',
+          });
+          props.setOpen(false);
+          return;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.reason) {
+          showToast({
+            title: 'An error occurred',
+            description: data.reason,
+            variant: 'error',
+          });
+        } else {
+          showToast({
+            title: 'An error occurred',
+            description:
+              'An error occurred while creating your account. Please try again.',
+            variant: 'error',
+          });
+        }
+      });
     console.error('Signup form is not implemented yet');
   }
 
@@ -221,6 +263,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
           </form>
         )}
 
+        {/* Sign up form */}
         {!showLogin() && (
           <form
             class='grid grid-cols-2 gap-4 w-full'
@@ -337,7 +380,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            <Button class='col-span-2 gap-4' disabled={formProcessing()}>
+            <Button type="submit" class='col-span-2 gap-4' disabled={formProcessing()}>
               {formProcessing() && <img src={tailspin} class='h-full' />}
               Become a Looser
             </Button>

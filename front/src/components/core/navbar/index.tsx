@@ -19,9 +19,7 @@ import { UserDetailsHook } from '~/types/User';
 type NavbarProps = {};
 
 export default function Navbar(prop: NavbarProps): JSXElement {
-  const { userDetails, updateUserDetails, fetchUserDetails } = useContext(
-    UserDetailsContext,
-  ) as UserDetailsHook;
+  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   const navigate = useNavigate();
   const [loginDialogVisible, setLoginDialogVisible] = createSignal(false);
@@ -57,10 +55,12 @@ export default function Navbar(prop: NavbarProps): JSXElement {
           <DropdownMenu>
             <DropdownMenuTrigger class='flex flex-row items-center gap-2'>
               <Avatar>
-                <AvatarImage src='https://thispersondoesnotexist.com/'></AvatarImage>
-                <AvatarFallback>N</AvatarFallback>
+                <AvatarImage src={userDetails()?.avatar_url}></AvatarImage>
+                <AvatarFallback>
+                  {userDetails()?.first_name.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
-              Natheer
+              {userDetails()?.first_name}
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>My Account</DropdownMenuLabel>

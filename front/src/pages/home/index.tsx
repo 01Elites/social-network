@@ -7,7 +7,7 @@ export default function HomePage(): JSXElement {
   return (
     <Layout>
       <section class='flex gap-4'>
-        <Feed class='w-3/4 bg-orange-50' />
+        <Feed class='w-3/4' />
         <div class='grow bg-red-50'>Contacts</div>
       </section>
     </Layout>

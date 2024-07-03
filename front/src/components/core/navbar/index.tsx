@@ -1,5 +1,6 @@
 import { useNavigate } from '@solidjs/router';
 import { JSXElement, createSignal, useContext } from 'solid-js';
+import logo from '~/assets/logo.svg';
 import LoginDialog from '~/components/LoginDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
@@ -13,15 +14,12 @@ import {
 } from '~/components/ui/dropdown-menu';
 import { TextField, TextFieldInput } from '~/components/ui/text-field';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import logo from '~/logo.svg';
 import { UserDetailsHook } from '~/types/User';
 
 type NavbarProps = {};
 
-export default function Navbar(prop: NavbarProps): JSXElement {
-  const { userDetails, updateUserDetails, fetchUserDetails } = useContext(
-    UserDetailsContext,
-  ) as UserDetailsHook;
+export default function Navbar(props: NavbarProps): JSXElement {
+  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   const navigate = useNavigate();
   const [loginDialogVisible, setLoginDialogVisible] = createSignal(false);
@@ -36,7 +34,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         style={{
           width: 'calc(100% - 40px)',
         }}
-        class='fixed mx-5 hidden h-[70px] items-center justify-between gap-4 align-middle xs:flex'
+        class='fixed mx-5 flex h-[70px] items-center justify-between gap-4 align-middle'
       >
         <img
           src={logo}
@@ -57,10 +55,12 @@ export default function Navbar(prop: NavbarProps): JSXElement {
           <DropdownMenu>
             <DropdownMenuTrigger class='flex flex-row items-center gap-2'>
               <Avatar>
-                <AvatarImage src='https://thispersondoesnotexist.com/'></AvatarImage>
-                <AvatarFallback>N</AvatarFallback>
+                <AvatarImage src={userDetails()?.avatar_url}></AvatarImage>
+                <AvatarFallback>
+                  {userDetails()?.first_name.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
-              Natheer
+              {userDetails()?.first_name}
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -87,6 +87,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
+          // This is the else
           <Button
             variant='secondary'
             onClick={() => {

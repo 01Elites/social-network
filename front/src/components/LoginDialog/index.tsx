@@ -1,4 +1,4 @@
-import { JSXElement, createEffect, createSignal } from 'solid-js';
+import { JSXElement, createEffect, createSignal, useContext } from 'solid-js';
 import {
   Dialog,
   DialogContent,
@@ -7,16 +7,28 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 
-import logo from '~/logo.svg';
-import rebootLogo from '~/reboot_01_logo.png';
+import logo from '~/assets/logo.svg';
+import rebootLogo from '~/assets/reboot_01_logo.png';
+import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import { Button } from '~/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 import {
   TextField,
   TextFieldInput,
   TextFieldLabel,
   TextFieldTextArea,
 } from '~/components/ui/text-field';
+import { showToast } from '~/components/ui/toast';
+import config from '~/config';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { UserDetailsHook } from '~/types/User';
 interface LoginDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -33,11 +45,56 @@ const signUpMessages = [
 ];
 
 export default function LoginDialog(props: LoginDialogProps): JSXElement {
+  const { fetchUserDetails } = useContext(
+    UserDetailsContext,
+  ) as UserDetailsHook;
+
   const [showLogin, setShowLogin] = createSignal(true);
+
+  const [formProcessing, setFormProcessing] = createSignal(false);
 
   // -------- Login Dialog --------
   const [loginEmail, setLoginEmail] = createSignal('');
   const [loginPassword, setLoginPassword] = createSignal('');
+
+  function handleLoginForm(e: SubmitEvent) {
+    e.preventDefault();
+    setFormProcessing(true);
+
+    fetch(config.API_URL + '/auth/signin', {
+      method: 'POST',
+      body: JSON.stringify({ email: loginEmail(), password: loginPassword() }),
+    })
+      .then((res) => {
+        setFormProcessing(false);
+        if (res.status === 200) {
+          fetchUserDetails();
+          props.setOpen(false);
+          return;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.reason) {
+          showToast({
+            title: 'An error occurred',
+            description: data.reason,
+            variant: 'error',
+          });
+        } else {
+          showToast({
+            title: 'An error occurred',
+            description:
+              'An error occurred while logging in. Please try again.',
+            variant: 'error',
+          });
+        }
+      });
+  }
+
+  function handleLoginWithReboot() {
+    console.error('Login with Reboot01 is not implemented yet');
+  }
 
   // -------- Signup Dialog --------
   const [signupFirstName, setSignupFirstName] = createSignal('');
@@ -56,6 +113,53 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     'valid' | 'invalid'
   >('valid');
 
+  function handleSignupForm(e: SubmitEvent) {
+    e.preventDefault();
+    setFormProcessing(true);
+    fetch(config.API_URL + '/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({
+        first_name: signupFirstName(),
+        last_name: signupLastName(),
+        email: signupEmail(),
+        date_of_birth: new Date(signupDOB()).toISOString(),
+        nick_name: signupNickname(),
+        profile_privacy: signupPrivacy(),
+        about: signupAbout(),
+        password: signupPassword(),
+        gender: 'female', // Hardcoded for testing
+      }),
+    })
+      .then(async (res) => {
+        setFormProcessing(false);
+        if (res.status === 201) {
+          showToast({
+            title: 'Account created',
+            description: 'Your account has been created successfully',
+            variant: 'success',
+          });
+          props.setOpen(false);
+          setShowLogin(true);
+          return;
+        }
+
+        const error = await res.json();
+        if (error.reason) {
+          throw new Error(error.reason);
+        }
+        throw new Error(
+          'An error occurred while creating your account. Please try again.',
+        );
+      })
+      .catch((error: Error) => {
+        showToast({
+          title: 'An error occurred',
+          description: error.message,
+          variant: 'error',
+        });
+      });
+  }
+
   createEffect(() => {
     // if empty, don't show validation
     if (signupConfirmPassword() === '') {
@@ -67,17 +171,17 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     }
   });
 
-  createEffect(() => {
-    console.log('firstName', signupFirstName());
-    console.log('lastName', signupLastName());
-    console.log('email', signupEmail());
-    console.log('dob', signupDOB());
-    console.log('nickname', signupNickname());
-    console.log('privacy', signupPrivacy());
-    console.log('about', signupAbout());
-    console.log('password', signupPassword());
-    console.log('confirm password', signupConfirmPassword());
-  });
+  // createEffect(() => {
+  //   console.log('firstName', signupFirstName());
+  //   console.log('lastName', signupLastName());
+  //   console.log('email', signupEmail());
+  //   console.log('dob', signupDOB());
+  //   console.log('nickname', signupNickname());
+  //   console.log('privacy', signupPrivacy());
+  //   console.log('about', signupAbout());
+  //   console.log('password', signupPassword());
+  //   console.log('confirm password', signupConfirmPassword());
+  // });
 
   return (
     <Dialog
@@ -103,14 +207,20 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         </DialogHeader>
 
         {showLogin() && (
-          <form class='flex flex-col gap-4'>
-            <Button variant='outline' class='gap-4'>
+          <form class='flex flex-col gap-4' onSubmit={handleLoginForm}>
+            <Button
+              variant='outline'
+              class='gap-4'
+              onClick={handleLoginWithReboot}
+              disabled={formProcessing()}
+            >
               <img src={rebootLogo} class='h-5'></img>
               Login with Reboot01
             </Button>
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginEmail}
+              required
             >
               <TextFieldLabel for='email'>Email</TextFieldLabel>
               <TextFieldInput type='email' id='email' placeholder='Email' />
@@ -119,6 +229,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginPassword}
+              required
             >
               <TextFieldLabel for='password'>Password</TextFieldLabel>
               <TextFieldInput
@@ -128,8 +239,17 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            <Button disabled={loginEmail() === '' || loginPassword() === ''}>
-              Login
+            <Button
+              disabled={
+                loginEmail() === '' ||
+                loginPassword() === '' ||
+                formProcessing()
+              }
+              type='submit'
+              class='gap-4'
+            >
+              {formProcessing() && <img src={tailspin} class='h-full' />}
+              {formProcessing() ? 'Logging in...' : 'Login'}
             </Button>
             <p class='text-center'>
               Don't have an account?{' '}
@@ -138,6 +258,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 variant='link'
                 class='p-0 text-base underline'
                 onClick={() => setShowLogin(false)}
+                disabled={formProcessing()}
               >
                 Sign up for Free
               </Button>
@@ -145,11 +266,16 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
           </form>
         )}
 
+        {/* Sign up form */}
         {!showLogin() && (
-          <form class='grid grid-cols-2 gap-4 w-full'>
+          <form
+            class='grid grid-cols-2 gap-4 w-full'
+            onSubmit={handleSignupForm}
+          >
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupFirstName}
+              required
             >
               <TextFieldLabel for='fname'>First Name</TextFieldLabel>
               <TextFieldInput type='text' id='fname' placeholder='Yaman' />
@@ -157,6 +283,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupLastName}
+              required
             >
               <TextFieldLabel for='lname'>Last Name</TextFieldLabel>
               <TextFieldInput type='text' id='lname' placeholder='Almasri' />
@@ -164,6 +291,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupEmail}
+              required
             >
               <TextFieldLabel for='email'>Email</TextFieldLabel>
               <TextFieldInput
@@ -175,6 +303,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupDOB}
+              required
             >
               <TextFieldLabel for='dob'>Date of Birth</TextFieldLabel>
               <TextFieldInput type='date' id='dob' placeholder='30/6/2024' />
@@ -192,16 +321,33 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            {/* TODO: Solid-ui was down at 1 am, tomorrow when its up switch this to a ComboBox */}
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupPrivacy}
             >
               <TextFieldLabel for='privacy'>Profile Privacy</TextFieldLabel>
-              <select class='border-input border-[1px] h-full p-2 rounded-md'>
-                <option value='public'>Public</option>
-                <option value='private'>Private</option>
-              </select>
+
+              <Select
+                class='w-full col-span-1'
+                placeholder='Profile Privacy'
+                itemComponent={(props) => (
+                  <SelectItem item={props.item}>
+                    {props.item.rawValue}
+                  </SelectItem>
+                )}
+                options={['public', 'private']}
+                defaultValue={'public'}
+              >
+                <SelectTrigger aria-label='profile privacy' class='w-full'>
+                  <SelectValue<string>>
+                    {(state) => {
+                      setSignupPrivacy(state.selectedOption() as any);
+                      return state.selectedOption();
+                    }}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent />
+              </Select>
             </TextField>
 
             <TextField
@@ -220,6 +366,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupPassword}
+              required
             >
               <TextFieldLabel for='password'>Password</TextFieldLabel>
               <TextFieldInput
@@ -233,6 +380,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupConfirmPassword}
               validationState={signupPasswordValidation()}
+              required
             >
               <TextFieldLabel for='confirm-password'>
                 Confirm Password
@@ -244,11 +392,19 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            <Button class='col-span-2'>Become a Looser</Button>
+            <Button
+              type='submit'
+              class='col-span-2 gap-4'
+              disabled={formProcessing()}
+            >
+              {formProcessing() && <img src={tailspin} class='h-full' />}
+              Become a Looser
+            </Button>
             <Button
               variant='link'
               class='p-0 text-base underline justify-start'
               onClick={() => setShowLogin(true)}
+              disabled={formProcessing()}
             >
               I am already a looser
             </Button>

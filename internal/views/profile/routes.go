@@ -6,6 +6,8 @@ import (
 )
 
 func SetupProfileRoutes() {
+	http.HandleFunc("GET /api/profile", middleware.AllowCORS(middleware.CheckAuth(getProfile)))
+	http.HandleFunc("PATCH /api/profile", middleware.AllowCORS(middleware.CheckAuth(patchProfile)))
 	http.HandleFunc("GET /api/profile", middleware.ValidateSessionMiddleware(getProfile))
 	http.HandleFunc("PATCH /api/profile", middleware.ValidateSessionMiddleware(patchProfile))
 	http.HandleFunc("GET /api/profile/{id}", middleware.ValidateSessionMiddleware(getProfileByID))

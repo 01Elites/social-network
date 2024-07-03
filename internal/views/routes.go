@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"social-network/internal/views/auth"
+	"social-network/internal/views/middleware"
 	"social-network/internal/views/post"
 	"social-network/internal/views/profile"
 )
@@ -31,6 +32,8 @@ func SetupRoutes() {
 
 	// /********************* Posts ************************/
 	post.SetupPostRoutes()
+
+	http.HandleFunc("OPTIONS /api/", middleware.AllowCORS(func(w http.ResponseWriter, r *http.Request) {}))
 
 	// /********************* Group ************************/
 	http.HandleFunc("POST /api/create_group", CreateGroupHandler)

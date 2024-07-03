@@ -12,6 +12,8 @@ import rebootLogo from '~/assets/reboot_01_logo.png';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import { Button } from '~/components/ui/button';
+import { Checkbox } from '~/components/ui/checkbox';
+import { Label } from '~/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -102,11 +104,10 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
   const [signupEmail, setSignupEmail] = createSignal('');
   const [signupDOB, setSignupDOB] = createSignal('');
   const [signupNickname, setSignupNickname] = createSignal('');
-  const [signupPrivacy, setSignupPrivacy] = createSignal<
-    'public' | 'private'
-  >();
+  const [signupGender, setSignupGender] = createSignal<'female' | 'male'>();
   const [signupAbout, setSignupAbout] = createSignal('');
   const [signupPassword, setSignupPassword] = createSignal('');
+  const [signupPrivate, setSignupPrivate] = createSignal(false);
   const [signupConfirmPassword, setSignupConfirmPassword] = createSignal('');
 
   const [signupPasswordValidation, setSignupPasswordValidation] = createSignal<
@@ -124,10 +125,10 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         email: signupEmail(),
         date_of_birth: new Date(signupDOB()).toISOString(),
         nick_name: signupNickname(),
-        profile_privacy: signupPrivacy(),
+        profile_privacy: signupPrivate() ? 'private' : 'public',
         about: signupAbout(),
         password: signupPassword(),
-        gender: 'female', // Hardcoded for testing
+        gender: signupGender(), // Hardcoded for testing
       }),
     })
       .then(async (res) => {
@@ -311,25 +312,25 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
 
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
-              onChange={setSignupPrivacy}
+              onChange={setSignupGender}
             >
-              <TextFieldLabel for='privacy'>Profile Privacy</TextFieldLabel>
+              <TextFieldLabel>Gender</TextFieldLabel>
 
               <Select
                 class='w-full col-span-1'
-                placeholder='Profile Privacy'
+                placeholder='Select your Gender'
                 itemComponent={(props) => (
                   <SelectItem item={props.item}>
                     {props.item.rawValue}
                   </SelectItem>
                 )}
-                options={['public', 'private']}
-                defaultValue={'public'}
+                options={['male', 'female']}
+                defaultValue='male'
               >
                 <SelectTrigger aria-label='profile privacy' class='w-full'>
                   <SelectValue<string>>
                     {(state) => {
-                      setSignupPrivacy(state.selectedOption() as any);
+                      setSignupGender(state.selectedOption() as any);
                       return state.selectedOption();
                     }}
                   </SelectValue>
@@ -379,6 +380,20 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 placeholder='confirm your password'
               />
             </TextField>
+
+            <div class='items-top flex space-x-2 col-span-2'>
+              <Checkbox
+                id='terms1'
+                checked={signupPrivate()}
+                onChange={setSignupPrivate}
+              />
+              <div class='grid gap-1.5 leading-none'>
+                <Label for='terms1-input'>Make my profile private</Label>
+                <p class='text-sm text-muted-foreground'>
+                  I am a big looser and I don't want anyone to know about me
+                </p>
+              </div>
+            </div>
 
             <Button
               type='submit'

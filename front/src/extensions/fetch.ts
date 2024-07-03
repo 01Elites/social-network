@@ -9,7 +9,6 @@ export async function fetchWithAuth(
   // Add the Authorization header to the request
   const options: RequestInit = init || {};
 
-  console.log('fetchWithAuth', input, options);
 
   if (token !== '') {
     options.headers = {
@@ -17,9 +16,6 @@ export async function fetchWithAuth(
       Authorization: `Bearer ${token}`,
     };
   }
-
-
-  console.log('fetchWithAuth after', input, options);
 
   // Perform the fetch
   return fetch(input, options).then((response) => {

@@ -1,7 +1,9 @@
 package session
 
 import (
+	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"social-network/internal/database"
@@ -49,4 +51,28 @@ func SetSessionCookie(w http.ResponseWriter, sessionToken string) {
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &updatedCookie)
+}
+
+func SetAutherizationHeader(w http.ResponseWriter, token string) {
+	w.Header().Set("Authorization", "Bearer "+token)
+}
+
+func ClearAutherizationHeader(w http.ResponseWriter) {
+	w.Header().Set("Authorization", "")
+}
+
+// ExtractToken extracts the Bearer token from the Authorization header
+func ExtractToken(r *http.Request) (string, error) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return "", errors.New("missing Authorization header")
+	}
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return "", errors.New("invalid Authorization header format")
+	}
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	if token == "" {
+		return "", errors.New("missing token")
+	}
+	return token, nil
 }

@@ -29,8 +29,6 @@ type SignUpRequst struct {
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-
 	var data SignUpRequst
 
 	// Create a JSON decoder for the request body
@@ -122,8 +120,6 @@ type SignInRequst struct {
 }
 
 func SignIn(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-
 	var data SignInRequst
 
 	decoder := json.NewDecoder(r.Body)
@@ -163,22 +159,23 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set a cookie with a session token that can be used to authenticate access without logging in
-	session.SetSessionCookie(w, sessionUUID.String())
+	// session.SetSessionCookie(w, sessionUUID.String())
 
+	session.SetAutherizationHeader(w, sessionUUID.String())
 	w.WriteHeader(http.StatusOK)
 	io.WriteString(w, "Signin successful")
 }
 
 func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token from the cookie
-	cookie, err := r.Cookie("SN_SESSION")
+	token, err := session.ExtractToken(r)
 	if err != nil {
-		// No session token, user is not logged in
+		log.Printf("Error extracting token: %v", err)
+		helpers.HTTPError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	sessionToken := cookie.Value
 
 	// Delete the session from the database
-	if err := database.DeleteUserSession(sessionToken); err != nil {
+	if err := database.DeleteUserSession(token); err != nil {
 		log.Printf("Error deleting session: %v", err)
 		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
 		return

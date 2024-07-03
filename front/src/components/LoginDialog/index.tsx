@@ -127,7 +127,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         profile_privacy: signupPrivacy(),
         about: signupAbout(),
         password: signupPassword(),
-        gender: 'male', // Hardcoded for testing
+        gender: 'female', // Hardcoded for testing
       }),
     })
       .then(async (res) => {

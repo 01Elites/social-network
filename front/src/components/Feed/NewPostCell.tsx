@@ -1,5 +1,5 @@
 import { Image } from '@kobalte/core/image';
-import { JSXElement, useContext } from 'solid-js';
+import { JSXElement, createSignal, useContext } from 'solid-js';
 import { TextField, TextFieldInput } from '~/components/ui/text-field';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { UserDetailsHook } from '~/types/User';
@@ -9,6 +9,8 @@ import { Button } from '../ui/button';
 
 export default function NewPostCell(): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+
+  const [postText, setPostText] = createSignal('');
 
   return (
     <div class='border-[1px] rounded p-2 flex gap-2'>
@@ -20,13 +22,18 @@ export default function NewPostCell(): JSXElement {
         />
         <Image.Fallback>E</Image.Fallback>
       </Image>
-      <TextField class='grow'>
+      <TextField class='grow' onChange={setPostText}>
         <TextFieldInput
           class='border-none'
           type='text'
           placeholder='Your father disappointed?'
         />
       </TextField>
+      {postText().trim().length > 10 && (
+        <Button class='animate-content-show3' title='Post Button'>
+          Post
+        </Button>
+      )}
       <Button variant='ghost' title='Upload an image Button'>
         <img src={photo} alt='Upload an image icon' />
       </Button>

@@ -115,6 +115,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
 
   function handleSignupForm(e: SubmitEvent) {
     e.preventDefault();
+    setFormProcessing(true);
     fetch(config.API_URL + '/auth/signup', {
       method: 'POST',
       body: JSON.stringify({
@@ -126,10 +127,11 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         profile_privacy: signupPrivacy(),
         about: signupAbout(),
         password: signupPassword(),
-        gender: "male" // Hardcoded for testing
+        gender: 'male', // Hardcoded for testing
       }),
     })
-      .then((res) => {
+      .then(async (res) => {
+        setFormProcessing(false);
         if (res.status === 201) {
           showToast({
             title: 'Account created',
@@ -137,27 +139,25 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             variant: 'success',
           });
           props.setOpen(false);
+          setShowLogin(true);
           return;
         }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.reason) {
-          showToast({
-            title: 'An error occurred',
-            description: data.reason,
-            variant: 'error',
-          });
-        } else {
-          showToast({
-            title: 'An error occurred',
-            description:
-              'An error occurred while creating your account. Please try again.',
-            variant: 'error',
-          });
+
+        const error = await res.json();
+        if (error.reason) {
+          throw new Error(error.reason);
         }
+        throw new Error(
+          'An error occurred while creating your account. Please try again.',
+        );
+      })
+      .catch((error: Error) => {
+        showToast({
+          title: 'An error occurred',
+          description: error.message,
+          variant: 'error',
+        });
       });
-    console.error('Signup form is not implemented yet');
   }
 
   createEffect(() => {
@@ -220,6 +220,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginEmail}
+              required
             >
               <TextFieldLabel for='email'>Email</TextFieldLabel>
               <TextFieldInput type='email' id='email' placeholder='Email' />
@@ -228,6 +229,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginPassword}
+              required
             >
               <TextFieldLabel for='password'>Password</TextFieldLabel>
               <TextFieldInput
@@ -273,6 +275,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupFirstName}
+              required
             >
               <TextFieldLabel for='fname'>First Name</TextFieldLabel>
               <TextFieldInput type='text' id='fname' placeholder='Yaman' />
@@ -280,6 +283,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupLastName}
+              required
             >
               <TextFieldLabel for='lname'>Last Name</TextFieldLabel>
               <TextFieldInput type='text' id='lname' placeholder='Almasri' />
@@ -287,6 +291,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupEmail}
+              required
             >
               <TextFieldLabel for='email'>Email</TextFieldLabel>
               <TextFieldInput
@@ -298,6 +303,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupDOB}
+              required
             >
               <TextFieldLabel for='dob'>Date of Birth</TextFieldLabel>
               <TextFieldInput type='date' id='dob' placeholder='30/6/2024' />
@@ -335,8 +341,8 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 <SelectTrigger aria-label='profile privacy' class='w-full'>
                   <SelectValue<string>>
                     {(state) => {
-                      setSignupPrivacy(state.selectedOption());
-                      return state.selectedOption()
+                      setSignupPrivacy(state.selectedOption() as any);
+                      return state.selectedOption();
                     }}
                   </SelectValue>
                 </SelectTrigger>
@@ -360,6 +366,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupPassword}
+              required
             >
               <TextFieldLabel for='password'>Password</TextFieldLabel>
               <TextFieldInput
@@ -373,6 +380,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               class='grid w-full items-center gap-1.5 col-span-1'
               onChange={setSignupConfirmPassword}
               validationState={signupPasswordValidation()}
+              required
             >
               <TextFieldLabel for='confirm-password'>
                 Confirm Password
@@ -384,7 +392,11 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            <Button type="submit" class='col-span-2 gap-4' disabled={formProcessing()}>
+            <Button
+              type='submit'
+              class='col-span-2 gap-4'
+              disabled={formProcessing()}
+            >
               {formProcessing() && <img src={tailspin} class='h-full' />}
               Become a Looser
             </Button>

@@ -181,7 +181,7 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 		return
 	}
 	// Expire the cookie
-	session.ClearSessionCookie(w)
+	session.ClearAutherizationHeader(w)
 	// AddClient(data.UserName)
 	io.WriteString(w, "LogOut success")
 }

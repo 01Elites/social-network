@@ -294,7 +294,12 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               required
             >
               <TextFieldLabel for='dob'>Date of Birth</TextFieldLabel>
-              <TextFieldInput type='date' id='dob' placeholder='30/6/2024' />
+              <TextFieldInput
+                class='block' // without it calendar icon gets ruined
+                type='date'
+                id='dob'
+                placeholder='30/6/2024'
+              />
             </TextField>
 
             <TextField

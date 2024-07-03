@@ -11,6 +11,7 @@ import (
 	"social-network/internal/database"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
+	"social-network/internal/views/session"
 
 	"github.com/gofrs/uuid"
 )
@@ -162,7 +163,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set a cookie with a session token that can be used to authenticate access without logging in
-	SetSessionCookie(w, sessionUUID.String())
+	session.SetSessionCookie(w, sessionUUID.String())
 
 	w.WriteHeader(http.StatusOK)
 	io.WriteString(w, "Signin successful")
@@ -183,7 +184,7 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 		return
 	}
 	// Expire the cookie
-	clearSessionCookie(w)
+	session.ClearSessionCookie(w)
 	// AddClient(data.UserName)
 	io.WriteString(w, "LogOut success")
 }

@@ -1,11 +1,29 @@
-package auth
+package session
 
 import (
 	"net/http"
 	"time"
+
+	"social-network/internal/database"
 )
 
-func clearSessionCookie(w http.ResponseWriter) {
+func ValidateSession(w http.ResponseWriter, r *http.Request) (string, error) {
+	// Extract the session token from the cookie
+	cookie, err := r.Cookie("SN_SESSION")
+	if err != nil {
+		return "", err // No session token, user is not logged in
+	}
+	// Validate the session token in the database
+	userID, err := database.ValidateSessionToken(cookie.Value)
+	if err != nil {
+		return "", err
+	}
+
+	SetSessionCookie(w, cookie.Value)
+	return userID, nil
+}
+
+func ClearSessionCookie(w http.ResponseWriter) {
 	// Clear the session cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "SN_SESSION",

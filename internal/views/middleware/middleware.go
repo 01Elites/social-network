@@ -12,6 +12,7 @@ func AllowCORS(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+		w.Header().Set("Access-Control-Allow-Headers", "Authorization")
 		next(w, r)
 	}
 }

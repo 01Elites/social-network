@@ -171,18 +171,6 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     }
   });
 
-  // createEffect(() => {
-  //   console.log('firstName', signupFirstName());
-  //   console.log('lastName', signupLastName());
-  //   console.log('email', signupEmail());
-  //   console.log('dob', signupDOB());
-  //   console.log('nickname', signupNickname());
-  //   console.log('privacy', signupPrivacy());
-  //   console.log('about', signupAbout());
-  //   console.log('password', signupPassword());
-  //   console.log('confirm password', signupConfirmPassword());
-  // });
-
   return (
     <Dialog
       open={props.open}

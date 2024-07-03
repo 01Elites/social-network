@@ -18,7 +18,7 @@ import { UserDetailsHook } from '~/types/User';
 
 type NavbarProps = {};
 
-export default function Navbar(prop: NavbarProps): JSXElement {
+export default function Navbar(props: NavbarProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function Navbar(prop: NavbarProps): JSXElement {
         style={{
           width: 'calc(100% - 40px)',
         }}
-        class='fixed mx-5 hidden h-[70px] items-center justify-between gap-4 align-middle xs:flex'
+        class='fixed mx-5 flex h-[70px] items-center justify-between gap-4 align-middle'
       >
         <img
           src={logo}

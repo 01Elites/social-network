@@ -5,7 +5,7 @@ import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { UserDetailsHook } from '~/types/User';
 
 import photo from '~/assets/photo.svg';
-import { Button } from '../ui/button';
+import { Button } from '~/components/ui/button';
 
 export default function NewPostCell(): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
@@ -29,7 +29,7 @@ export default function NewPostCell(): JSXElement {
           placeholder='Your father disappointed?'
         />
       </TextField>
-      {postText().trim().length > 10 && (
+      {postText().trim().length > 0 && (
         <Button class='animate-content-show3' title='Post Button'>
           Post
         </Button>

@@ -1,6 +1,7 @@
 import { createSignal, onMount } from 'solid-js';
 import config from '../../config';
 import User, { UserDetailsHook } from '../../types/User';
+import { fetchWithAuth } from '~/extensions/fetch';
 
 
 
@@ -10,7 +11,7 @@ function useUserDetails(): UserDetailsHook {
 
   async function fetchUserDetails(): Promise<void> {
     try {
-      const response = await fetch(config.API_URL + '/profile');
+      const response = await fetchWithAuth(config.API_URL + '/profile');
       
       if (!response.ok) {
         const error = await response.json();

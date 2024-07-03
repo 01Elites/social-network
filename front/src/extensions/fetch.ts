@@ -9,6 +9,8 @@ export async function fetchWithAuth(
   // Add the Authorization header to the request
   const options: RequestInit = init || {};
 
+  console.log('fetchWithAuth', input, options);
+
   if (token !== '') {
     options.headers = {
       ...options.headers,
@@ -16,14 +18,16 @@ export async function fetchWithAuth(
     };
   }
 
+
+  console.log('fetchWithAuth after', input, options);
+
   // Perform the fetch
-  return fetch(input, init).then((response) => {
+  return fetch(input, options).then((response) => {
     // Check for new token in the response headers
-    const newToken = response.headers.get('Set-Authorization');
+    const newToken = response.headers.get('Authorization');
     if (newToken) {
       localStorage.setItem('SN_TOKEN', newToken.replace('Bearer ', ''));
     }
-
     return response;
   });
 }

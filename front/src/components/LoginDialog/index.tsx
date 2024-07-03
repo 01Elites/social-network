@@ -30,6 +30,7 @@ import {
 import { showToast } from '~/components/ui/toast';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/types/User';
 interface LoginDialogProps {
   open: boolean;
@@ -63,8 +64,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     e.preventDefault();
     setFormProcessing(true);
 
-    fetch(config.API_URL + '/auth/signin', {
-      credentials: 'include',
+    fetchWithAuth(config.API_URL + '/auth/signin', {
       method: 'POST',
       body: JSON.stringify({ email: loginEmail(), password: loginPassword() }),
     })
@@ -116,7 +116,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
   function handleSignupForm(e: SubmitEvent) {
     e.preventDefault();
     setFormProcessing(true);
-    fetch(config.API_URL + '/auth/signup', {
+    fetchWithAuth(config.API_URL + '/auth/signup', {
       method: 'POST',
       body: JSON.stringify({
         first_name: signupFirstName(),

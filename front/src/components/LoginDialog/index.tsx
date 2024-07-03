@@ -64,33 +64,32 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     setFormProcessing(true);
 
     fetch(config.API_URL + '/auth/signin', {
+      credentials: 'include',
       method: 'POST',
       body: JSON.stringify({ email: loginEmail(), password: loginPassword() }),
     })
-      .then((res) => {
+      .then(async (res) => {
         setFormProcessing(false);
         if (res.status === 200) {
           fetchUserDetails();
           props.setOpen(false);
           return;
         }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.reason) {
-          showToast({
-            title: 'An error occurred',
-            description: data.reason,
-            variant: 'error',
-          });
-        } else {
-          showToast({
-            title: 'An error occurred',
-            description:
-              'An error occurred while logging in. Please try again.',
-            variant: 'error',
-          });
+
+        const error = await res.json();
+        if (error.reason) {
+          throw new Error(error.reason);
         }
+        throw new Error(
+          'An error occurred while logging you in. Please try again.',
+        );
+      })
+      .catch((error: Error) => {
+        showToast({
+          title: 'An error occurred',
+          description: error.message,
+          variant: 'error',
+        });
       });
   }
 

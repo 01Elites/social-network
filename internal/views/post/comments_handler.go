@@ -69,7 +69,11 @@ func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	page, _ := strconv.Atoi(pageStr)
 	comments, err := database.Get_PostComments_from_db(userID, postIDInt, page)
 	if err != nil {
-		http.Error(w, "Failed to get comment", http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
+		jsonError := models.Error{
+			Reason: "invalid post id",
+		}
+		json.NewEncoder(w).Encode(jsonError)
 		return
 	}
 	commentsCapsul := struct {

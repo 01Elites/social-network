@@ -18,6 +18,7 @@ import (
 )
 
 type SignUpRequst struct {
+	UserName       string    `json:"user_name"`
 	Email          string    `json:"email"`
 	Password       string    `json:"password"`
 	FirstName      string    `json:"first_name"`
@@ -50,14 +51,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Email = strings.ToLower(data.Email) // Convert email to lowercase for consistency
-
-	if err := helpers.ValidateEmail(&data.Email); err != nil {
-		log.Printf("Email validation error: %v", err)
-		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	if data.ProfilePrivacy == "" {
 		data.ProfilePrivacy = models.ProfilePrivacy.Public
 	}
@@ -80,12 +73,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		About:          data.About,
 	}
 
-	if err := helpers.ValidateUnemptyFields(&userProfile); err != nil {
-		log.Printf("Validation error: %v", err)
-		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	if err := helpers.ValidateUserProfileData(&userProfile); err != nil {
 		log.Printf("Validation error: %v", err)
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
@@ -100,13 +87,30 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data.Password = hash
+	data.Email = strings.ToLower(data.Email) // Convert email to lowercase for consistency
 	user := models.User{
+		UserName: data.UserName,
 		Email:    data.Email,
 		Password: data.Password,
 		Provider: models.Provider.Manual,
 	}
+
+	if err := helpers.ValidateUserFields(&user); err != nil {
+		log.Printf("Validation error: %v", err)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if err := database.SignUpUser(user, userProfile); err != nil {
 		if strings.Contains(err.Error(), "SQLSTATE 23505") {
+			if strings.Contains(err.Error(), "user_user_name_key") {
+				log.Printf("Username already exists: %v", err)
+				helpers.HTTPError(w, "Username already exists", http.StatusConflict)
+				return
+			} else if strings.Contains(err.Error(), "unique_email_provider") {
+				log.Printf("Email already exists: %v", err)
+				helpers.HTTPError(w, "Email already exists", http.StatusConflict)
+				return
+			}
 			log.Printf("User already exists: %v", err)
 			helpers.HTTPError(w, "User already exists", http.StatusConflict)
 			return
@@ -142,7 +146,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
-	
+
 	data.Email = strings.ToLower(data.Email) // Convert email to lowercase for consistency
 
 	user, err := database.GetManualUser(data.Email)

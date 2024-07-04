@@ -27,7 +27,7 @@ CREATE TYPE public.notification_type AS ENUM (
 
 CREATE TABLE public.user (
     user_id        UUID PRIMARY KEY,
-    user_name      VARCHAR(100) UNIQUE,
+    user_name      VARCHAR(100) UNIQUE NOT NULL,
     email          VARCHAR NOT NULL,
     "password"     VARCHAR,
     provider       public.provider_type

@@ -185,7 +185,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <img src={logo} alt='Elite Logo' class='w-20' />
           </div>
           <DialogTitle
-            class={showLogin() ? 'text-center text-3xl' : 'text-3xl text-left'}
+            class={showLogin() ? 'text-center text-3xl' : 'text-left text-3xl'}
           >
             {showLogin() ? 'Oh, no life?' : 'Sign Up'}
           </DialogTitle>
@@ -257,11 +257,11 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         {/* Sign up form */}
         {!showLogin() && (
           <form
-            class='grid grid-cols-2 gap-4 w-full'
+            class='grid w-full grid-cols-2 gap-4'
             onSubmit={handleSignupForm}
           >
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupFirstName}
               required
             >
@@ -269,7 +269,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               <TextFieldInput type='text' id='fname' placeholder='Yaman' />
             </TextField>
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupLastName}
               required
             >
@@ -277,7 +277,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               <TextFieldInput type='text' id='lname' placeholder='Almasri' />
             </TextField>
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupEmail}
               required
             >
@@ -289,7 +289,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupDOB}
               required
             >
@@ -303,7 +303,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupNickname}
             >
               <TextFieldLabel for='nickname'>Nickname</TextFieldLabel>
@@ -315,13 +315,13 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupGender}
             >
               <TextFieldLabel>Gender</TextFieldLabel>
 
               <Select
-                class='w-full col-span-1'
+                class='col-span-1 w-full'
                 placeholder='Select your Gender'
                 itemComponent={(props) => (
                   <SelectItem item={props.item}>
@@ -344,12 +344,12 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-2'
+              class='col-span-2 grid w-full items-center gap-1.5'
               onChange={setSignupAbout}
             >
               <TextFieldLabel for='about'>About you</TextFieldLabel>
               <TextFieldTextArea
-                class=' resize-none'
+                class='resize-none'
                 id='about'
                 placeholder='The biggest Looser 🤡'
                 autoResize={false}
@@ -357,7 +357,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupPassword}
               required
             >
@@ -370,7 +370,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <TextField
-              class='grid w-full items-center gap-1.5 col-span-1'
+              class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupConfirmPassword}
               validationState={signupPasswordValidation()}
               required
@@ -385,7 +385,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
 
-            <div class='items-top flex space-x-2 col-span-2'>
+            <div class='items-top col-span-2 flex space-x-2'>
               <Checkbox
                 id='terms1'
                 checked={signupPrivate()}
@@ -409,7 +409,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </Button>
             <Button
               variant='link'
-              class='p-0 text-base underline justify-start'
+              class='justify-start p-0 text-base underline'
               onClick={() => setShowLogin(true)}
               disabled={formProcessing()}
             >

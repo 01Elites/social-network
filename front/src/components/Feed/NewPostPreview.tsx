@@ -16,7 +16,7 @@ interface NewPostPreviewProps {
 
 export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
   return (
-    <Dialog defaultOpen={false}>
+    <Dialog defaultOpen={true}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Apparently he is Disappointed</DialogTitle>

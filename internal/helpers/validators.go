@@ -45,8 +45,32 @@ func ValidateEmail(email *string) error {
 	return nil
 }
 
-func ValidateUnemptyFields(data *models.UserProfile) error {
-	// Trim spaces and check for empty required fields
+func ValidateUserFields(data *models.User) error {
+	if err := ValidateEmail(&data.Email); err != nil {
+		return err
+	}
+	data.UserName = strings.TrimSpace(data.UserName)
+	if data.UserName == "" {
+		return errors.New("username is required")
+	}
+	if len(data.UserName) > 20 {
+		return errors.New("username should be up to 20 characters long")
+	}
+	if data.Password == "" {
+		return errors.New("password is required")
+	}
+	// Validate Provider
+	switch data.Provider {
+	case models.Provider.Google, models.Provider.Github, models.Provider.Manual, models.Provider.Reboot:
+		// valid
+	default:
+		return fmt.Errorf("invalid Provider: %v", data.Provider)
+	}
+	return nil
+}
+
+// ValidateSignUpData validates the sign-up data and returns an error if any validation fails.
+func ValidateUserProfileData(data *models.UserProfile) error {
 	data.FirstName = strings.TrimSpace(data.FirstName)
 	data.LastName = strings.TrimSpace(data.LastName)
 
@@ -61,12 +85,6 @@ func ValidateUnemptyFields(data *models.UserProfile) error {
 	if data.Gender == "" {
 		return errors.New("gender is required")
 	}
-
-	return nil
-}
-
-// ValidateSignUpData validates the sign-up data and returns an error if any validation fails.
-func ValidateUserProfileData(data *models.UserProfile) error {
 	// Check the length of the username
 	if len(data.NickName) > 20 {
 		return errors.New("nickname should be up to 20 characters long")

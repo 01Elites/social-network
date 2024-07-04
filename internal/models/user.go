@@ -34,6 +34,7 @@ var Gender = struct {
 // User struct defines the structure for storing user information
 type User struct {
 	UserID    string          `db:"user_id"`
+	UserName  string          `db:"user_name"`
 	Email     string          `db:"email"`
 	Password  string          `db:"password,omitempty"`
 	Provider  string          `db:"provider"`
@@ -55,14 +56,14 @@ type UserProfile struct {
 }
 
 type ProfilePost struct {
-	ID            int         `json:"post_id"`
-	Title         string      `json:"title"`
-	Content       string      `json:"content,omitempty"`
-	Image         string      `json:"image_id,omitempty"`
-	CreationDate  time.Time   `json:"creation_date"`
-	PostPrivacy   string      `json:"post_privacy,omitempty"`
-	PostLikes     int         `json:"likes_count"`
-	CommentsCount int         `json:"comments_count"`
-	Likers_ids    []string    `json:"likers_ids"`
-	IsLiked       bool        `json:"is_Liked,omitempty"`
+	ID            int       `json:"post_id"`
+	Title         string    `json:"title"`
+	Content       string    `json:"content,omitempty"`
+	Image         string    `json:"image_id,omitempty"`
+	CreationDate  time.Time `json:"creation_date"`
+	PostPrivacy   string    `json:"post_privacy,omitempty"`
+	PostLikes     int       `json:"likes_count"`
+	CommentsCount int       `json:"comments_count"`
+	Likers_ids    []string  `json:"likers_ids"`
+	IsLiked       bool      `json:"is_Liked,omitempty"`
 }

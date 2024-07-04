@@ -1,5 +1,5 @@
 import { JSXElement } from 'solid-js';
-import flag_icon from './flag.svg'
+import flag_icon from './flag.svg';
 
 interface inputs {
   class?: string;
@@ -7,14 +7,12 @@ interface inputs {
 }
 
 export default function Flag_Icon(props?: inputs): JSXElement {
-
   return (
     <img
       src={flag_icon}
       alt='Apps'
       class={props ? props.class : ''}
-      onClick={props ? props.onClick : () => { }}
-
+      onClick={props ? props.onClick : () => {}}
     />
-  )
+  );
 }

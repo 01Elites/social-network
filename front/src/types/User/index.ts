@@ -10,15 +10,13 @@ type User = {
   profile_privacy?: 'public' | 'private';
 };
 
-
-interface UserDetailsHook  {
+interface UserDetailsHook {
   userDetails: () => User | null;
+  setUserDetails: (details: User | null) => void;
   userDetailsError: () => string | null;
   fetchUserDetails: () => Promise<void>;
   updateUserDetails: (partialDetails: Partial<User>) => Promise<void>;
-};
+}
 
 export default User;
-export type {
-  UserDetailsHook,
-};
+export type { UserDetailsHook };

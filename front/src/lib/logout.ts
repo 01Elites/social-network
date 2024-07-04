@@ -1,3 +1,3 @@
 export default function Logout() {
-  console.log("Logged out pressed!")
+  console.log('Logged out pressed!');
 }

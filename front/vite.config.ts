@@ -1,6 +1,6 @@
+import devtools from 'solid-devtools/vite';
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
-import devtools from 'solid-devtools/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
@@ -14,7 +14,7 @@ export default defineConfig({
       locator: {
         jsxLocation: true,
         componentLocation: true,
-      }
+      },
     }),
     solidPlugin(),
   ],

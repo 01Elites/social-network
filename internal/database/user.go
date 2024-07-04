@@ -36,10 +36,10 @@ func SignUpUser(user models.User, userProfile models.UserProfile) error {
 
 func CreateUser(user models.User) error {
 	// Prepare SQL statement
-	query := `INSERT INTO public.user (user_id, email, "password", provider)
-	        VALUES ($1, $2, $3, $4)`
+	query := `INSERT INTO public.user (user_id, user_name, email, "password", provider)
+	        VALUES ($1, $2, $3, $4, $5)`
 	// Execute SQL statement
-	_, err := DB.Exec(context.Background(), query, user.UserID, user.Email, user.Password, user.Provider)
+	_, err := DB.Exec(context.Background(), query, user.UserID, user.UserName, user.Email, user.Password, user.Provider)
 	if err != nil {
 		log.Printf("Failed to insert user: %v\n", err)
 		return err
@@ -103,7 +103,7 @@ func CreateUserProfile(userProfile models.UserProfile) error {
 	return nil
 }
 
-func UpdateUserProfile(userID string, userProfile models.UserProfile) error {
+func UpdateUserProfile(userProfile models.UserProfile) error {
 	// Prepare SQL statement
 	query := `UPDATE public.profile SET 
 		first_name = $1,
@@ -125,7 +125,7 @@ func UpdateUserProfile(userID string, userProfile models.UserProfile) error {
 		userProfile.ProfilePrivacy,
 		userProfile.NickName,
 		userProfile.About,
-		userID,
+		userProfile.UserID,
 	)
 	if err != nil {
 		log.Printf("Failed to update user profile: %v\n", err)

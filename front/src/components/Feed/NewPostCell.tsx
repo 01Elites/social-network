@@ -13,7 +13,7 @@ export default function NewPostCell(): JSXElement {
   const [postText, setPostText] = createSignal('');
 
   return (
-    <div class='border-[1px] rounded p-2 flex gap-2'>
+    <div class='flex gap-2 rounded border-[1px] p-2'>
       <Avatar>
         <AvatarImage src={userDetails()?.avatar_url} />
         <AvatarFallback>

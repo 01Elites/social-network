@@ -9,7 +9,6 @@ export async function fetchWithAuth(
   // Add the Authorization header to the request
   const options: RequestInit = init || {};
 
-
   if (token !== '') {
     options.headers = {
       ...options.headers,

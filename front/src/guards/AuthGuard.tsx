@@ -1,5 +1,5 @@
-import { Component, JSX } from 'solid-js';
-import { Router, Route, useNavigate } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
+import { JSX } from 'solid-js';
 
 function isAuthenticated(): boolean {
   // Replace with your actual authentication logic

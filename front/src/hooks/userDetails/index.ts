@@ -1,24 +1,26 @@
 import { createSignal, onMount } from 'solid-js';
+import { fetchWithAuth } from '~/extensions/fetch';
 import config from '../../config';
 import User, { UserDetailsHook } from '../../types/User';
-import { fetchWithAuth } from '~/extensions/fetch';
-
-
 
 function useUserDetails(): UserDetailsHook {
   const [userDetails, setUserDetails] = createSignal<User | null>(null);
-  const [userDetailsError, setUserDetailsError] = createSignal<string | null>(null);
+  const [userDetailsError, setUserDetailsError] = createSignal<string | null>(
+    null,
+  );
 
   async function fetchUserDetails(): Promise<void> {
     try {
       const response = await fetchWithAuth(config.API_URL + '/profile');
-      
+
       if (!response.ok) {
         const error = await response.json();
         if (error.reason) {
           throw new Error(error.reason);
         }
-        throw new Error('Failed to fetch user details. Please check your network connection.');
+        throw new Error(
+          'Failed to fetch user details. Please check your network connection.',
+        );
       }
 
       const data: User = await response.json();
@@ -32,7 +34,7 @@ function useUserDetails(): UserDetailsHook {
 
   async function updateUserDetails(partialDetails: Partial<User>) {
     try {
-      const response = await fetch(config.API_URL + '/api/profile', {
+      const response = await fetchWithAuth(config.API_URL + '/api/profile', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -53,10 +55,11 @@ function useUserDetails(): UserDetailsHook {
 
   return {
     userDetails,
+    setUserDetails,
     userDetailsError,
     fetchUserDetails,
     updateUserDetails,
   };
 }
 
-export {useUserDetails};
+export { useUserDetails };

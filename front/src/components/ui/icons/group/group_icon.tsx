@@ -1,4 +1,4 @@
-import group from './group.svg'
+import group from './group.svg';
 
 interface inputs {
   class?: string;
@@ -11,7 +11,7 @@ export default function Group_Icon(props: inputs) {
       src={group}
       alt='Group'
       class={props ? props.class : ''}
-      onClick={props ? props.onClick : () => { }}
+      onClick={props ? props.onClick : () => {}}
     />
-  )
+  );
 }

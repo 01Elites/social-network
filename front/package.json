@@ -4,10 +4,11 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "vite",
+    "start": "vite", 
     "dev": "vite --host",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
   },
   "license": "MIT",
   "devDependencies": {

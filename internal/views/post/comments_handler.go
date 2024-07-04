@@ -3,10 +3,12 @@ package post
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"social-network/internal/database"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
+	"social-network/internal/helpers"
 	"strconv"
 )
 
@@ -31,6 +33,13 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return
+	}
+	if comment.Image != "" {
+		comment.Image, err = helpers.SaveBase64Image(comment.Image)
+		if err != nil {
+			log.Println("Error with Image:", err)
+			return 
+		}
 	}
 	err = database.Create_Comment_in_db(userID, comment)
 	if err != nil {

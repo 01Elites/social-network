@@ -31,7 +31,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	if post.Image != "" {
 		post.Image, err = helpers.SaveBase64Image(post.Image)
 		if err != nil {
-
 			fmt.Println("Error with Image:\n", err)
 		}
 	}

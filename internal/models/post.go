@@ -3,18 +3,18 @@ package models
 import "time"
 
 type Post struct {
-	ID            int         `json:"post_id"`
-	User          UserProfile `json:"poster,omitempty"`
-	Title         string      `json:"title"`
-	Content       string      `json:"content,omitempty"`
-	Image         string      `json:"image_id,omitempty"`
-	CreationDate  time.Time   `json:"creation_date"`
-	PostPrivacy   string      `json:"post_privacy,omitempty"`
-	PostLikes     int         `json:"likes_count"`
-	CommentsCount int         `json:"comments_count"`
-	Likers_ids    []string    `json:"likers_ids"`
-	IsLiked       bool        `json:"is_Liked,omitempty"`
-	GroupID       int         `json:"group_id,omitempty"`
+	ID            int             `json:"post_id"`
+	User          PostFeedProfile `json:"poster,omitempty"`
+	Title         string          `json:"title"`
+	Content       string          `json:"content,omitempty"`
+	Image         string          `json:"image_id,omitempty"`
+	CreationDate  time.Time       `json:"creation_date"`
+	PostPrivacy   string          `json:"post_privacy,omitempty"`
+	PostLikes     int             `json:"likes_count"`
+	CommentsCount int             `json:"comments_count"`
+	Likers_ids    []string        `json:"likers_ids"`
+	IsLiked       bool            `json:"is_Liked,omitempty"`
+	GroupID       int             `json:"group_id,omitempty"`
 }
 
 type Create_Post struct {

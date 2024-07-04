@@ -38,7 +38,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		ID: groupID,
 	}
-	json.NewEncoder(w).Encode(groupIDjson)
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(groupIDjson)
 }
 

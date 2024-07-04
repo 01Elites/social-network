@@ -2,9 +2,10 @@ package database
 
 import (
 	"context"
-	"log"
-	"social-network/internal/models"
 	"errors"
+	"log"
+	"social-network/internal/helpers"
+	"social-network/internal/models"
 )
 
 func CreatePostInDB(userID string, post models.Create_Post) (int, error){
@@ -60,7 +61,7 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 				content, 
 				created_at,
         user_id,
-				image, 
+				post.image, 
         first_name,
 				last_name,
 				profile.image,
@@ -102,6 +103,13 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			log.Printf("database failed to scan comments count: %v\n", err)
 			return nil, err
 		}
+		if p.Image != "" {
+		p.Image, err = helpers.GetImage(p.Image)
+		if err != nil {
+			log.Printf("failed to get image: %v\n", err)
+				return nil, err
+		}
+		}
 		p.Likers_ids,p.IsLiked, err = GetPostLikers(p.ID, loggeduser.UserID)
 		if err != nil {
 			log.Printf("database: Failed to scan likers: %v\n", err)
@@ -115,21 +123,21 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 		log.Printf("database failed to scan allowed users: %v\n", err)
 		return nil, err
 	}
-		for rows.Next(){
-			var allowed_userid string 
-			if err := rows.Scan(&allowed_userid);err != nil {
-				log.Printf("database failed to scan allowed_user: %v\n", err)
+	for rows.Next(){
+		var allowed_userid string 
+		if err := rows.Scan(&allowed_userid);err != nil {
+			log.Printf("database failed to scan allowed_user: %v\n", err)
 			return nil, err
-			}
-			if allowed_userid == loggeduser.UserID {
-				posts = append(posts, p)
-				break
-			}
 		}
-		} else if loggeduser.Following[p.User.UserID]{
+		if allowed_userid == loggeduser.UserID {
+			posts = append(posts, p)
+			break
+		}
+		}
+		} else if loggeduser.Following[p.User.UserID] || loggeduser.UserID == p.User.UserID{
 			posts = append(posts, p)
 	} 
-	}
+}
 	return posts, nil
 }
 
@@ -141,7 +149,7 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 				post_id,
         title,
 				content, 
-				image,
+				post.image,
         user_id, 
 				created_at,
         first_name,
@@ -181,6 +189,13 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 		log.Printf("database failed to scan comments count: %v\n", err)
 		return models.Post{}, err
 	}
+	if post.Image != "" {
+		post.Image, err = helpers.GetImage(post.Image)
+		if err != nil {
+			log.Printf("failed to get image: %v\n", err)
+				return models.Post{}, err
+		}
+		}
 	post.Likers_ids, post.IsLiked, err = GetPostLikers(post.ID, userid)
 	if err != nil {
 		log.Printf("database: Failed to scan likers: %v\n", err)
@@ -272,9 +287,10 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			post_id, 
 			title,
 			content, 
+			post.image,
 			user_id, 
-			nick_name,
-			image.profile
+			user_name,
+			profile.image
 	FROM 
 			post 
 	INNER JOIN 
@@ -294,13 +310,21 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			&p.ID,
 			&p.Title,
 			&p.Content,
+			&p.Image,
 			&p.User.UserID,
-			&p.User.NickName,
+			&p.User.UserName,
 			&p.User.Image,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
+		if p.Image != "" {
+			p.Image, err = helpers.GetImage(p.Image)
+			if err != nil {
+				log.Printf("failed to get image: %v\n", err)
+					return nil, err
+			}
+			}
 		posts = append(posts, p)
 	}
 	return posts, nil
@@ -357,6 +381,13 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
 			return []models.ProfilePost{}, err
 		}
 		post.PostLikes = len(post.Likers_ids)
+		if post.Image != "" {
+			post.Image, err = helpers.GetImage(post.Image)
+			if err != nil {
+				log.Printf("failed to get image: %v\n", err)
+					return nil, err
+			}
+			}
 		if userid == loggeduser {
 			posts = append(posts, post)
 			continue

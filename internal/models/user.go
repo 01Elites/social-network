@@ -44,15 +44,15 @@ type User struct {
 
 // UserProfile struct defines the structure for storing user profile information
 type UserProfile struct {
-	UserID         string    `db:"user_id"`
-	NickName       string    `db:"nick_name"`
-	FirstName      string    `db:"first_name"`
-	LastName       string    `db:"last_name"`
-	Gender         string    `db:"gender"`
-	DateOfBirth    time.Time `db:"date_of_birth"`
-	ProfilePrivacy string    `db:"privacy"`
-	Image          string    `db:"image"`
-	About          string    `db:"about"`
+	UserID         string    `db:"user_id" json:"user_id,omitempty"`
+	NickName       string    `db:"nick_name" json:"nick_name,omitempty"`
+	FirstName      string    `db:"first_name" json:"first_name"`
+	LastName       string    `db:"last_name" json:"last_name"`
+	Gender         string    `db:"gender" json:"gender,omitempty"`
+	DateOfBirth    time.Time `db:"date_of_birth" json:"date_of_birth,omitempty"`
+	ProfilePrivacy string    `db:"privacy" json:"post_privacy,omitempty"`
+	Image          string    `db:"image" json:"image_id,omitempty"`
+	About          string    `db:"about" json:"about,omitempty"`
 }
 
 type ProfilePost struct {
@@ -66,4 +66,13 @@ type ProfilePost struct {
 	CommentsCount int       `json:"comments_count"`
 	Likers_ids    []string  `json:"likers_ids"`
 	IsLiked       bool      `json:"is_Liked,omitempty"`
+}
+
+type PostFeedProfile struct {
+	UserID         string    `db:"user_id" json:"user_id,omitempty"`
+	UserName       string    `db:"user_name" json:"user_name,omitempty"`
+	FirstName      string    `db:"first_name" json:"first_name"`
+	LastName       string    `db:"last_name" json:"last_name"`
+	ProfilePrivacy string    `db:"privacy" json:"post_privacy,omitempty"`
+	Image          string    `db:"image" json:"image_id,omitempty"`
 }

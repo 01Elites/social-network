@@ -132,7 +132,12 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	UserPageID := r.PathValue("id")
+	userName := r.PathValue("user_name")
+	UserPageID, err := database.GetUserIDByUserName(userName)
+	if err != nil {
+		helpers.HTTPError(w, "Failed to get userID", http.StatusInternalServerError)
+		return
+	}
 
 	var profile profileData
 	// email, err := database.GetUserEmail(UserPageID)
@@ -142,6 +147,7 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 	// }
 	prof, err := database.GetUserProfile(UserPageID)
 	if err != nil {
+		fmt.Println("Error getting user profile:", err)
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
@@ -178,7 +184,15 @@ func getProfilePosts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	UserPageID := r.PathValue("id")
+	// UserPageID := r.PathValue("id")
+
+	userName := r.PathValue("user_name")
+	UserPageID, err := database.GetUserIDByUserName(userName)
+	if err != nil {
+		helpers.HTTPError(w, "Failed to get userID", http.StatusInternalServerError)
+		return
+	}
+
 	following, err := database.GetUsersFollowingByID(userID)
 	if err != nil {
 		http.Error(w, "Cannot get user followings", http.StatusInternalServerError)

@@ -96,6 +96,7 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedProfile := models.UserProfile{
+		UserID:         userID,
 		NickName:       update.NickName,
 		FirstName:      update.FirstName,
 		LastName:       update.LastName,
@@ -113,7 +114,7 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update the user profile
-	if err := database.UpdateUserProfile(userID, updatedProfile); err != nil {
+	if err := database.UpdateUserProfile(updatedProfile); err != nil {
 		log.Printf("Failed to update user profile: %v", err)
 		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
 		return
@@ -151,7 +152,7 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Error getting image:", err)
 		}
 	}
-	
+
 	profile = profileData{
 		// Email:          email,
 		NickName:  prof.NickName,

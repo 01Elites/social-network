@@ -103,7 +103,7 @@ func CreateUserProfile(userProfile models.UserProfile) error {
 	return nil
 }
 
-func UpdateUserProfile(userID string, userProfile models.UserProfile) error {
+func UpdateUserProfile(userProfile models.UserProfile) error {
 	// Prepare SQL statement
 	query := `UPDATE public.profile SET 
 		first_name = $1,
@@ -125,7 +125,7 @@ func UpdateUserProfile(userID string, userProfile models.UserProfile) error {
 		userProfile.ProfilePrivacy,
 		userProfile.NickName,
 		userProfile.About,
-		userID,
+		userProfile.UserID,
 	)
 	if err != nil {
 		log.Printf("Failed to update user profile: %v\n", err)

@@ -32,7 +32,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		post.Image, err = helpers.SaveBase64Image(post.Image)
 		if err != nil {
 
-			fmt.Println("EEErooor:\n", err)
+			fmt.Println("Error with Image:\n", err)
 		}
 	}
 

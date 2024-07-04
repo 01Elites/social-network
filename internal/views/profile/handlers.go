@@ -2,6 +2,7 @@ package profile
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -45,6 +46,13 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
+
+	if prof.Image != "" { // If the user has no image, use the default image
+		prof.Image, err = helpers.GetImage(prof.Image)
+		if err != nil {
+			fmt.Println("Error getting image:", err)
+		}
+	}
 	profile = profileData{
 		Email:          email,
 		NickName:       prof.NickName,
@@ -79,6 +87,14 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
+
+	if update.AvatarURL != "" { // If the user has no image, use the default image
+		update.AvatarURL, err = helpers.SaveBase64Image(update.AvatarURL)
+		if err != nil {
+			fmt.Println("Error with Image:", err)
+		}
+	}
+
 	updatedProfile := models.UserProfile{
 		NickName:       update.NickName,
 		FirstName:      update.FirstName,
@@ -128,6 +144,14 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
+
+	if prof.Image != "" { // If the user has no image, use the default image
+		prof.Image, err = helpers.GetImage(prof.Image)
+		if err != nil {
+			fmt.Println("Error getting image:", err)
+		}
+	}
+	
 	profile = profileData{
 		// Email:          email,
 		NickName:  prof.NickName,

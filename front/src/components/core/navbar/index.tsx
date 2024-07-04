@@ -13,13 +13,17 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { TextField, TextFieldInput } from '~/components/ui/text-field';
+import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/types/User';
 
 type NavbarProps = {};
 
 export default function Navbar(props: NavbarProps): JSXElement {
-  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+  const { userDetails, setUserDetails } = useContext(
+    UserDetailsContext,
+  ) as UserDetailsHook;
 
   const navigate = useNavigate();
   const [loginDialogVisible, setLoginDialogVisible] = createSignal(false);
@@ -75,11 +79,11 @@ export default function Navbar(props: NavbarProps): JSXElement {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  fetch('/api/auth/logout', { method: 'DELETE' }).finally(
-                    () => {
-                      navigate('/');
-                    },
-                  );
+                  fetchWithAuth(config.API_URL + '/auth/logout', {
+                    method: 'DELETE',
+                  }).finally(() => {
+                    setUserDetails(null);
+                  });
                 }}
               >
                 Logout

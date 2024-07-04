@@ -8,6 +8,7 @@ import (
 	"social-network/internal/views/middleware"
 	"social-network/internal/views/post"
 	"social-network/internal/views/profile"
+	"social-network/internal/views/websocket"
 )
 
 // SetupRoutes sets up the routes for the web application.
@@ -44,6 +45,6 @@ func SetupRoutes() {
 	// http.HandleFunc("GET /api/stats", GetStatsHandler)
 	// http.HandleFunc("GET /api/categories", GetCategoriesHandler)
 
-	// /********************* Chat ************************/
-	// http.HandleFunc("/ws", HandleWebSocket)
+	/********************* Websocket ************************/
+	websocket.SetupWebSocketRoutes()
 }

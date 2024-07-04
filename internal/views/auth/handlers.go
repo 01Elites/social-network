@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -25,6 +26,7 @@ type SignUpRequst struct {
 	Gender         string    `json:"gender"`
 	NickName       string    `json:"nick_name"`
 	ProfilePrivacy string    `json:"profile_privacy"`
+	Image          string    `json:"image"`
 	About          string    `json:"about"`
 }
 
@@ -35,7 +37,8 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
 	// Decode the JSON directly from the request body
-	if err := decoder.Decode(&data); err != nil {
+	err := decoder.Decode(&data)
+	if err != nil {
 		log.Printf("Error decoding sign up request: %v", err)
 		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
@@ -47,6 +50,8 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data.Email = strings.ToLower(data.Email) // Convert email to lowercase for consistency
+
 	if err := helpers.ValidateEmail(&data.Email); err != nil {
 		log.Printf("Email validation error: %v", err)
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
@@ -57,6 +62,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		data.ProfilePrivacy = models.ProfilePrivacy.Public
 	}
 
+	if data.Image != "" { // Save the image if it exists
+		data.Image, err = helpers.SaveBase64Image(data.Image)
+		if err != nil {
+			fmt.Println("Error with Profile Image:\n", err)
+		}
+	}
+
 	userProfile := models.UserProfile{
 		NickName:       data.NickName,
 		FirstName:      data.FirstName,
@@ -64,7 +76,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		Gender:         data.Gender,
 		DateOfBirth:    data.DateOfBirth,
 		ProfilePrivacy: data.ProfilePrivacy,
-		Image:          "",
+		Image:          data.Image,
 		About:          data.About,
 	}
 
@@ -130,6 +142,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
+	
+	data.Email = strings.ToLower(data.Email) // Convert email to lowercase for consistency
 
 	user, err := database.GetManualUser(data.Email)
 	if err != nil {

@@ -192,25 +192,6 @@ func GetUserByID(userID string) (*models.User, error) {
 	return &user, nil
 }
 
-func GetUsersFollowingByID(userID string) (map[string]bool, error) {
-	var Following map[string]bool
-	query := `SELECT followed_id FROM follower WHERE follower_id = $1`
-	rows, err := DB.Query(context.Background(), query, userID)
-	if err != nil {
-		log.Printf("database failed to scan followed user: %v\n", err)
-		return nil, err
-	}
-	for rows.Next() {
-		var followedUserID string
-		if err = rows.Scan(&followedUserID); err != nil {
-			log.Printf("database failed to scan followed user: %v\n", err)
-			return nil, err
-		}
-		Following[followedUserID] = true
-	}
-	return Following, nil
-}
-
 func GetUserGroups(userID string) (map[int]bool, error) {
 	var Groups map[int]bool
 	query := `SELECT group_id FROM group_member WHERE user_id = $1`

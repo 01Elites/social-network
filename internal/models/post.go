@@ -4,17 +4,17 @@ import "time"
 
 type Post struct {
 	ID            int         `json:"post_id"`
-	User          UserProfile `json:"poster"`
+	User          UserProfile `json:"poster,omitempty"`
 	Title         string      `json:"title"`
 	Content       string      `json:"content,omitempty"`
-	Image         string      `json:"image,omitempty"`
+	Image         string      `json:"image_id,omitempty"`
 	CreationDate  time.Time   `json:"creation_date"`
 	PostPrivacy   string      `json:"post_privacy,omitempty"`
 	PostLikes     int         `json:"likes_count"`
-	GroupID       int         `json:"group_id,omitempty"`
-	IsLiked       bool        `json:"is_Liked,omitempty"`
 	CommentsCount int         `json:"comments_count"`
 	Likers_ids    []string    `json:"likers_ids"`
+	IsLiked       bool        `json:"is_Liked,omitempty"`
+	GroupID       int         `json:"group_id,omitempty"`
 }
 
 type Create_Post struct {
@@ -38,11 +38,6 @@ type Comment struct {
 	Content      string      `json:"body"`
 	CreationDate time.Time   `json:"creation_date"`
 	Image        string      `json:"image_id,omitempty"`
-}
-
-type Create_Group struct {
-	Title       string
-	Description string
 }
 
 type Error struct {

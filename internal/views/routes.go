@@ -2,8 +2,9 @@ package views
 
 import (
 	"net/http"
-
 	"social-network/internal/views/auth"
+	"social-network/internal/views/group"
+	"social-network/internal/views/notifications"
 	"social-network/internal/views/middleware"
 	"social-network/internal/views/post"
 	"social-network/internal/views/profile"
@@ -36,14 +37,9 @@ func SetupRoutes() {
 	http.HandleFunc("OPTIONS /api/", middleware.AllowCORS(func(w http.ResponseWriter, r *http.Request) {}))
 
 	// /********************* Group ************************/
-	http.HandleFunc("POST /api/create_group", CreateGroupHandler)
-	http.HandleFunc("GET /api/group/{id}", GetGroupPageHandler)
-	// http.HandleFunc("/invite_user", m(InvitationHandler))
-	// http.HandleFunc("/group_request", m(RequestHandler))
-	// http.HandleFunc("/search_group", m(SearchGroupHandler))
-	// http.HandleFunc("/create_event", m(CreateEventHandler))
-	// http.HandleFunc("/event_response", m(EventResponseHandler))
+	group.SetupGroupRoutes()
 
+	notifications.SetupNotificationRoutes()
 	// /********************* Categories ************************/
 	// http.HandleFunc("GET /api/stats", GetStatsHandler)
 	// http.HandleFunc("GET /api/categories", GetCategoriesHandler)

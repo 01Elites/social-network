@@ -210,3 +210,15 @@ func GetUserGroups(userID string) (map[int]bool, error) {
 	}
 	return Groups, nil
 }
+
+// get a userID by uerName
+func GetUserIDByUserName(userName string) (string, error) {
+	var userID string
+	query := `SELECT user_id FROM public.user WHERE user_name = $1`
+	err := DB.QueryRow(context.Background(), query, userName).Scan(&userID)
+	if err != nil {
+		log.Printf("Failed to fetch user by ID: %v\n", err)
+		return "", err
+	}
+	return userID, nil
+}

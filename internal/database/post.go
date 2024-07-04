@@ -12,11 +12,11 @@ func CreatePostInDB(userID string, post models.Create_Post) (int, error){
 	if post.GroupID != 0 {
 	query := `
     INSERT INTO 
-        post (title, content, privacy_type, group_id, user_id) 
+        post (title, content, privacy_type, group_id, user_id, image) 
     VALUES 
-        ($1, $2, $3, $4, $5)
+        ($1, $2, $3, $4, $5, $6)
     RETURNING post_id`
-	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, post.GroupID, userID).Scan(&postID)
+	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, post.GroupID, userID, post.Image).Scan(&postID)
 	if err != nil {
 		log.Printf("database: Failed to insert post into database: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -24,11 +24,11 @@ func CreatePostInDB(userID string, post models.Create_Post) (int, error){
 } else {
 	query := `
     INSERT INTO 
-        post (title, content, privacy_type, user_id) 
+        post (title, content, privacy_type, user_id, image) 
     VALUES 
-        ($1, $2, $3, $4)
+        ($1, $2, $3, $4, $5)
     RETURNING post_id`
-	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, userID).Scan(&postID)
+	err := DB.QueryRow(context.Background(),query, post.Title, post.Content, post.Privacy, userID, post.Image).Scan(&postID)
 	if err != nil {
 		log.Printf("database: Failed to insert post into database: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -59,9 +59,11 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
         title,
 				content, 
 				created_at,
-        user_id, 
+        user_id,
+				image, 
         first_name,
 				last_name,
+				profile.image,
 				privacy_type
     FROM 
         post 
@@ -86,8 +88,10 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			&p.Content,
 			&p.CreationDate,
 			&p.User.UserID,
+			&p.Image,
 			&p.User.FirstName,
 			&p.User.LastName,
+			&p.User.Image,
 			&p.PostPrivacy,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
@@ -137,10 +141,12 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 				post_id,
         title,
 				content, 
+				image,
         user_id, 
 				created_at,
         first_name,
-				last_name
+				last_name,
+				profile.image
     FROM 
         post 
     INNER JOIN 
@@ -159,11 +165,12 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 		&post.ID,
 		&post.Title,
 		&post.Content,
+		&post.User.Image,
 		&post.User.UserID,
 		&post.CreationDate,
-		// &post.User.Image,
 		&post.User.FirstName,
 		&post.User.LastName,
+		&post.User.Image,
 	)
 	if err != nil {
 		log.Printf("database: Failed to scan row: %v", err)
@@ -267,7 +274,7 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			content, 
 			user_id, 
 			nick_name,
-			privacy_type
+			image.profile
 	FROM 
 			post 
 	INNER JOIN 
@@ -289,7 +296,7 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			&p.Content,
 			&p.User.UserID,
 			&p.User.NickName,
-			&p.PostPrivacy,
+			&p.User.Image,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
@@ -307,7 +314,8 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
         title,
 				content, 
         privacy_type,
-				created_at
+				created_at,
+				image
     FROM 
         post 
     WHERE 
@@ -333,6 +341,7 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
 			&post.Content,
 			&post.PostPrivacy,
 			&post.CreationDate,
+			&post.Image,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err

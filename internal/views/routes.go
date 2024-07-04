@@ -22,9 +22,6 @@ func SetupRoutes() {
 		w.Write([]byte("Hello, World!"))
 	})
 
-	// http.HandleFunc("/", RootHandler)
-	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("www/static/"))))
-
 	http.HandleFunc("OPTIONS /api/", middleware.AllowCORS(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 	}))
@@ -34,7 +31,6 @@ func SetupRoutes() {
 
 	/********************* User ************************/
 	profile.SetupProfileRoutes()
-	// http.HandleFunc("GET /api/whoami", WhoAmI) // Handle whoami
 
 	/********************* Posts ************************/
 	post.SetupPostRoutes()
@@ -43,11 +39,7 @@ func SetupRoutes() {
 	group.SetupGroupRoutes()
 
 	/********************* Notifications ************************/
-
 	notifications.SetupNotificationRoutes()
-	/********************* Categories ************************/
-	// http.HandleFunc("GET /api/stats", GetStatsHandler)
-	// http.HandleFunc("GET /api/categories", GetCategoriesHandler)
 
 	/********************* Websocket ************************/
 	websocket.SetupWebSocketRoutes()

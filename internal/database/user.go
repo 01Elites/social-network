@@ -193,7 +193,7 @@ func GetUserByID(userID string) (*models.User, error) {
 }
 
 func GetUserGroups(userID string) (map[int]bool, error) {
-	var Groups map[int]bool
+	Groups := make(map[int]bool, 0)
 	query := `SELECT group_id FROM group_member WHERE user_id = $1`
 	rows, err := DB.Query(context.Background(), query, userID)
 	if err != nil {

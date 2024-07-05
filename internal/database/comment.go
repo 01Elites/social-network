@@ -76,6 +76,13 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
 					return nil, err
 			}
 			}
+			if comment.User.Image != "" {
+				comment.User.Image, err = helpers.GetImage(comment.User.Image)
+				if err != nil {
+					log.Printf("failed to get image: %v\n", err)
+					return nil, err
+				}
+			}
 		comments = append(comments, comment)
 	}
 	return comments, nil

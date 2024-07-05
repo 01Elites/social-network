@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"social-network/internal/database"
+	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 )
@@ -17,11 +18,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	var group models.Create_Group
 	err := json.NewDecoder(r.Body).Decode(&group)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-				Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	groupID, err := database.CreateGroup(userID, group)

@@ -48,7 +48,7 @@ func GetGroupMembers(groupID int) ([]models.User, error) {
 
 func GroupMember(userID string, groupID int) (bool, error) {
 	var IsMember int
-	query := `SELECT SELECT COUNT(*) FROM group_member WHERE group_id = $1 AND user_id = $2`
+	query := `SELECT COUNT(*) FROM group_member WHERE group_id = $1 AND user_id = $2`
 	err := DB.QueryRow(context.Background(), query, groupID, userID).Scan(&IsMember)
 	if err != nil {
 		log.Printf("database failed to scan group user: %v\n", err)

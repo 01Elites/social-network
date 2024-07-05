@@ -21,17 +21,13 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	var comment models.Create_Comment
 	parentID, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		http.Error(w, "Failed to decode post id", http.StatusBadRequest)
+		helpers.HTTPError(w, ("Failed to decode post id" + err.Error()), http.StatusBadRequest)
 		return
 	}
 	comment.ParentID = parentID
 	err = json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-				Reason: "failed to decode comment",
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, ("Failed to decode comment:" + err.Error()), http.StatusBadRequest)
 		return
 	}
 	if comment.Image != "" {
@@ -43,11 +39,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = database.Create_Comment_in_db(userID, comment)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		jsonError := models.Error{
-				Reason: "invalid post id",
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, ("Invalid post ID:" + err.Error()), http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -62,18 +54,14 @@ func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	postIDInt, _ := strconv.Atoi(r.PathValue("id"))
 	if postIDInt == 0 {
-		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		helpers.HTTPError(w, "Invalid post ID", http.StatusBadRequest)
 		return
 	}
 	pageStr := r.URL.Query().Get("page")
 	page, _ := strconv.Atoi(pageStr)
 	comments, err := database.Get_PostComments_from_db(userID, postIDInt, page)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		jsonError := models.Error{
-			Reason: "invalid post id",
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, ("Invalid post ID:" + err.Error()), http.StatusNotFound)
 		return
 	}
 	commentsCapsul := struct {
@@ -81,7 +69,6 @@ func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		CommentsFeed: comments,
 	}
-	json.NewEncoder(w).Encode(commentsCapsul)
 	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, "get comments successful")
+	json.NewEncoder(w).Encode(commentsCapsul)
 }

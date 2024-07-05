@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"log"
 	"os"
+
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	// "github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var (
-	DB  *pgxpool.Pool
+	DB *pgxpool.Pool
 )
 
 func Init() {
@@ -43,38 +45,9 @@ func Init() {
 	if err != nil {
 		log.Fatalf("Unable to ping the database: %v\n", err)
 	}
-	
+
 	// Assign the initialized database connection to the global variable
 	DB = conn
-}
-
-func InsertDummyData() {
-	// Define the dummy user data
-	dummyUsers := []struct {
-		UserID   string
-		UserName string
-		Email    string
-		Password string
-		Provider string
-	}{
-			{"123e4567-e89b-12d3-a456-426614174000", "Alice", "alice@example.com", "password123", "manual"},
-			{"123e4567-e89b-12d3-a456-426614174001", "Bob", "bob@example.com", "password123", "google"},
-	}
-
-	// Prepare the insert statement with the provider field
-	stmt := `INSERT INTO public.user (user_id, user_name, email, password, provider)
-					 VALUES ($1, $2, $3, $4, $5)
-					 ON CONFLICT (user_name) DO NOTHING`
-
-	// Insert the dummy data
-	for _, user := range dummyUsers {
-		_, err := DB.Exec(context.Background(), stmt, user.UserID, user.UserName, user.Email, user.Password, user.Provider)
-		if err != nil {
-			log.Printf("Error inserting dummy data: %v\n", err)
-		}
-	}
-
-	log.Println("Dummy data inserted successfully")
 }
 
 func ApplyMigrations() error {

@@ -20,7 +20,6 @@ func main() {
 
 	// Initiate the database connection
 	database.Init()
-	// database.InsertDummyData() // Insert dummy data for testing
 
 	// Setup the routes for the views
 	views.SetupRoutes()

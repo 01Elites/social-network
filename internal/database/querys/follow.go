@@ -35,7 +35,7 @@ func CreateFollowRequest(request models.Request) (int, error) {
 		WHERE
 		 (sender_id = $1 AND receiver_id = $2) 
 `
-	err := DB.QueryRow(context.Background(), query, request.SenderID, request.ReceiverID).Scan(requestID)
+	err := DB.QueryRow(context.Background(), query, request.Sender, request.Receiver).Scan(requestID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -50,7 +50,7 @@ func CreateFollowRequest(request models.Request) (int, error) {
 	VALUES 
 			($1, $2)
 	RETURNING request_id`
-	err = DB.QueryRow(context.Background(), query, request.SenderID, request.ReceiverID).Scan(&request.ID)
+	err = DB.QueryRow(context.Background(), query, request.Sender, request.Receiver).Scan(&request.ID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
 		return 0, err // Return error if failed to insert post

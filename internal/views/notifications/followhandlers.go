@@ -15,8 +15,17 @@ func CreateFollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var request models.Request
-	request.SenderID = userID
+	request.Sender = userID
 	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		jsonError := models.Error{
+			Reason: err.Error(),
+		}
+		json.NewEncoder(w).Encode(jsonError)
+		return
+	}
+	request.Receiver, err = database.GetUserIDByUserName(request.Receiver)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{

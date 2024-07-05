@@ -8,6 +8,11 @@ import (
 	"social-network/internal/views/middleware"
 )
 
+// CreateFollowHandler creates a follow request for a user. It expects a JSON body with the following format:
+//
+//	{
+//		"receiver": "username" // the username of the user to follow
+//	}
 func CreateFollowHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {

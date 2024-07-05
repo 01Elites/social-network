@@ -22,6 +22,7 @@ func SetupRoutes() {
 		w.Write([]byte("Hello, World!"))
 	})
 
+	// test Handle the OPTIONS request for the root route and return the allowed methods
 	http.HandleFunc("OPTIONS /api/", middleware.AllowCORS(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 	}))
@@ -29,18 +30,18 @@ func SetupRoutes() {
 	/********************* Authentication ************************/
 	auth.SetupAuthRoutes()
 
-	/********************* User ************************/
+	/************************** User *****************************/
 	profile.SetupProfileRoutes()
 
-	/********************* Posts ************************/
+	/*************************** Posts ***************************/
 	post.SetupPostRoutes()
 
-	/********************* Group ************************/
+	/*************************** Group ***************************/
 	group.SetupGroupRoutes()
 
-	/********************* Notifications ************************/
+	/********************** Notifications ************************/
 	notifications.SetupNotificationRoutes()
 
-	/********************* Websocket ************************/
+	/*********************** Websocket ***************************/
 	websocket.SetupWebSocketRoutes()
 }

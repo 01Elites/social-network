@@ -70,7 +70,7 @@ func InsertDummyData() {
 	for _, user := range dummyUsers {
 		_, err := DB.Exec(context.Background(), stmt, user.UserID, user.UserName, user.Email, user.Password, user.Provider)
 		if err != nil {
-			log.Print("Error inserting dummy data: %v\n", err)
+			log.Printf("Error inserting dummy data: %v\n", err)
 		}
 	}
 

@@ -15,7 +15,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	var group models.Create_Group
+	var group models.CreateGroup
 	err := json.NewDecoder(r.Body).Decode(&group)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)

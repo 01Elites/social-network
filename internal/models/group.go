@@ -7,20 +7,20 @@ type GroupFeed struct {
 	IsMember bool   `json:"ismember,omitempty"`
 }
 
-
-type Create_Group struct {
+type CreateGroup struct {
 	Title       string `json:"title,omitempty"`
 	Description string `json:"description,omitempty"`
 }
 
-type GroupInvite struct {
-	ID			    int    `json:"invite_id,omitempty"`
-	GroupID 	  int    `json:"group_id,omitempty"`
-	ReceiverID  string `json:"receiver_id,omitempty"`
+type GroupAction struct {
+	ID         int    `json:"id,omitempty"`
+	GroupID    int    `json:"group_id,omitempty"`
+	ReceiverID string `json:"receiver_id,omitempty"`
 }
-
-type InviteResponse struct {
-	ID			    int    `json:"invite_id,omitempty"`
-	GroupID 		int		 `json:"group_id,omitempty"`
-	Status      string `json:"status,omitempty"`
+type GroupResponse struct {
+	ID             int    `json:"invite_id,omitempty"`
+	GroupID        int    `json:"group_id,omitempty"`
+	RequesterID    string `json:"requester_id,omitempty"`
+	Status         string `json:"status,omitempty"`
+	NotificationID int    `json:"notification_id,omitempty"`
 }

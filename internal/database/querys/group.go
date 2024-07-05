@@ -6,7 +6,7 @@ import (
 	"social-network/internal/models"
 )
 
-func CreateGroup(userID string, group models.Create_Group) (int, error){
+func CreateGroup(userID string, group models.CreateGroup) (int, error){
 	query := `
     INSERT INTO 
         "group" (title, description, creator_id) 

@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
-	"social-network/internal/database"
+	 "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/views"
 )
@@ -13,13 +13,13 @@ func main() {
 	helpers.LoadEnv("internal/database/.env")
 
 	// Apply database migrations
-	err := database.ApplyMigrations()
+	err := querys.ApplyMigrations()
 	if err != nil {
 		log.Fatalf("Could not apply migrations: %v", err)
 	}
 
 	// Initiate the database connection
-	database.Init()
+	querys.Init()
 
 	// Setup the routes for the views
 	views.SetupRoutes()

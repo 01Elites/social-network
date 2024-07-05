@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/session"

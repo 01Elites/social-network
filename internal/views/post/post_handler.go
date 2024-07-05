@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
@@ -20,7 +20,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Create_Post
 	err := json.NewDecoder(r.Body).Decode(&post)
 	if err != nil || post.Title == "" || post.Content == "" {
-		helpers.HTTPError(w,  err.Error(), http.StatusBadRequest)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if post.Image != "" {
@@ -31,7 +31,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	postID, err := database.CreatePostInDB(userID, post)
 	if err != nil {
-		helpers.HTTPError(w,  err.Error(), http.StatusBadRequest)
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)

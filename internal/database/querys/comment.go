@@ -1,10 +1,10 @@
-package database
+package querys
 
 import (
 	"context"
 	"log"
-	"social-network/internal/models"
 	"social-network/internal/helpers"
+	"social-network/internal/models"
 )
 
 func Create_Comment_in_db(userID string, comment models.Create_Comment) error {
@@ -15,7 +15,7 @@ func Create_Comment_in_db(userID string, comment models.Create_Comment) error {
     VALUES 
         ($1, $2, $3, $4)`
 
-	_, err := DB.Exec(context.Background(), query, comment.ParentID,userID, comment.Image, comment.Content)
+	_, err := DB.Exec(context.Background(), query, comment.ParentID, userID, comment.Image, comment.Content)
 	if err != nil {
 		log.Printf("database: Failed to insert comment into database: %v", err)
 		return err
@@ -73,16 +73,16 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
 			comment.Image, err = helpers.GetImage(comment.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
-					return nil, err
+				return nil, err
 			}
+		}
+		if comment.User.Image != "" {
+			comment.User.Image, err = helpers.GetImage(comment.User.Image)
+			if err != nil {
+				log.Printf("failed to get image: %v\n", err)
+				return nil, err
 			}
-			if comment.User.Image != "" {
-				comment.User.Image, err = helpers.GetImage(comment.User.Image)
-				if err != nil {
-					log.Printf("failed to get image: %v\n", err)
-					return nil, err
-				}
-			}
+		}
 		comments = append(comments, comment)
 	}
 	return comments, nil

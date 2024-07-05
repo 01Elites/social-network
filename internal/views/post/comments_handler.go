@@ -5,10 +5,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
+	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
-	"social-network/internal/helpers"
 	"strconv"
 )
 
@@ -34,7 +34,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		comment.Image, err = helpers.SaveBase64Image(comment.Image)
 		if err != nil {
 			log.Println("Error with Image:", err)
-			return 
+			return
 		}
 	}
 	err = database.Create_Comment_in_db(userID, comment)

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
@@ -29,7 +29,7 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
 		helpers.HTTPError(w, "User Not Part of Group", http.StatusBadRequest)
 		return
-	} 
+	}
 	if !group.IsMember {
 		json.NewEncoder(w).Encode(group)
 		w.WriteHeader(http.StatusOK)

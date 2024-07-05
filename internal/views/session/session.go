@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
 )
 
 func ValidateSession(w http.ResponseWriter, r *http.Request) (string, error) {

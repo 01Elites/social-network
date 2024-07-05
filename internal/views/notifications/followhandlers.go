@@ -3,7 +3,7 @@ package notifications
 import (
 	"encoding/json"
 	"net/http"
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 )
@@ -20,7 +20,7 @@ func CreateFollowHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: err.Error(),
+			Reason: err.Error(),
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return
@@ -29,10 +29,10 @@ func CreateFollowHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: err.Error(),
+			Reason: err.Error(),
 		}
 		json.NewEncoder(w).Encode(jsonError)
-			return
+		return
 	}
 	requestIDjson := struct {
 		ID int `json:"id"`
@@ -55,7 +55,7 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: err.Error(),
+			Reason: err.Error(),
 		}
 		json.NewEncoder(w).Encode(jsonError)
 		return
@@ -64,10 +64,10 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: err.Error(),
+			Reason: err.Error(),
 		}
 		json.NewEncoder(w).Encode(jsonError)
-			return
+		return
 	}
 	requestIDjson := struct {
 		ID int `json:"id"`

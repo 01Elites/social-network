@@ -1,4 +1,4 @@
-package database
+package querys
 
 import (
 	"context"
@@ -92,7 +92,7 @@ func RespondToFollow(response models.Response) error {
 }
 
 // IsFollowing checks if a user is following another user
-func IsFollowing(userID string, followedID string) (bool) {
+func IsFollowing(userID string, followedID string) bool {
 	query := `SELECT followed_id FROM follower WHERE follower_id = $1 AND followed_id = $2`
 	err := DB.QueryRow(context.Background(), query, userID, followedID).Scan(&followedID)
 	if err != nil {

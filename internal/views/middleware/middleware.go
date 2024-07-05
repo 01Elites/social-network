@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
 	"social-network/internal/views/session"
 )
 

@@ -3,7 +3,7 @@ package group
 import (
 	"encoding/json"
 	"net/http"
-	"social-network/internal/database"
+	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
@@ -25,10 +25,10 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		jsonError := models.Error{
-				Reason: err.Error(),
+			Reason: err.Error(),
 		}
 		json.NewEncoder(w).Encode(jsonError)
-			return
+		return
 	}
 	groupIDjson := struct {
 		ID int `json:"id"`
@@ -38,4 +38,3 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(groupIDjson)
 }
-

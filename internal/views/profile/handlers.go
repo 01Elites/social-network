@@ -15,6 +15,7 @@ import (
 )
 
 type profileData struct {
+	UserName       string    `json:"user_name"`
 	Email          string    `json:"email"`
 	NickName       string    `json:"nick_name"`
 	FirstName      string    `json:"first_name"`
@@ -36,9 +37,9 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var profile profileData
-	email, err := database.GetUserEmail(userID)
+	user, err := database.GetUserEmailUserName(userID)
 	if err != nil {
-		helpers.HTTPError(w, "Failed to get user email", http.StatusInternalServerError)
+		helpers.HTTPError(w, "Failed to get user email and username", http.StatusInternalServerError)
 		return
 	}
 	prof, err := database.GetUserProfile(userID)
@@ -54,7 +55,8 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	profile = profileData{
-		Email:          email,
+		UserName:       user.UserName,
+		Email:          user.Email,
 		NickName:       prof.NickName,
 		FirstName:      prof.FirstName,
 		LastName:       prof.LastName,

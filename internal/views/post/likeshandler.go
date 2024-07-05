@@ -17,7 +17,7 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	post_id, err := strconv.Atoi(r.PathValue("post_id"))
+	post_id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		helpers.HTTPError(w, ("Invalid postID:" + err.Error()), http.StatusBadRequest)
 		return

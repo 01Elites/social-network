@@ -75,6 +75,7 @@ func RespondToInvite(response models.GroupResponse, userID string) error{
 func CreateRequest(groupID int, senderID string) (int, error) {
 	var status string
 	var requestID int
+	var creatorID int
 	query := `
 	SELECT 
 		 status,
@@ -96,29 +97,34 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 	query = `
     INSERT INTO 
         group_requests (group_id, sender_id) 
+		INNER JOIN
+			group USING (group_id)
     VALUES 
-        ($1, $2)`
-	err = DB.QueryRow(context.Background(), query, groupID, senderID).Scan(&requestID)
+        ($1, $2)
+				RETURNING
+				request_id AND creator_id`
+	err = DB.QueryRow(context.Background(), query, groupID, senderID).Scan(&requestID, &creatorID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
 		return 0, err // Return error if failed to insert post
 	}
+	// add to notification table for creator
 	return requestID, nil
 }
 
 func RespondToRequest(response models.GroupResponse) error{
 	var requesterID string
+	query := `UPDATE group_requests SET status = $1 WHERE group_id = $2, receiver_id = $3 AND status = 'pending'`
+	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, response.RequesterID)
+	if err != nil {
+		log.Printf("database: Failed to update response in database: %v", err)
+		return err // Return error if failed to insert post
+	}
+	if response.ID == 0 {
+		log.Print("no match")
+		return nil
+	}
 	if response.Status == "accepted" {
-		query := `UPDATE group_requests SET status = $1 WHERE group_id = $2, receiver_id = $3 AND status = 'pending'`
-		_, err := DB.Exec(context.Background(), query, "accepted", response.GroupID, response.RequesterID)
-		if err != nil {
-			log.Printf("database: Failed to update response in database: %v", err)
-			return err // Return error if failed to insert post
-		}
-		if response.ID == 0 {
-			log.Print("no match")
-			return nil
-		}
 		query = `INSERT INTO 
 			group_member (user_id, group_id) 
 	VALUES 
@@ -128,13 +134,6 @@ func RespondToRequest(response models.GroupResponse) error{
 			log.Printf("database: Failed to add group member: %v", err)
 			return err // Return error if failed to insert post
 		}
-	} else if response.Status == "rejected" {
-		query := `UPDATE group_requests SET status = 'rejected' WHERE requester_id = $1 AND group_id = $2`
-		_, err := DB.Exec(context.Background(), query, response.RequesterID, response.GroupID)
-		if err != nil {
-			log.Printf("database: Failed to update response in database: %v", err)
-			return err // Return error if failed to insert post
-		}
-	}
+	} 
 	return nil
 }

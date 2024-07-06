@@ -20,7 +20,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Create_Post
 	err := json.NewDecoder(r.Body).Decode(&post)
 	if err != nil || post.Title == "" || post.Content == "" {
-		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		helpers.HTTPError(w, "invalid post", http.StatusBadRequest)
 		return
 	}
 	if post.Image != "" && post.Image != "null" {

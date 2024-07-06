@@ -10,8 +10,8 @@ type Request struct {
 
 type Response struct {
 	ID             int    `json:"response_id,omitempty"`
-	FollowerID     string `json:"follower_id,omitempty"`
-	FolloweeID     string `json:"followee_id,omitempty"`
+	Follower       string `json:"follower,omitempty"` // user Name
+	Followee       string `json:"followee,omitempty"` // user Name
 	Status         string `json:"status,omitempty"`
 	NotificationID int    `json:"notification_id,omitempty"`
 }

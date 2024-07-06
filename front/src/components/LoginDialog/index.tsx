@@ -412,9 +412,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 !signupLastName() ||
                 !signupEmail() ||
                 !signupDOB() ||
-                !signupNickname() ||
                 !signupGender() ||
-                !signupAbout() ||
                 !signupPassword() ||
                 !signupConfirmPassword() ||
                 signupPasswordValidation() === 'invalid' ||

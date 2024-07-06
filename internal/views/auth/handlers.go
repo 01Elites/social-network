@@ -14,6 +14,8 @@ import (
 	"social-network/internal/models"
 	"social-network/internal/views/session"
 
+	"math/rand"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -88,8 +90,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	data.Password = hash
 	data.Email = strings.ToLower(data.Email) // Convert email to lowercase for consistency
+
+	// -------- GENERATE A RANDOM USERNAME ---------
+	rand.Seed(time.Now().UnixNano())
+	randomDigits := fmt.Sprintf("%04d", rand.Intn(10000))
+
 	user := models.User{
-		UserName: data.UserName,
+		UserName: data.FirstName[:1] + data.LastName + randomDigits,
 		Email:    data.Email,
 		Password: data.Password,
 		Provider: models.Provider.Manual,

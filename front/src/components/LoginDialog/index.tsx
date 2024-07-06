@@ -59,8 +59,8 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
   const [loginEmail, setLoginEmail] = createSignal('');
   const [loginPassword, setLoginPassword] = createSignal('');
 
-  function handleLoginForm(e: SubmitEvent) {
-    e.preventDefault();
+  function handleLoginForm(e?: SubmitEvent) {
+    e?.preventDefault();
     setFormProcessing(true);
 
     fetchWithAuth(config.API_URL + '/auth/signin', {
@@ -128,8 +128,10 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             description: 'Your account has been created successfully',
             variant: 'success',
           });
-          props.setOpen(false);
           setShowLogin(true);
+          setLoginEmail(signupEmail());
+          setLoginPassword(signupPassword());
+          handleLoginForm();
           return;
         }
 

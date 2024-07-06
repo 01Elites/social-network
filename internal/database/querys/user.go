@@ -223,7 +223,52 @@ func GetUserIDByUserName(userName string) (string, error) {
 	return userID, nil
 }
 
-// get a userID by uerName
+// IsFollowing checks if a user is following another user
+func IsFollowing(userID string, followedID string) bool {
+	query := `SELECT followed_id FROM follower WHERE follower_id = $1 AND followed_id = $2`
+	err := DB.QueryRow(context.Background(), query, userID, followedID).Scan(&followedID)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return false
+		}
+		log.Printf("database: Failed to check if user is following: %v", err)
+		return false
+	}
+	return true
+}
+
+// FollowUser adds a follow relationship between two users
+func FollowUser(request models.Request) error {
+	// Check if user is already following
+	if IsFollowing(request.Sender, request.Receiver) {
+		return errors.New("user is already following")
+	}
+	// Insert follow relationship into database
+	query := `INSERT INTO follower (follower_id, followed_id) VALUES ($1, $2)`
+	_, err := DB.Exec(context.Background(), query, request.Sender, request.Receiver)
+	if err != nil {
+		log.Printf("database: Failed to insert follow relationship: %v", err)
+		return err
+	}
+	return nil
+}
+
+// UnFollowUser removes a follow relationship between two users
+func UnFollowUser(request models.Request) error {
+	// Check if user is following
+	if !IsFollowing(request.Sender, request.Receiver) {
+		return errors.New("user is not following")
+	}
+	// Remove follow relationship from database
+	query := `DELETE FROM follower WHERE follower_id = $1 AND followed_id = $2`
+	_, err := DB.Exec(context.Background(), query, request.Sender, request.Receiver)
+	if err != nil {
+		log.Printf("database: Failed to delete follow relationship: %v", err)
+		return err
+	}
+	return nil
+}
+// get userName by ID
 func GetUserNameByID(userID string) (string, error) {
 	var username string
 	query := `SELECT user_name FROM public.user WHERE user_id = $1`

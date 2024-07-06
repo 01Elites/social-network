@@ -21,6 +21,24 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	isMember, err := database.GroupMember(userID, invite.GroupID)
+	if err != nil {
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if !isMember {
+		helpers.HTTPError(w, "user not a member to make an invitation", http.StatusBadRequest)
+		return
+	}
+	isMember, err = database.GroupMember(invite.ReceiverID, invite.GroupID)
+	if err != nil {
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if isMember {
+		helpers.HTTPError(w, "user already a member", http.StatusBadRequest)
+		return
+	}
 	inviteID, err := database.CreateInvite(invite.GroupID, userID, invite.ReceiverID)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)

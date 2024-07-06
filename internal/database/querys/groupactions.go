@@ -10,14 +10,6 @@ import (
 func CreateInvite(groupID int, senderID string, receiverID string) (int, error) {
 	var status string
 	var invitationID int
-	isMember, err := GroupMember(senderID, groupID)
-	if err != nil {
-		return 0, err
-	}
-	if !isMember {
-		log.Printf("user not a member")
-		return 0 , nil
-	}
 	query := `
 	SELECT 
 		 status,
@@ -27,7 +19,7 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 		WHERE
 		 (group_id = $1 AND receiver_id = $2) 
 `
-	err = DB.QueryRow(context.Background(), query, groupID, receiverID).Scan(&status,&invitationID,)
+	err := DB.QueryRow(context.Background(), query, groupID, receiverID).Scan(&status,&invitationID,)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for invitation: %v", err)
 		return 0, err // Return error if failed to insert post

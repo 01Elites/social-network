@@ -68,6 +68,8 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts)
 }
 
+
+
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -88,6 +90,8 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(post)
 }
+
+
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)

@@ -1,4 +1,4 @@
-import { JSXElement, createEffect, createSignal, useContext } from 'solid-js';
+import { JSXElement, createSignal, useContext } from 'solid-js';
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,6 @@ import {
   TextField,
   TextFieldInput,
   TextFieldLabel,
-  TextFieldTextArea,
 } from '~/components/ui/text-field';
 import { showToast } from '~/components/ui/toast';
 import config from '~/config';
@@ -102,16 +101,9 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
   const [signupLastName, setSignupLastName] = createSignal('');
   const [signupEmail, setSignupEmail] = createSignal('');
   const [signupDOB, setSignupDOB] = createSignal('');
-  const [signupNickname, setSignupNickname] = createSignal('');
   const [signupGender, setSignupGender] = createSignal<'female' | 'male'>();
-  const [signupAbout, setSignupAbout] = createSignal('');
   const [signupPassword, setSignupPassword] = createSignal('');
   const [signupPrivate, setSignupPrivate] = createSignal(false);
-  const [signupConfirmPassword, setSignupConfirmPassword] = createSignal('');
-
-  const [signupPasswordValidation, setSignupPasswordValidation] = createSignal<
-    'valid' | 'invalid'
-  >('valid');
 
   function handleSignupForm(e: SubmitEvent) {
     e.preventDefault();
@@ -119,14 +111,11 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     fetchWithAuth(config.API_URL + '/auth/signup', {
       method: 'POST',
       body: JSON.stringify({
-        // user_name: 'fuck',
         first_name: signupFirstName(),
         last_name: signupLastName(),
         email: signupEmail(),
         date_of_birth: new Date(signupDOB()).toISOString(),
-        nick_name: signupNickname(),
         profile_privacy: signupPrivate() ? 'private' : 'public',
-        about: signupAbout(),
         password: signupPassword(),
         gender: signupGender(), // Hardcoded for testing
       }),
@@ -161,17 +150,6 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
       });
   }
 
-  createEffect(() => {
-    // if empty, don't show validation
-    if (signupConfirmPassword() === '') {
-      setSignupPasswordValidation('valid');
-    } else if (signupPassword() !== signupConfirmPassword()) {
-      setSignupPasswordValidation('invalid');
-    } else {
-      setSignupPasswordValidation('valid');
-    }
-  });
-
   return (
     <Dialog
       open={props.open}
@@ -182,15 +160,27 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     >
       <DialogContent>
         <DialogHeader>
-          <div class={showLogin() ? 'flex justify-center' : ''}>
-            <img src={logo} alt='Elite Logo' class='w-20' />
+          <div
+            class={
+              showLogin()
+                ? 'flex justify-center'
+                : 'flex justify-center xs:justify-start'
+            }
+          >
+            <img src={logo} alt='Elite Logo' class='w-28' />
           </div>
           <DialogTitle
-            class={showLogin() ? 'text-center text-3xl' : 'text-left text-3xl'}
+            class={
+              showLogin()
+                ? 'text-center text-3xl'
+                : 'text-center text-3xl xs:text-left'
+            }
           >
             {showLogin() ? 'Oh, no life?' : 'Sign Up'}
           </DialogTitle>
-          <DialogDescription class={showLogin() ? 'text-center' : 'text-left'}>
+          <DialogDescription
+            class={showLogin() ? 'text-center' : 'text-center xs:text-left'}
+          >
             {showLogin() ? loginMessages.random() : signUpMessages.random()}
           </DialogDescription>
         </DialogHeader>
@@ -257,11 +247,11 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         {/* Sign up form */}
         {!showLogin() && (
           <form
-            class='grid w-full grid-cols-2 gap-4'
+            class='grid w-full grid-cols-1 gap-4 xs:grid-cols-2'
             onSubmit={handleSignupForm}
           >
             <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
+              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
               onChange={setSignupFirstName}
               value={signupFirstName()}
               required
@@ -270,7 +260,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               <TextFieldInput type='text' id='fname' placeholder='Yaman' />
             </TextField>
             <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
+              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
               onChange={setSignupLastName}
               value={signupLastName()}
               required
@@ -279,7 +269,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               <TextFieldInput type='text' id='lname' placeholder='Almasri' />
             </TextField>
             <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
+              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
               onChange={setSignupEmail}
               value={signupEmail()}
               required
@@ -292,7 +282,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               />
             </TextField>
             <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
+              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
               onChange={setSignupDOB}
               value={signupDOB()}
               required
@@ -307,26 +297,13 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
-              onChange={setSignupNickname}
-              value={signupNickname()}
-            >
-              <TextFieldLabel for='nickname'>Nickname</TextFieldLabel>
-              <TextFieldInput
-                type='text'
-                id='nickname'
-                placeholder='yalmasri'
-              />
-            </TextField>
-
-            <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
+              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
               onChange={setSignupGender}
             >
               <TextFieldLabel>Gender</TextFieldLabel>
 
               <Select
-                class='col-span-1 w-full'
+                class='col-span-2 w-full xs:col-span-1'
                 placeholder='Select your Gender'
                 itemComponent={(props) => (
                   <SelectItem item={props.item}>
@@ -349,20 +326,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <TextField
-              class='col-span-2 grid w-full items-center gap-1.5'
-              onChange={setSignupAbout}
-            >
-              <TextFieldLabel for='about'>About you</TextFieldLabel>
-              <TextFieldTextArea
-                class='resize-none'
-                id='about'
-                placeholder='The biggest Looser 🤡'
-                autoResize={false}
-              />
-            </TextField>
-
-            <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
+              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
               onChange={setSignupPassword}
               required
             >
@@ -371,22 +335,6 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 type='password'
                 id='password'
                 placeholder='your password'
-              />
-            </TextField>
-
-            <TextField
-              class='col-span-1 grid w-full items-center gap-1.5'
-              onChange={setSignupConfirmPassword}
-              validationState={signupPasswordValidation()}
-              required
-            >
-              <TextFieldLabel for='confirm-password'>
-                Confirm Password
-              </TextFieldLabel>
-              <TextFieldInput
-                type='password'
-                id='confirm-password'
-                placeholder='confirm your password'
               />
             </TextField>
 
@@ -414,8 +362,6 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 !signupDOB() ||
                 !signupGender() ||
                 !signupPassword() ||
-                !signupConfirmPassword() ||
-                signupPasswordValidation() === 'invalid' ||
                 formProcessing()
               }
             >

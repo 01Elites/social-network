@@ -1,17 +1,19 @@
-import { JSXElement, useContext } from 'solid-js';
+import { createSignal, JSXElement, useContext } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { UserDetailsHook } from '~/types/User';
 
-import photo from '~/assets/photo.svg';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
+import NewPostPreview from './NewPostPreview';
 
 export default function NewPostCell(): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
+  const [postPreviewOpen, setPostPreviewOpen] = createSignal(false);
+
   return (
     <div class='flex gap-2 rounded border-[1px] p-2'>
-      {/* <NewPostPreview /> */}
+      <NewPostPreview setOpen={setPostPreviewOpen} open={postPreviewOpen()} />
 
       <Avatar>
         <AvatarImage src={userDetails()?.avatar_url} />
@@ -19,16 +21,20 @@ export default function NewPostCell(): JSXElement {
           {userDetails()?.first_name.charAt(0).toUpperCase()}
         </AvatarFallback>
       </Avatar>
-      <Button variant='ghost' class='w-full justify-start'>
-        Your father disappointed?
-      </Button>
       <Button
+        variant='ghost'
+        class='w-full justify-start text-muted-foreground'
+        onClick={() => setPostPreviewOpen(true)}
+      >
+        Your father disappointed? Click to Cry 😢
+      </Button>
+      {/* <Button
         variant='ghost'
         title='Upload an image Button'
         class='hidden xs:inline-flex'
       >
         <img src={photo} alt='Upload an image icon' />
-      </Button>
+      </Button> */}
     </div>
   );
 }

@@ -8,7 +8,7 @@ CREATE TYPE public.profile_privacy AS ENUM ('private','public');
 
 CREATE TYPE public.gender_type AS ENUM ('male', 'female');
 
-CREATE TYPE public.status_type AS ENUM ('pending', 'accepted', 'rejected');
+CREATE TYPE public.status_type AS ENUM ('pending', 'accepted', 'rejected', 'canceled');
 
 CREATE TYPE public.post_privacy AS ENUM ('public', 'private', 'almost_private', 'group');
 

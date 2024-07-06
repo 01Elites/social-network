@@ -55,7 +55,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		data.ProfilePrivacy = models.ProfilePrivacy.Public
 	}
 
-	if data.Image != "" { // Save the image if it exists
+	if data.Image != "" && data.Image != "null" { // Save the image if it exists
 		data.Image, err = helpers.SaveBase64Image(data.Image)
 		if err != nil {
 			fmt.Println("Error with Profile Image:\n", err)

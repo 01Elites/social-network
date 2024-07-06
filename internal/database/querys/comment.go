@@ -69,13 +69,13 @@ func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
-		if comment.Image != "" {
+		if comment.Image != "" && comment.Image != "null" {
 			comment.Image, err = helpers.GetImage(comment.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
 			}
 		}
-		if comment.User.Image != "" {
+		if comment.User.Image != "" && comment.Image != "null" {
 			comment.User.Image, err = helpers.GetImage(comment.User.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)

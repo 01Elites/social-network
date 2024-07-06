@@ -48,7 +48,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if prof.Image != "" { // If the user has no image, use the default image
+	if prof.Image != "" && prof.Image != "null" { // If the user has no image, use the default image
 		prof.Image, err = helpers.GetImage(prof.Image)
 		if err != nil {
 			fmt.Println("Error getting image:", err)
@@ -154,7 +154,7 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if prof.Image != "" { // If the user has no image, use the default image
+	if prof.Image != "" && prof.Image != "null" { // If the user has no image, use the default image
 		prof.Image, err = helpers.GetImage(prof.Image)
 		if err != nil {
 			fmt.Println("Error getting image:", err)

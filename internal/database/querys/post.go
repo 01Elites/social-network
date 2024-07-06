@@ -112,13 +112,13 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			log.Printf("database failed to scan comments count: %v\n", err)
 			return nil, err
 		}
-		if p.Image != "" {
+		if p.Image != "" && p.Image != "null" {
 			p.Image, err = helpers.GetImage(p.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
 			}
 		}
-		if p.User.Image != "" {
+		if p.User.Image != "" && p.Image != "null" {
 			p.User.Image, err = helpers.GetImage(p.User.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
@@ -208,13 +208,13 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 		log.Printf("database failed to scan comments count: %v\n", err)
 		return models.Post{}, err
 	}
-	if post.Image != "" {
+	if post.Image != "" && post.Image != "null" {
 		post.Image, err = helpers.GetImage(post.Image)
 		if err != nil {
 			log.Printf("failed to get image: %v\n", err)
 		}
 	}
-	if post.User.Image != "" {
+	if post.User.Image != "" && post.Image != "null" {
 		post.User.Image, err = helpers.GetImage(post.User.Image)
 		if err != nil {
 			log.Printf("failed to get image: %v\n", err)
@@ -311,8 +311,7 @@ func DeletePost(postID int, userID string) error {
 	return nil
 }
 
-func 
-GetGroupPosts(groupID int) ([]models.Post, error) {
+func GetGroupPosts(groupID int) ([]models.Post, error) {
 	query := `
 	SELECT 
 			post_id, 
@@ -351,14 +350,14 @@ GetGroupPosts(groupID int) ([]models.Post, error) {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
-		if p.Image != "" {
+		if p.Image != "" && p.Image != "null" {
 			p.Image, err = helpers.GetImage(p.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
 				return nil, err
 			}
 		}
-		if p.User.Image != "" {
+		if p.User.Image != "" && p.Image != "null" {
 			p.User.Image, err = helpers.GetImage(p.User.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
@@ -432,7 +431,7 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
 			return []models.ProfilePost{}, err
 		}
 		post.PostLikes = len(post.Likers_ids)
-		if post.Image != "" {
+		if post.Image != "" && post.Image != "null" {
 			post.Image, err = helpers.GetImage(post.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)

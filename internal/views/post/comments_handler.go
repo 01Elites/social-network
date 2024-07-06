@@ -30,7 +30,7 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, ("Failed to decode comment:" + err.Error()), http.StatusBadRequest)
 		return
 	}
-	if comment.Image != "" {
+	if comment.Image != "" && comment.Image != "null" {
 		comment.Image, err = helpers.SaveBase64Image(comment.Image)
 		if err != nil {
 			log.Println("Error with Image:", err)

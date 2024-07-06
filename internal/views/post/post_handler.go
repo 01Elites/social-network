@@ -23,7 +23,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if post.Image != "" {
+	if post.Image != "" && post.Image != "null" {
 		post.Image, err = helpers.SaveBase64Image(post.Image)
 		if err != nil {
 			fmt.Println("Error with Image:\n", err)
@@ -68,8 +68,6 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts)
 }
 
-
-
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -90,8 +88,6 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(post)
 }
-
-
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)

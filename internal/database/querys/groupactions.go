@@ -4,21 +4,30 @@ import (
 	"context"
 	"log"
 	"social-network/internal/models"
+	// "github.com/jackc/pgx/v5"
 )
 
 func CreateInvite(groupID int, senderID string, receiverID string) (int, error) {
 	var status string
 	var invitationID int
+	isMember, err := GroupMember(senderID, groupID)
+	if err != nil {
+		return 0, err
+	}
+	if !isMember {
+		log.Printf("user not a member")
+		return 0 , nil
+	}
 	query := `
 	SELECT 
 		 status,
 		 invitation_id
 		FROM
-			group_invitation
+			group_invitations
 		WHERE
-		 (sender_id = $1 AND receiver_id = $2) 
+		 (group_id = $1 AND receiver_id = $2) 
 `
-	err := DB.QueryRow(context.Background(), query, senderID, receiverID).Scan(invitationID, status)
+	err = DB.QueryRow(context.Background(), query, groupID, receiverID).Scan(&status,&invitationID,)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for invitation: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -29,9 +38,11 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 	}
 	query = `
     INSERT INTO 
-        group_invitations (group_id, sender_id, reciever_id) 
+        group_invitations (group_id, sender_id, receiver_id) 
     VALUES 
-        ($1, $2, $3)`
+        ($1, $2, $3)
+		RETURNING
+				invitation_id`
 	err = DB.QueryRow(context.Background(), query, groupID, senderID, receiverID).Scan(&invitationID)
 	if err != nil {
 		log.Printf("database: Failed to insert invitation into database: %v", err)
@@ -41,41 +52,35 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 }
 
 func RespondToInvite(response models.GroupResponse, userID string) error{
+	query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending'`
+	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, userID)
+	if err != nil {
+		log.Printf("database: Failed to update response in database: %v", err)
+		return err // Return error if failed to update response
+	}
 	if response.Status == "accepted" {
-		query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2, receiver_id = $3 AND status = 'pending'`
-		_, err := DB.Exec(context.Background(), query, "accepted", response.GroupID, userID)
-		if err != nil {
-			log.Printf("database: Failed to update response in database: %v", err)
-			return err // Return error if failed to insert post
-		}
-		if response.ID == 0 {
-			log.Print("no match")
+		isMember, _ := GroupMember(userID, response.GroupID)
+		if isMember{
+			log.Printf("User already a member")
 			return nil
 		}
 		query = `INSERT INTO 
-			group_member (user_id, group_id) 
+			group_member (user_id, group_id)
 	VALUES 
 			($1, $2)`
 		_, err = DB.Exec(context.Background(), query, userID, response.GroupID)
 		if err != nil {
-			log.Printf("database: Failed to add follower: %v", err)
-			return err // Return error if failed to insert post
+			log.Printf("database: Failed to add group member: %v", err)
+			return err // Return error if failed to insert group member
 		}
-	} else if response.Status == "rejected" {
-		query := `UPDATE group_invitations SET status = 'rejected' WHERE sender_id = $1 AND group_id = $2`
-		_, err := DB.Exec(context.Background(), query, userID, response.GroupID)
-		if err != nil {
-			log.Printf("database: Failed to update response in database: %v", err)
-			return err // Return error if failed to insert post
-		}
-	}
+	} 
 	return nil
 }
 
 func CreateRequest(groupID int, senderID string) (int, error) {
 	var status string
 	var requestID int
-	var creatorID int
+	var creatorID string
 	query := `
 	SELECT 
 		 status,
@@ -83,9 +88,9 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 		FROM
 			group_requests
 		WHERE
-		 sender_id = $1 
+		 requester_id = $1 
 `
-	err := DB.QueryRow(context.Background(), query, senderID).Scan(requestID, status)
+	err := DB.QueryRow(context.Background(), query, senderID).Scan(&status,&requestID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -96,14 +101,18 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 	}
 	query = `
     INSERT INTO 
-        group_requests (group_id, sender_id) 
-		INNER JOIN
-			group USING (group_id)
+        group_requests (group_id, requester_id) 
     VALUES 
         ($1, $2)
 				RETURNING
-				request_id AND creator_id`
-	err = DB.QueryRow(context.Background(), query, groupID, senderID).Scan(&requestID, &creatorID)
+				request_id`
+	err = DB.QueryRow(context.Background(), query, groupID, senderID).Scan(&requestID)
+	if err != nil {
+		log.Printf("database: Failed to insert request into database: %v", err)
+		return 0, err // Return error if failed to insert post
+	}
+	query = `SELECT creator_id FROM "group" WHERE group_id = $1`
+	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -113,23 +122,18 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 }
 
 func RespondToRequest(response models.GroupResponse) error{
-	var requesterID string
-	query := `UPDATE group_requests SET status = $1 WHERE group_id = $2, receiver_id = $3 AND status = 'pending'`
+	query := `UPDATE group_requests SET status = $1 WHERE group_id = $2 AND requester_id = $3 AND status = 'pending'`
 	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, response.RequesterID)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)
 		return err // Return error if failed to insert post
-	}
-	if response.ID == 0 {
-		log.Print("no match")
-		return nil
 	}
 	if response.Status == "accepted" {
 		query = `INSERT INTO 
 			group_member (user_id, group_id) 
 	VALUES 
 			($1, $2)`
-		_, err = DB.Exec(context.Background(), query, requesterID, response.GroupID)
+		_, err = DB.Exec(context.Background(), query, response.RequesterID, response.GroupID)
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
 			return err // Return error if failed to insert post

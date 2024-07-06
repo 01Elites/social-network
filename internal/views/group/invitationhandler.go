@@ -26,8 +26,8 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(inviteID)
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(inviteID)
 }
 
 func InvitationResponseHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,28 +73,23 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	json.NewEncoder(w).Encode(requestID)
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(requestID)
 }
 
 func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
-	if !ok {
-		http.Error(w, "User ID not found", http.StatusInternalServerError)
-		return
-	}
 	var response models.GroupResponse
 	err := json.NewDecoder(r.Body).Decode(&response)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = database.UpdateNotificationTable(response.NotificationID, response.Status, userID)
-	if err != nil {
-		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
-		return
-	}
-	
+	// err = database.UpdateNotificationTable(response.NotificationID, response.Status, userID)
+	// if err != nil {
+	// 	helpers.HTTPError(w, err.Error(), http.StatusNotFound)
+	// 	return
+	// }
+
 	err = database.RespondToRequest(response)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)

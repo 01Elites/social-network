@@ -19,6 +19,16 @@ func CreateGroup(userID string, group models.CreateGroup) (int, error){
 		log.Printf("database: Failed to insert group into database: %v", err)
 		return 0, err // Return error if failed to insert post
 	}
+	query = `
+	INSERT INTO 
+			"group_member" (user_id, group_id) 
+	VALUES 
+			($1, $2)`
+_, err = DB.Exec(context.Background(),query, userID, group_id)
+if err != nil {
+	log.Printf("database: Failed to insert group into database: %v", err)
+	return 0, err // Return error if failed to insert post
+}
 	return group_id, nil
 }
 

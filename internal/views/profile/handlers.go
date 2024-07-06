@@ -6,12 +6,12 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
-
-	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
+	"time"
+
+	database "social-network/internal/database/querys"
 )
 
 type profileData struct {

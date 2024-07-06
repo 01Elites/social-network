@@ -18,9 +18,9 @@ render(
       {/* <AuthGuard> */}
       <Route path='/' component={HomePage} />
       {/* </AuthGuard> */}
-      <Route path='/login' component={HomePage} />
+      {/* <Route path='/login' component={HomePage} /> */}
       {/* <AuthGuard> */}
-      <Route path='/profile' />
+      {/* <Route path='/profile' /> */}
       {/* </AuthGuard> */}
     </Router>
   ),

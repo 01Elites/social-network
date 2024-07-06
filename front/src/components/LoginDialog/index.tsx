@@ -200,7 +200,8 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               variant='outline'
               class='gap-4'
               onClick={handleLoginWithReboot}
-              disabled={formProcessing()}
+              // disabled={formProcessing()}
+              disabled={true}
             >
               <img src={rebootLogo} class='h-5'></img>
               Login with Reboot01

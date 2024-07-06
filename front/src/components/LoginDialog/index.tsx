@@ -119,6 +119,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     fetchWithAuth(config.API_URL + '/auth/signup', {
       method: 'POST',
       body: JSON.stringify({
+        // user_name: 'fuck',
         first_name: signupFirstName(),
         last_name: signupLastName(),
         email: signupEmail(),
@@ -209,6 +210,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginEmail}
+              value={loginEmail()}
               required
             >
               <TextFieldLabel for='email'>Email</TextFieldLabel>
@@ -218,6 +220,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginPassword}
+              value={loginPassword()}
               required
             >
               <TextFieldLabel for='password'>Password</TextFieldLabel>
@@ -229,11 +232,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             </TextField>
 
             <Button
-              disabled={
-                loginEmail() === '' ||
-                loginPassword() === '' ||
-                formProcessing()
-              }
+              disabled={!loginEmail() || !loginPassword() || formProcessing()}
               type='submit'
               class='gap-4'
             >
@@ -264,6 +263,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupFirstName}
+              value={signupFirstName()}
               required
             >
               <TextFieldLabel for='fname'>First Name</TextFieldLabel>
@@ -272,6 +272,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupLastName}
+              value={signupLastName()}
               required
             >
               <TextFieldLabel for='lname'>Last Name</TextFieldLabel>
@@ -280,6 +281,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupEmail}
+              value={signupEmail()}
               required
             >
               <TextFieldLabel for='email'>Email</TextFieldLabel>
@@ -292,6 +294,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupDOB}
+              value={signupDOB()}
               required
             >
               <TextFieldLabel for='dob'>Date of Birth</TextFieldLabel>
@@ -306,6 +309,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <TextField
               class='col-span-1 grid w-full items-center gap-1.5'
               onChange={setSignupNickname}
+              value={signupNickname()}
             >
               <TextFieldLabel for='nickname'>Nickname</TextFieldLabel>
               <TextFieldInput
@@ -403,7 +407,19 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <Button
               type='submit'
               class='col-span-2 gap-4'
-              disabled={formProcessing()}
+              disabled={
+                !signupFirstName() ||
+                !signupLastName() ||
+                !signupEmail() ||
+                !signupDOB() ||
+                !signupNickname() ||
+                !signupGender() ||
+                !signupAbout() ||
+                !signupPassword() ||
+                !signupConfirmPassword() ||
+                signupPasswordValidation() === 'invalid' ||
+                formProcessing()
+              }
             >
               {formProcessing() && <img src={tailspin} class='h-full' />}
               Become a Looser

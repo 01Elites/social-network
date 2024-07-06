@@ -2,7 +2,6 @@ package group
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
@@ -31,8 +30,8 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !group.IsMember {
-		json.NewEncoder(w).Encode(group)
 		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(group)
 		return
 	}
 	group.Posts, err = database.GetGroupPosts(group.ID)
@@ -46,6 +45,5 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, "get post successful")
 	json.NewEncoder(w).Encode(group)
 }

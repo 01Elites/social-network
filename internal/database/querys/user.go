@@ -183,8 +183,8 @@ func ValidateSessionToken(sessionID string) (string, error) {
 func GetUserByID(userID string) (*models.User, error) {
 	// Fetch user by user ID
 	var user models.User
-	query := `SELECT user_id, email, provider FROM public.user WHERE user_id = $1`
-	err := DB.QueryRow(context.Background(), query, userID).Scan(&user.UserID, &user.Email, &user.Provider)
+	query := `SELECT user_id, user_name, email, provider FROM public.user WHERE user_id = $1`
+	err := DB.QueryRow(context.Background(), query, userID).Scan(&user.UserID, &user.UserName, &user.Email, &user.Provider)
 	if err != nil {
 		log.Printf("Failed to fetch user by ID: %v\n", err)
 		return &user, err
@@ -221,4 +221,16 @@ func GetUserIDByUserName(userName string) (string, error) {
 		return "", err
 	}
 	return userID, nil
+}
+
+// get a userID by uerName
+func GetUserNameByID(userID string) (string, error) {
+	var username string
+	query := `SELECT user_name FROM public.user WHERE user_id = $1`
+	err := DB.QueryRow(context.Background(), query, userID).Scan(&username)
+	if err != nil {
+		log.Printf("Failed to fetch user by ID: %v\n", err)
+		return "", err
+	}
+	return username, nil
 }

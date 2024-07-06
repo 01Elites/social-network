@@ -32,8 +32,8 @@ if err != nil {
 	return group_id, nil
 }
 
-func GetGroupMembers(groupID int) ([]models.User, error) {
-	var users []models.User
+func GetGroupMembers(groupID int) ([]string, error) {
+	var users []string
 	query := `SELECT user_id FROM group_member WHERE group_id = $1`
 	rows, err := DB.Query(context.Background(), query, groupID)
 	if err != nil {
@@ -46,12 +46,12 @@ func GetGroupMembers(groupID int) ([]models.User, error) {
 			log.Printf("database failed to scan group user: %v\n", err)
 			return nil, err
 		}
-		user, err := GetUserByID(userID)
+		username, err := GetUserNameByID(userID)
 		if err != nil {
 			log.Printf("database failed to get user data: %v\n", err)
 			return nil, err
 		}
-		users = append(users, *user)
+		users = append(users, username)
 	}
 	return users, nil
 }

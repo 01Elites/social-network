@@ -1,10 +1,10 @@
 package models
 
 type GroupFeed struct {
-	ID       int    `json:"id,omitempty"`
-	Members  []User `json:"members,omitempty"`
-	Posts    []Post `json:"posts,omitempty"`
-	IsMember bool   `json:"ismember,omitempty"`
+	ID       int      `json:"id,omitempty"`
+	Members  []string `json:"members,omitempty"`
+	Posts    []Post   `json:"posts,omitempty"`
+	IsMember bool     `json:"ismember,omitempty"`
 }
 
 type CreateGroup struct {

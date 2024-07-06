@@ -69,10 +69,10 @@ type ProfilePost struct {
 }
 
 type PostFeedProfile struct {
-	UserID         string    `db:"user_id" json:"user_id,omitempty"`
-	UserName       string    `db:"user_name" json:"user_name,omitempty"`
-	FirstName      string    `db:"first_name" json:"first_name"`
-	LastName       string    `db:"last_name" json:"last_name"`
-	ProfilePrivacy string    `db:"privacy" json:"post_privacy,omitempty"`
-	Image          string    `db:"image" json:"image_id,omitempty"`
+	UserID         string `db:"user_id" json:"user_id,omitempty"`
+	UserName       string `db:"user_name" json:"user_name,omitempty"`
+	FirstName      string `db:"first_name" json:"first_name"`
+	LastName       string `db:"last_name" json:"last_name"`
+	ProfilePrivacy string `db:"privacy" json:"post_privacy,omitempty"`
+	Image          string `db:"image" json:"image_id,omitempty"`
 }

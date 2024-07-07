@@ -41,7 +41,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	postID, err := database.CreatePostInDB(userID, post)
 	if err != nil {
-		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		helpers.HTTPError(w, "invalid post data", http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)

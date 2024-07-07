@@ -51,11 +51,6 @@ func RespondToInvite(response models.GroupResponse, userID string) error{
 		return err // Return error if failed to update response
 	}
 	if response.Status == "accepted" {
-		isMember, _ := GroupMember(userID, response.GroupID)
-		if isMember{
-			log.Printf("User already a member")
-			return nil
-		}
 		query = `INSERT INTO 
 			group_member (user_id, group_id)
 	VALUES 
@@ -72,7 +67,6 @@ func RespondToInvite(response models.GroupResponse, userID string) error{
 func CreateRequest(groupID int, senderID string) (int, error) {
 	var status string
 	var requestID int
-	var creatorID string
 	query := `
 	SELECT 
 		 status,
@@ -88,8 +82,13 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 		return 0, err // Return error if failed to insert post
 	}
 	if status == "pending" {
-		log.Printf("request already made")
-		return requestID, nil
+		query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1`
+		_, err := DB.Exec(context.Background(), query, senderID)
+		if err != nil{
+			log.Printf("database: Failed to update request in database: %v", err)
+			return 0, err
+		}
+		return 0, nil
 	}
 	query = `
     INSERT INTO 
@@ -103,12 +102,14 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 		log.Printf("database: Failed to insert request into database: %v", err)
 		return 0, err // Return error if failed to insert post
 	}
+	var creatorID string
 	query = `SELECT creator_id FROM "group" WHERE group_id = $1`
 	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
 		return 0, err // Return error if failed to insert post
 	}
+	// database.AddToNotificationTable()
 	// add to notification table for creator
 	return requestID, nil
 }

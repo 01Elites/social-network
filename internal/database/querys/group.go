@@ -3,18 +3,19 @@ package querys
 import (
 	"context"
 	"log"
+
 	"social-network/internal/models"
 )
 
-func CreateGroup(userID string, group models.CreateGroup) (int, error){
+func CreateGroup(userID string, group models.CreateGroup) (int, error) {
 	query := `
     INSERT INTO 
         "group" (title, description, creator_id) 
     VALUES 
         ($1, $2, $3)
 		RETURNING group_id`
-		var group_id int
-	err := DB.QueryRow(context.Background(),query, group.Title, group.Description, userID).Scan(&group_id)
+	var group_id int
+	err := DB.QueryRow(context.Background(), query, group.Title, group.Description, userID).Scan(&group_id)
 	if err != nil {
 		log.Printf("database: Failed to insert group into database: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -24,11 +25,11 @@ func CreateGroup(userID string, group models.CreateGroup) (int, error){
 			"group_member" (user_id, group_id) 
 	VALUES 
 			($1, $2)`
-_, err = DB.Exec(context.Background(),query, userID, group_id)
-if err != nil {
-	log.Printf("database: Failed to insert group into database: %v", err)
-	return 0, err // Return error if failed to insert post
-}
+	_, err = DB.Exec(context.Background(), query, userID, group_id)
+	if err != nil {
+		log.Printf("database: Failed to insert group into database: %v", err)
+		return 0, err // Return error if failed to insert post
+	}
 	return group_id, nil
 }
 
@@ -64,8 +65,36 @@ func GroupMember(userID string, groupID int) (bool, error) {
 		log.Printf("database failed to scan group user: %v\n", err)
 		return false, err
 	}
-	if IsMember == 0{
+	if IsMember == 0 {
 		return false, nil
 	}
 	return true, nil
+}
+
+func CheckGroupID(groupID int) bool {
+	var groupExists int
+	query := `SELECT COUNT(*) FROM "group" WHERE group_id = $1`
+	err := DB.QueryRow(context.Background(), query, groupID).Scan(&groupExists)
+	if err != nil {
+		log.Printf("database failed to scan group user: %v\n", err)
+		return false
+	}
+	if groupExists == 0 {
+		return false
+	}
+	return true
+}
+
+func CheckGroupCreator(userID string, groupID int) bool {
+	var creatorID string
+	query := `SELECT creator_id FROM "group" WHERE group_id = $1`
+	err := DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID)
+	if err != nil {
+		log.Printf("database failed to scan group creator: %v\n", err)
+		return false
+	}
+	if creatorID != userID {
+		return false
+	}
+	return true
 }

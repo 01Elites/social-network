@@ -9,6 +9,7 @@ import (
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 	"strconv"
+	"strings"
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,10 +20,19 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var post models.Create_Post
 	err := json.NewDecoder(r.Body).Decode(&post)
-	if err != nil || post.Content == "" {
+	if err != nil {
 		helpers.HTTPError(w, "invalid post", http.StatusBadRequest)
 		return
 	}
+
+	// validate the post content
+	post.Content = strings.TrimSpace(post.Content)
+	if post.Content == "" {
+		helpers.HTTPError(w, "invalid post", http.StatusBadRequest)
+		return
+	}
+
+	// save the image if it exists
 	if post.Image != "" && post.Image != "null" {
 		post.Image, err = helpers.SaveBase64Image(post.Image)
 		if err != nil {

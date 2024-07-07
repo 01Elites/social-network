@@ -159,7 +159,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	user, err := database.GetManualUser(data.Email)
 	if err != nil {
 		log.Printf("Error getting manual user: %v", err)
-		helpers.HTTPError(w, "username or password is incorrect", http.StatusBadRequest)
+		helpers.HTTPError(w, "username or password is incorrect", http.StatusUnauthorized)
 		return
 	}
 	hashMatched := CheckPasswordHash(data.Password, user.Password)

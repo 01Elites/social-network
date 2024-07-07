@@ -6,10 +6,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
+
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
-	"time"
 
 	database "social-network/internal/database/querys"
 )
@@ -25,13 +26,14 @@ type profileData struct {
 	AvatarURL      string    `json:"avatar_url"`
 	About          string    `json:"about"`
 	ProfilePrivacy string    `json:"profile_privacy"`
-	Is_followed    bool      `json:"is_followed,omitempty"`
+	Follow_status  string    `json:"follow_status"`
 }
 
 func getProfile(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
+		log.Printf("User ID not found")
 		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
@@ -39,11 +41,13 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	var profile profileData
 	user, err := database.GetUserByID(userID)
 	if err != nil {
-		helpers.HTTPError(w, "Failed to get user email and username", http.StatusInternalServerError)
+		log.Printf("Failed to get user details: %v", err)
+		helpers.HTTPError(w, "Failed to get user details", http.StatusInternalServerError)
 		return
 	}
 	prof, err := database.GetUserProfile(userID)
 	if err != nil {
+		log.Printf("Error getting user profile: %v", err)
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
@@ -126,10 +130,11 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 // getProfileByID retrieves the profile of a user by their ID
-func getProfileByID(w http.ResponseWriter, r *http.Request) {
+func getProfileByUserName(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
+		log.Printf("User ID not found")
 		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
@@ -137,6 +142,7 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 	userName := r.PathValue("user_name")
 	UserPageID, err := database.GetUserIDByUserName(userName)
 	if err != nil {
+		log.Printf("Failed to get userID: %v", err)
 		helpers.HTTPError(w, "Failed to get userID", http.StatusInternalServerError)
 		return
 	}
@@ -144,12 +150,13 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 	var profile profileData
 	user, err := database.GetUserByID(UserPageID)
 	if err != nil {
-		helpers.HTTPError(w, "Failed to get user email and username", http.StatusInternalServerError)
+		log.Printf("Failed to get user: %v", err)
+		helpers.HTTPError(w, "Failed to get user", http.StatusInternalServerError)
 		return
 	}
 	prof, err := database.GetUserProfile(UserPageID)
 	if err != nil {
-		fmt.Println("Error getting user profile:", err)
+		log.Printf("Error getting user profile: %v", err)
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
@@ -160,7 +167,6 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Error getting image:", err)
 		}
 	}
-
 	profile = profileData{
 		UserName: user.UserName,
 		// Email:     user.Email,
@@ -172,7 +178,7 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 		AvatarURL:      prof.Image,
 		About:          prof.About,
 		ProfilePrivacy: prof.ProfilePrivacy,
-		Is_followed:    database.IsFollowing(userID, UserPageID),
+		Follow_status:  database.GetFollowStatus(userID, UserPageID),
 	}
 	if err := json.NewEncoder(w).Encode(profile); err != nil {
 		log.Printf("Failed to encode profile data: %v", err)
@@ -184,6 +190,7 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 func getProfilePosts(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
+		log.Printf("User ID not found")
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
@@ -191,22 +198,15 @@ func getProfilePosts(w http.ResponseWriter, r *http.Request) {
 	userName := r.PathValue("user_name")
 	UserPageID, err := database.GetUserIDByUserName(userName)
 	if err != nil {
+		log.Printf("Failed to get userID: %v", err)
 		helpers.HTTPError(w, "Failed to get userID", http.StatusInternalServerError)
 		return
 	}
 
-	following, err := database.GetUsersFollowingByID(userID)
+	posts, err := database.GetUserPosts(userID, UserPageID, database.IsFollowing(userID, UserPageID))
 	if err != nil {
-		http.Error(w, "Cannot get user followings", http.StatusInternalServerError)
-		return
-	}
-	posts, err := database.GetUserPosts(userID, UserPageID, following[UserPageID])
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		log.Printf("Failed to get posts: %v", err)
+		helpers.HTTPError(w, "Failed to get posts", http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

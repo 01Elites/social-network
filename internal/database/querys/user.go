@@ -226,6 +226,34 @@ func IsFollowing(userID string, followedID string) bool {
 	return true
 }
 
+func GetRequestStatus(userID string, followedID string) (string, error) {
+	var status string
+	query := `SELECT status FROM follow_requests WHERE sender_id = $1 AND receiver_id = $2`
+	err := DB.QueryRow(context.Background(), query, userID, followedID).Scan(&status)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return "not_requested", err
+		}
+		log.Printf("database: Failed to check if user is following: %v", err)
+		return "", err
+	}
+	return status, nil
+}
+
+func GetFollowStatus(userID string, followedID string) string {
+	if IsFollowing(userID, followedID) {
+		return "following"
+	}
+	status, err := GetRequestStatus(userID, followedID)
+	if err != nil {
+		return "not_following"
+	}
+	if status == "pending" {
+		return "pending"
+	}
+	return "not_following"
+}
+
 // FollowUser adds a follow relationship between two users
 func FollowUser(request models.Request) error {
 	// Check if user is already following
@@ -257,6 +285,7 @@ func UnFollowUser(request models.Request) error {
 	}
 	return nil
 }
+
 // get userName by ID
 func GetUserNameByID(userID string) (string, error) {
 	var username string

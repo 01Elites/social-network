@@ -65,14 +65,14 @@ func ClearAutherizationHeader(w http.ResponseWriter) {
 func ExtractToken(r *http.Request) (string, error) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		return "", errors.New("missing Authorization header")
+		return "", errors.New("unauthorized request")
 	}
 	if !strings.HasPrefix(authHeader, "Bearer ") {
 		return "", errors.New("invalid Authorization header format")
 	}
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 	if token == "" {
-		return "", errors.New("missing token")
+		return "", errors.New("invalid token")
 	}
 	return token, nil
 }

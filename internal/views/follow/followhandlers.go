@@ -1,9 +1,11 @@
-package notifications
+package follow
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	database "social-network/internal/database/querys"
+	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 )
@@ -16,38 +18,31 @@ import (
 func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
-		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		log.Printf("Error extracting token. User ID not found\n")
+		helpers.HTTPError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+
 	var request models.Request
 	request.Sender = userID
 	// Decode the request body into the request struct
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		log.Printf("Error decoding follow request: %v\n", err)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
+
 	// Get the userID of the receiver
 	request.Receiver, err = database.GetUserIDByUserName(request.Receiver)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		log.Printf("Error while gtting UserID By UserName: %v\n", err)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
 	// Check if the user is trying to follow themselves
 	if request.Receiver == userID {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: "You can't follow yourself",
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, "You can't follow yourself!!", http.StatusBadRequest)
 		return
 	}
 
@@ -58,11 +53,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	if isFollowing {
 		err = database.UnFollowUser(request)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			jsonError := models.Error{
-				Reason: err.Error(),
-			}
-			json.NewEncoder(w).Encode(jsonError)
+			helpers.HTTPError(w, "Something Went Wrong with unfollow!!", http.StatusBadRequest)
 			return
 		}
 		// Notifications(request , "unfollow")
@@ -74,22 +65,14 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if receiver account is private
 	ReceiverProf, err := database.GetUserProfile(request.Receiver)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, "Something is Wrong!!", http.StatusBadRequest)
 		return
 	}
 	// Check if the receiver account is private or public
 	if ReceiverProf.ProfilePrivacy == "private" {
 		request.ID, err = database.CreateFollowRequest(request)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			jsonError := models.Error{
-				Reason: err.Error(),
-			}
-			json.NewEncoder(w).Encode(jsonError)
+			helpers.HTTPError(w, "Something is Wrong with the Follow Request!!", http.StatusBadRequest)
 			return
 		}
 		// Notifications(request , "followRequest")
@@ -97,11 +80,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		err = database.FollowUser(request)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			jsonError := models.Error{
-				Reason: err.Error(),
-			}
-			json.NewEncoder(w).Encode(jsonError)
+			helpers.HTTPError(w, "Something Went Wrong with the Following Request!!", http.StatusBadRequest)
 			return
 		}
 		// Notifications(request , "follow")
@@ -128,7 +107,8 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
-		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		log.Printf("Error extracting token. User ID not found\n")
+		helpers.HTTPError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 	var response models.Response
@@ -136,52 +116,34 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if Followee account is private
 	FolloweeProf, err := database.GetUserProfile(response.Followee)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, "Something is Wrong!!", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Check if the receiver account is private or public
 	if FolloweeProf.ProfilePrivacy != "private" {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: "Bro Your account is public, you don't have any follow request",
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, "Bro Your account is public, you don't have any follow request!!", http.StatusBadRequest)
 		return
 	}
 
 	// Decode the request body into the response struct
 	err = json.NewDecoder(r.Body).Decode(&response)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		log.Printf("Error decoding follow Respons: %v\n", err)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
 	// Get the userID of the follower
 	response.Follower, err = database.GetUserIDByUserName(response.Follower)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		log.Printf("Error while gtting UserID By UserName: %v\n", err)
+		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
 
 	err = database.RespondToFollow(response)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		jsonError := models.Error{
-			Reason: err.Error(),
-		}
-		json.NewEncoder(w).Encode(jsonError)
+		helpers.HTTPError(w, "Something Went Wrong with the Follow Respons!!", http.StatusBadRequest)
 		return
 	}
 	// requestIDjson := struct {

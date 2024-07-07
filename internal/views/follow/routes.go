@@ -1,4 +1,4 @@
-package notifications
+package follow
 
 import (
 	"net/http"

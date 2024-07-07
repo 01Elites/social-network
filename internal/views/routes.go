@@ -3,9 +3,9 @@ package views
 import (
 	"net/http"
 	"social-network/internal/views/auth"
+	"social-network/internal/views/follow"
 	"social-network/internal/views/group"
 	"social-network/internal/views/middleware"
-	"social-network/internal/views/notifications"
 	"social-network/internal/views/post"
 	"social-network/internal/views/profile"
 	"social-network/internal/views/websocket"
@@ -40,7 +40,7 @@ func SetupRoutes() {
 	group.SetupGroupRoutes()
 
 	/************************** Follow ***************************/
-	notifications.SetupFollowRoutes()
+	follow.SetupFollowRoutes()
 
 	/*********************** Websocket ***************************/
 	websocket.SetupWebSocketRoutes()

@@ -23,7 +23,7 @@ type Create_Post struct {
 	Privacy   string   `json:"privacy"`
 	Image     string   `json:"image_id"`
 	GroupID   int      `json:"group_id"`
-	UserNames []string `json:"usernames"`
+	UserNames []string `json:"user_names"`
 }
 
 type Create_Comment struct {

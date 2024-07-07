@@ -47,17 +47,6 @@ func CreateUser(user models.User) error {
 	return nil
 }
 
-func GetUserEmailUserName(userID string) (*models.User, error) {
-	query := `SELECT email, user_name FROM public.user WHERE user_id = $1`
-	user := &models.User{}
-	err := DB.QueryRow(context.Background(), query, userID).Scan(&user.Email, &user.UserName)
-	if err != nil {
-		log.Printf("Failed to fetch user email: %v\n", err)
-		return nil, err
-	}
-	return user, nil
-}
-
 func GetUserProfile(userID string) (*models.UserProfile, error) {
 	// Fetch user profile from database
 	var userProfile models.UserProfile

@@ -39,6 +39,7 @@ func CreatePostInDB(userID string, post models.Create_Post) (int, error) {
 			for i := 0; i < len(post.UserNames); i++ {
 				ID, err := GetUserIDByUserName(post.UserNames[i])
 				if err != nil {
+					log.Printf("database: Failed to get user id: %v", err)
 					return 0, err
 				}
 				query := `

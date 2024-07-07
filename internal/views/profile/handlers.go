@@ -37,7 +37,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var profile profileData
-	user, err := database.GetUserEmailUserName(userID)
+	user, err := database.GetUserByID(userID)
 	if err != nil {
 		helpers.HTTPError(w, "Failed to get user email and username", http.StatusInternalServerError)
 		return
@@ -142,7 +142,7 @@ func getProfileByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var profile profileData
-	user, err := database.GetUserEmailUserName(UserPageID)
+	user, err := database.GetUserByID(UserPageID)
 	if err != nil {
 		helpers.HTTPError(w, "Failed to get user email and username", http.StatusInternalServerError)
 		return

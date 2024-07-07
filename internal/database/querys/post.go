@@ -117,12 +117,14 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			p.Image, err = helpers.GetImage(p.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
+				return nil, err
 			}
 		}
 		if p.User.Image != "" && p.Image != "null" {
 			p.User.Image, err = helpers.GetImage(p.User.Image)
 			if err != nil {
 				log.Printf("failed to get image: %v\n", err)
+				return nil, err
 			}
 		}
 		p.Likers_Usernames, p.IsLiked, err = GetPostLikers(p.ID, loggeduser.UserID)
@@ -219,6 +221,7 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 		post.User.Image, err = helpers.GetImage(post.User.Image)
 		if err != nil {
 			log.Printf("failed to get image: %v\n", err)
+			return models.Post{}, err
 		}
 	}
 	post.Likers_Usernames, post.IsLiked, err = GetPostLikers(post.ID, userid)

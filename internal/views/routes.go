@@ -39,8 +39,8 @@ func SetupRoutes() {
 	/*************************** Group ***************************/
 	group.SetupGroupRoutes()
 
-	/********************** Notifications ************************/
-	notifications.SetupNotificationRoutes()
+	/************************** Follow ***************************/
+	notifications.SetupFollowRoutes()
 
 	/*********************** Websocket ***************************/
 	websocket.SetupWebSocketRoutes()

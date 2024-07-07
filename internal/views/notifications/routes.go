@@ -5,7 +5,7 @@ import (
 	"social-network/internal/views/middleware"
 )
 
-func SetupNotificationRoutes() {
+func SetupFollowRoutes() {
 	http.HandleFunc("POST /api/followrequest", middleware.AllowCORS(middleware.CheckAuth(FollowHandler)))
 	http.HandleFunc("POST /api/followresponse", middleware.AllowCORS(middleware.CheckAuth(RespondToFollowHandler)))
 }

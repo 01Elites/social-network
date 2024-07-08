@@ -3,8 +3,10 @@ package querys
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
+	"social-network/internal/helpers"
 	"social-network/internal/models"
 
 	"github.com/gofrs/uuid"
@@ -66,7 +68,25 @@ func GetUserProfile(userID string) (*models.UserProfile, error) {
 		return nil, err
 	}
 
+	if userProfile.Image != "" && userProfile.Image != "null" { // If the user has no image, use the default image
+		userProfile.Image, err = helpers.GetImage(userProfile.Image)
+		if err != nil {
+			fmt.Println("Error getting image:", err)
+			userProfile.Image = ""
+		}
+	}
 	return &userProfile, nil
+}
+
+func IsPrivateUser(userID string) (bool, error) {
+	var privacy string
+	query := `SELECT privacy FROM public.profile WHERE user_id = $1`
+	err := DB.QueryRow(context.Background(), query, userID).Scan(&privacy)
+	if err != nil {
+		log.Printf("Failed to fetch user profile: %v\n", err)
+		return false, err
+	}
+	return privacy == models.ProfilePrivacy.Private, nil
 }
 
 func CreateUserProfile(userProfile models.UserProfile) error {

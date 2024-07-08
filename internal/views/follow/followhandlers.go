@@ -63,13 +63,13 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if receiver account is private
-	ReceiverProf, err := database.GetUserProfile(request.Receiver)
+	isPrivateReceiver, err := database.IsPrivateUser(request.Receiver)
 	if err != nil {
 		helpers.HTTPError(w, "Something is Wrong!!", http.StatusBadRequest)
 		return
 	}
 	// Check if the receiver account is private or public
-	if ReceiverProf.ProfilePrivacy == "private" {
+	if isPrivateReceiver {
 		request.ID, err = database.CreateFollowRequest(request)
 		if err != nil {
 			helpers.HTTPError(w, "Something is Wrong with the Follow Request!!", http.StatusBadRequest)
@@ -114,14 +114,14 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	var response models.Response
 	response.Followee = userID
 	// Check if Followee account is private
-	FolloweeProf, err := database.GetUserProfile(response.Followee)
+	isPrivateFollowee, err := database.IsPrivateUser(response.Followee)
 	if err != nil {
 		helpers.HTTPError(w, "Something is Wrong!!", http.StatusBadRequest)
 		return
 	}
 
 	// Check if the receiver account is private or public
-	if FolloweeProf.ProfilePrivacy != "private" {
+	if isPrivateFollowee {
 		helpers.HTTPError(w, "Bro Your account is public, you don't have any follow request!!", http.StatusBadRequest)
 		return
 	}

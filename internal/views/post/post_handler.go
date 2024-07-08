@@ -23,14 +23,14 @@ It requires a valid user session to create a post.
 
 Example:
     // To create a new post
-    POST /api/posts
+    POST /api/post
     Body: {
     "title": "string",
     "body": "string",
     "image_id": "string" // optional
     "privacy": "private"| "public" | "almost_private",
     "user_names": "[]string" // only if privacy == "almost_private"
-}
+	}
 */
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -51,7 +51,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post.Content = strings.TrimSpace(post.Content)
 	if post.Content == "" {
 		log.Printf("Post content is empty\n")
-		helpers.HTTPError(w, "invalid post", http.StatusBadRequest)
+		helpers.HTTPError(w, "content cannot be empty", http.StatusBadRequest)
 		return
 	}
 	// save the image if it exists
@@ -91,6 +91,10 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
  
 GetPostsHandler A function that retrieve posts, (used for mainpage posts listing) 
 This function fetches posts based on the user session and on whether the user follows the poster.
+
+Example:
+    // To retrieve posts
+    GET api/posts
 
 Response:
     {
@@ -146,7 +150,7 @@ It requires a valid user session to access the post.
 
 Example:
     // To retrieve a post with ID 123
-    GET api/posts/123
+    GET api/post/123
 
 Response:
     {
@@ -161,7 +165,7 @@ Response:
         "first_name": "string",
         "last_name": "string",
         "user_name":"string"
-    }
+	}
 }
 */
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {

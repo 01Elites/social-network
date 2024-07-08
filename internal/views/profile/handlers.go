@@ -51,13 +51,6 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
-
-	if prof.Image != "" && prof.Image != "null" { // If the user has no image, use the default image
-		prof.Image, err = helpers.GetImage(prof.Image)
-		if err != nil {
-			fmt.Println("Error getting image:", err)
-		}
-	}
 	profile = profileData{
 		UserName:       user.UserName,
 		Email:          user.Email,
@@ -161,12 +154,6 @@ func getProfileByUserName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if prof.Image != "" && prof.Image != "null" { // If the user has no image, use the default image
-		prof.Image, err = helpers.GetImage(prof.Image)
-		if err != nil {
-			fmt.Println("Error getting image:", err)
-		}
-	}
 	profile = profileData{
 		UserName: user.UserName,
 		// Email:     user.Email,

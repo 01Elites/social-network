@@ -99,9 +99,7 @@ func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Invalid post ID", http.StatusBadRequest)
 		return
 	}
-	pageStr := r.URL.Query().Get("page")
-	page, _ := strconv.Atoi(pageStr)
-	comments, err := database.Get_PostComments_from_db(userID, postIDInt, page)
+	comments, err := database.Get_PostComments_from_db(userID, postIDInt)
 	if err != nil {
 		helpers.HTTPError(w, ("Invalid post ID:" + err.Error()), http.StatusNotFound)
 		return

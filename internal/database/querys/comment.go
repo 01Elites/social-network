@@ -25,7 +25,7 @@ func Create_Comment_in_db(userID string, comment models.Create_Comment) error {
 }
 
 // Get_PostComments_from_db gets all the comments pretaining to a post.
-func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment, error) {
+func Get_PostComments_from_db(userID string, postID int) ([]models.Comment, error) {
 	// Query the database
 	query := `
     SELECT 

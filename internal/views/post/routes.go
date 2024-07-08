@@ -16,7 +16,7 @@ func SetupPostRoutes() {
 	/****************************************** POST Requests *********************************************/
 	http.HandleFunc("POST /api/post", middleware.AllowCORS(middleware.CheckAuth(CreatePostHandler)))
 	http.HandleFunc("POST /api/post/{id}/comments", middleware.AllowCORS(middleware.CheckAuth(CreateCommentHandler)))
-	http.HandleFunc("POST /api/like/{id}", middleware.AllowCORS(middleware.CheckAuth(CreateLikeHandler)))
+	http.HandleFunc("POST /api/like", middleware.AllowCORS(middleware.CheckAuth(CreateLikeHandler)))
 
 	/****************************************** DELETE Requests *********************************************/
 	http.HandleFunc("DELETE /api/post/{id}", middleware.AllowCORS(middleware.CheckAuth(DeletePostHandler)))

@@ -24,7 +24,7 @@ type GroupResponse struct {
 	ID             int    `json:"invite_id,omitempty"`
 	GroupID        int    `json:"group_id,omitempty"`
 	RequesterID    string `json:"requester_id,omitempty"`
-	Status         string `json:"status,omitempty"`
+	Status         string `json:"response,omitempty"`
 	NotificationID int    `json:"notification_id,omitempty"`
 }
 

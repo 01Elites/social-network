@@ -158,5 +158,5 @@ func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(group)
+	// json.NewEncoder(w).Encode(group)
 }

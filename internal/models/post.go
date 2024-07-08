@@ -12,7 +12,7 @@ type Post struct {
 	PostPrivacy      string          `json:"post_privacy,omitempty"`
 	PostLikes        int             `json:"likes_count"`
 	CommentsCount    int             `json:"comments_count"`
-	Likers_Usernames []string        `json:"likers_ids"`
+	Likers_Usernames []string        `json:"likers_usernames"`
 	IsLiked          bool            `json:"is_Liked,omitempty"`
 	GroupID          int             `json:"group_id,omitempty"`
 }

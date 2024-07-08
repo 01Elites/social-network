@@ -25,11 +25,11 @@ Example:
     // To create a new post
     POST /api/post
     Body: {
-    "title": "string",
-    "body": "string",
-    "image_id": "string" // optional
+    "title": string,
+    "body": string,
+    "image_id": string, // optional
     "privacy": "private"| "public" | "almost_private",
-    "user_names": "[]string" // only if privacy == "almost_private"
+    "user_names": []string // only if privacy == "almost_private"
 	}
 */
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -97,20 +97,24 @@ Example:
     GET api/posts
 
 Response:
-    {
-    "title": "string",
-    "content": "string",
-    "image_id": "string", // optional
-    "likers_usernames": "[]string",
-    "comments_count": 0,
-    "creation_date": 0 // unix time
-    "poster": {
-        "image_id": "string",
-        "first_name": "string",
-        "last_name": "string",
-        "user_name":"string"
-    }
-}
+
+[
+	{
+		"post_id": int,
+		"poster": {
+				"user_name": string,
+				"first_name": string,
+				"last_name": string
+		},
+		"title": string,
+		"content": string,
+		"creation_date": "2024-07-07T14:28:45.127591Z", // unix time
+		"post_privacy": "private"| "public" | "almost_private",
+		"likes_count": int,
+		"comments_count": int,
+		"likers_usernames": null | []string // optional 
+	}
+]
 */
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -153,19 +157,19 @@ Example:
     GET api/post/123
 
 Response:
-    {
-    "title": "string",
-    "content": "string",
-    "image_id": "string", // optional
-    "likers_usernames": "[]string",
-    "comments_count": 0,
-    "creation_date": 0 // unix time
+{
+    "post_id": int,
     "poster": {
-        "image_id": "string",
-        "first_name": "string",
-        "last_name": "string",
-        "user_name":"string"
-	}
+        "user_name": string,
+        "first_name": string,
+        "last_name": string
+    },
+    "title": string
+    "content": string
+    "creation_date": "2024-07-07T14:28:45.127591Z", // unix time
+    "likes_count": int,
+    "comments_count": int,
+		"likers_usernames": null | []string // optional 
 }
 */
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -222,7 +226,12 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = database.DeletePost(postIDInt, userID)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		if err.Error() == "user unauthorized" {
+			helpers.HTTPError(w, "user is unauthorized to delete the post", http.StatusUnauthorized)
+			return
+		}
+		log.Printf("Failed to delete post: %v\n", err)
+		helpers.HTTPError(w, "invalid post id", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

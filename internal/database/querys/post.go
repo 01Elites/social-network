@@ -320,6 +320,7 @@ func DeletePost(postID int, userID string) error {
 	query := `SELECT user_id FROM post WHERE post_id = $1`
 	err := DB.QueryRow(context.Background(), query, postID).Scan(&creator)
 	if err != nil {
+		log.Printf("Failed to get post creator: %v\n", err)
 		return err
 	}
 	if creator != userID {

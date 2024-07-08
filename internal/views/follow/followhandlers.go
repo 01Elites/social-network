@@ -102,7 +102,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 //
 //	{
 //		"follower": "username", // the username of the user who sent the follow request
-//		"status": "accept" or "reject" // the status of the follow request
+//		"status": "accepted" or "rejected" // the status of the follow request
 //	}
 func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)

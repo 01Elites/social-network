@@ -32,7 +32,26 @@ type SignUpRequst struct {
 	Image          string    `json:"image"`
 	About          string    `json:"about"`
 }
+/*
+ SignUp handles the HTTP POST request for user sign-up.
+ It reads the request body, unmarshals the JSON data, validates the sign-up data,
+ SignUpRequst struct defines the structure of the JSON request body expected for user sign-up.
 
+Body: {
+	"user_name":  string,
+	"email": string,
+	"password": string,
+	"first_name": string,
+	"last_name": string,
+	"gender": "male" | "female"
+	"date_of_birth": 0, // unix timestamp
+	"nick_name": string // optional
+	"about": string, // optional
+	"profile_privacy": "public" | "private"
+	}
+hashes the password, adds the user to the database, and returns the appropriate response.
+If any error occurs during the process, it returns the corresponding HTTP error status code.
+*/
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	var data SignUpRequst
 
@@ -142,6 +161,16 @@ type SignInRequst struct {
 	Password string `json:"password"`
 }
 
+/*
+SignIn handles the login request.
+It reads the request body and responds with a success(200) or Unauthorized(401).
+
+SignInRequst Body:
+{
+    "email": "string,"
+    "password": "string"
+}
+*/
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	var data SignInRequst
 
@@ -191,6 +220,9 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "Signin successful")
 }
 
+// LogOut handles the user logout functionality.
+// It retrieves the session token from the cookie, deletes the session from the Sessions map,
+// expires the cookie, and redirects the user to the login page.
 func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token from the cookie
 	token, err := session.ExtractToken(r)
 	if err != nil {

@@ -5,8 +5,8 @@ import (
 	"log"
 )
 
-// Uptate_Like_in_db updates the like in the database.
-// for both posts and comments
+// UpDateLikeInDB updates the like in the database
+// for the posts
 func UpDateLikeInDB(userID string, PostID int) error {
 	// Check if the user has already liked the post
 	query := "SELECT COUNT(*) FROM post_interaction WHERE user_id = $1 AND post_id = $2"

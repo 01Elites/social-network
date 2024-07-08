@@ -9,9 +9,10 @@ import (
 	"social-network/internal/models"
 )
 
+// CreatePostInDB adds the post to the database
 func CreatePostInDB(userID string, post models.Create_Post) (int, error) {
 	var postID int
-	if post.GroupID != 0 {
+	if post.GroupID != 0 { // post is a group post
 		query := `
     INSERT INTO 
         post (title, content, privacy_type, group_id, user_id, image) 
@@ -23,7 +24,7 @@ func CreatePostInDB(userID string, post models.Create_Post) (int, error) {
 			log.Printf("database: Failed to insert post into database: %v", err)
 			return 0, err // Return error if failed to insert post
 		}
-	} else {
+	} else { // post is a user post
 		query := `
     INSERT INTO 
         post (title, content, privacy_type, user_id, image) 
@@ -35,7 +36,7 @@ func CreatePostInDB(userID string, post models.Create_Post) (int, error) {
 			log.Printf("database: Failed to insert post into database: %v", err)
 			return 0, err // Return error if failed to insert post
 		}
-		if post.Privacy == "almost_private" {
+		if post.Privacy == "almost_private" { // add the userids for the users who are allowed to view post
 			for i := 0; i < len(post.UserNames); i++ {
 				ID, err := GetUserIDByUserName(post.UserNames[i])
 				if err != nil {
@@ -58,6 +59,7 @@ func CreatePostInDB(userID string, post models.Create_Post) (int, error) {
 	return postID, nil
 }
 
+// GetPostsFeed gets all the posts that the logged user can view
 func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 	// Query the database
 	query := `
@@ -160,6 +162,7 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 	return posts, nil
 }
 
+// Get post by ID gets the data for one post
 func GetPostByID(postID int, userid string) (models.Post, error) {
 	// Query the database
 	query := `
@@ -234,6 +237,7 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 	return post, nil
 }
 
+// GetPostCountByID checks if the postID exists
 func GetPostCountByID(postID int) (int, error) {
 	query := "SELECT COUNT(*) FROM post WHERE post_id = $1"
 	var count int
@@ -244,6 +248,7 @@ func GetPostCountByID(postID int) (int, error) {
 	return count, nil
 }
 
+// GetPostLikeCountByID gets the like counts for an indivitual post 
 func GetPostLikeCountByID(postID int) (int, error) {
 	query := "SELECT COUNT(*) FROM post_interaction WHERE post_id = $1"
 	var count int
@@ -254,6 +259,7 @@ func GetPostLikeCountByID(postID int) (int, error) {
 	return count, nil
 }
 
+// GetCommentsCountByID counts the number of comments for an indivitual post
 func GetCommentsCountByID(postID int) (int, error) {
 	query := "SELECT COUNT(*) FROM comment WHERE post_id = $1"
 	var count int
@@ -264,6 +270,7 @@ func GetCommentsCountByID(postID int) (int, error) {
 	return count, nil
 }
 
+// GetPostLikers gets the usernames for all of the users who liked the post
 func GetPostLikers(postID int, userID string) ([]string, bool, error) {
 	var likers []string
 	var isLiked bool
@@ -295,6 +302,7 @@ func GetPostLikers(postID int, userID string) ([]string, bool, error) {
 	return likers, isLiked, nil
 }
 
+// DeletePost deletes the post from the database
 func DeletePost(postID int, userID string) error {
 	var creator string
 	query := `SELECT user_id FROM post WHERE post_id = $1`
@@ -315,6 +323,7 @@ func DeletePost(postID int, userID string) error {
 	return nil
 }
 
+// GetGroupPosts selects all the posts for a single group
 func GetGroupPosts(groupID int) ([]models.Post, error) {
 	query := `
 	SELECT 
@@ -384,6 +393,7 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 	return posts, nil
 }
 
+// GetUserPosts gets the posts created by a single user
 func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.ProfilePost, error) {
 	// Query the database
 	query := `

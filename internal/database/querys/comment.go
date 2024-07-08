@@ -7,6 +7,7 @@ import (
 	"social-network/internal/models"
 )
 
+// Create_Comment_in_db adds the comment to the database
 func Create_Comment_in_db(userID string, comment models.Create_Comment) error {
 	// Insert the comment into the database
 	query := `
@@ -23,6 +24,7 @@ func Create_Comment_in_db(userID string, comment models.Create_Comment) error {
 	return nil
 }
 
+// Get_PostComments_from_db gets all the comments pretaining to a post.
 func Get_PostComments_from_db(userID string, postID, page int) ([]models.Comment, error) {
 	// Query the database
 	query := `

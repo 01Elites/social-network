@@ -7,6 +7,7 @@ import (
 	// "github.com/jackc/pgx/v5"
 )
 
+// CreateInvite adds an invitation to the group_invitations table
 func CreateInvite(groupID int, senderID string, receiverID string) (int, error) {
 	var status string
 	var invitationID int
@@ -43,6 +44,7 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 	return invitationID, nil
 }
 
+// RespondToInvite responds to an invitation that already exists in the group_invitations table
 func RespondToInvite(response models.GroupResponse, userID string) error{
 	query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending'`
 	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, userID)
@@ -64,6 +66,7 @@ func RespondToInvite(response models.GroupResponse, userID string) error{
 	return nil
 }
 
+// CreateRequest adds a request to the group_requests table
 func CreateRequest(groupID int, senderID string) (int, error) {
 	var status string
 	var requestID int
@@ -114,6 +117,7 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 	return requestID, nil
 }
 
+// RespondToRequest responds to a request that already exists in the group_requests table
 func RespondToRequest(response models.GroupResponse) error{
 	query := `UPDATE group_requests SET status = $1 WHERE group_id = $2 AND requester_id = $3 AND status = 'pending'`
 	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, response.RequesterID)

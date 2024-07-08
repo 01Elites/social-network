@@ -6,6 +6,6 @@ import (
 )
 
 func SetupFollowRoutes() {
-	http.HandleFunc("POST /api/followrequest", middleware.AllowCORS(middleware.CheckAuth(FollowHandler)))
-	http.HandleFunc("POST /api/followresponse", middleware.AllowCORS(middleware.CheckAuth(RespondToFollowHandler)))
+	http.HandleFunc("POST /api/follow_request", middleware.AllowCORS(middleware.CheckAuth(FollowHandler)))
+	http.HandleFunc("POST /api/follow_response", middleware.AllowCORS(middleware.CheckAuth(RespondToFollowHandler)))
 }

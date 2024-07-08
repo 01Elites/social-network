@@ -12,6 +12,21 @@ import (
 	"strconv"
 )
 
+/*
+CreateCommentHandler creates a new comment on a post.
+
+This function creates a new comment associated with a particular post.
+It requires a valid user session to create a comment.
+
+Example:
+
+	    // To create a new comment on a post
+	    POST /api/post/{id}/comments
+{
+    "body": "string",
+    "image_id": "string" // optional
+}
+*/
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -46,6 +61,33 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "create comment successful")
 }
 
+
+/*
+GetPostCommentsHandler retrieves comments for a specific post.
+
+This function retrieves comments associated with a particular post ID.
+It requires a valid user session to access the comments.
+
+Example:
+
+	// To retrieve comments for a post with ID 123
+	GET api/posts/123/comments
+
+Response:
+
+	[
+    {
+        "body": "string",
+        "image_id": "string" // optional 
+        "commenter": {
+            "first_name": "string",
+            "last_name": "string",
+            "image_id": "string",
+            "user_name":"string"
+        }
+    }
+]
+*/
 func GetPostCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {

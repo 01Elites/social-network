@@ -28,9 +28,14 @@ type GroupResponse struct {
 	NotificationID int    `json:"notification_id,omitempty"`
 }
 
-type GroupEvent struct {
+type CreateEvent struct {
 	GroupID     int       `json:"group_id,omitempty"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`
 	EventTime   time.Time `json:"event_date,omitempty"`
+}
+
+type EventResp struct {
+	EventID int `json:"event_id,omitempty"`
+	OptionID int `json:"option_id,omitempty"`
 }

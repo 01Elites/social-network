@@ -159,3 +159,13 @@ func CreateEvent(GroupID int, userID string, Title string, Description string, E
 	}
 	return nil
 }
+
+func RespondToEvent(response models.EventResp, userID string) error {
+	query := `INSERT INTO user_choice (event_id,user_id,option_id) VALUES ($1,$2,$3)`
+	_,err := DB.Exec(context.Background(),query,response.EventID,userID,response.OptionID)
+	if err != nil {
+		log.Printf("database: Failed to respond to event: %v",err)
+		return err
+	}
+	return nil
+}

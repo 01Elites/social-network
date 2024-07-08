@@ -15,7 +15,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	var request models.GroupEvent
+	var request models.CreateEvent
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		helpers.HTTPError(w, "failed to decode request", http.StatusBadRequest)
@@ -39,6 +39,41 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.CreateEvent(request.GroupID, userID, request.Title, request.Description, request.EventTime)
 	if err != nil {
 		helpers.HTTPError(w, "failed to cancel request", http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+
+func EventResponseHandler(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
+	var response models.EventResp
+	err := json.NewDecoder(r.Body).Decode(&response)
+	if err != nil {
+		helpers.HTTPError(w, "failed to decode request", http.StatusBadRequest)
+		return
+	}
+	groupId := database.CheckEventID(response.EventID)
+	if groupId == 0 {
+		helpers.HTTPError(w, "Event ID does not exist", http.StatusBadRequest)
+		return
+	}
+	isMember, err := database.GroupMember(userID, groupId)
+	if err != nil {
+		helpers.HTTPError(w, "error checking if user is a member", http.StatusBadRequest)
+		return
+	}
+	if !isMember {
+		helpers.HTTPError(w, "you are not a memeber", http.StatusBadRequest)
+		return
+	}
+	err = database.RespondToEvent(response, userID)
+	if err != nil {
+		helpers.HTTPError(w, "error when responding to request", http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

@@ -9,9 +9,9 @@ import (
 
 func CreateGroup(userID string, group models.CreateGroup) (int, error) {
 	query := `
-    INSERT INTO 
-        "group" (title, description, creator_id) 
-    VALUES 
+    INSERT INTO
+        "group" (title, description, creator_id)
+    VALUES
         ($1, $2, $3)
 		RETURNING group_id`
 	var group_id int
@@ -21,9 +21,9 @@ func CreateGroup(userID string, group models.CreateGroup) (int, error) {
 		return 0, err // Return error if failed to insert group
 	}
 	query = `
-	INSERT INTO 
-			"group_member" (user_id, group_id) 
-	VALUES 
+	INSERT INTO
+			"group_member" (user_id, group_id)
+	VALUES
 			($1, $2)`
 	_, err = DB.Exec(context.Background(), query, userID, group_id)
 	if err != nil {
@@ -97,6 +97,20 @@ func CheckGroupCreator(userID string, groupID int) bool {
 		return false
 	}
 	return true
+}
+
+func CheckEventID(eventID int) int {
+	var groupId int
+	query := `SELECT group_id FROM event WHERE event_id = $1`
+	err := DB.QueryRow(context.Background(), query, eventID).Scan(&groupId)
+	if err != nil {
+		log.Printf("database failed to scan event: %v\n", err)
+		return 0
+	}
+	if groupId == 0 {
+		return 0
+	}
+	return groupId
 }
 
 func LeaveGroup(userID string, groupID int) error {

@@ -3,6 +3,7 @@ import { render } from 'solid-js/web';
 import '~/extensions/arrays';
 import './index.css';
 import HomePage from './pages/home';
+import Profile from './pages/profile';
 
 const root = document.getElementById('root');
 
@@ -20,7 +21,7 @@ render(
       {/* </AuthGuard> */}
       {/* <Route path='/login' component={HomePage} /> */}
       {/* <AuthGuard> */}
-      {/* <Route path='/profile' /> */}
+      <Route path='/profile/:username' component={Profile} />
       {/* </AuthGuard> */}
     </Router>
   ),

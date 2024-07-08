@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"social-network/internal/models"
+	"time"
 	// "github.com/jackc/pgx/v5"
 )
 
@@ -20,7 +21,7 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 		WHERE
 		 (group_id = $1 AND receiver_id = $2)
 `
-	err := DB.QueryRow(context.Background(), query, groupID, receiverID).Scan(&status,&invitationID,)
+	err := DB.QueryRow(context.Background(), query, groupID, receiverID).Scan(&status, &invitationID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for invitation: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -45,7 +46,7 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 }
 
 // RespondToInvite responds to an invitation that already exists in the group_invitations table
-func RespondToInvite(response models.GroupResponse, userID string) error{
+func RespondToInvite(response models.GroupResponse, userID string) error {
 	query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending'`
 	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, userID)
 	if err != nil {
@@ -79,7 +80,7 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 		WHERE
 		 requester_id = $1
 `
-	err := DB.QueryRow(context.Background(), query, senderID).Scan(&status,&requestID)
+	err := DB.QueryRow(context.Background(), query, senderID).Scan(&status, &requestID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
 		return 0, err // Return error if failed to insert post
@@ -87,7 +88,7 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 	if status == "pending" {
 		query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1`
 		_, err := DB.Exec(context.Background(), query, senderID)
-		if err != nil{
+		if err != nil {
 			log.Printf("database: Failed to update request in database: %v", err)
 			return 0, err
 		}
@@ -118,7 +119,7 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 }
 
 // RespondToRequest responds to a request that already exists in the group_requests table
-func RespondToRequest(response models.GroupResponse) error{
+func RespondToRequest(response models.GroupResponse) error {
 	query := `UPDATE group_requests SET status = $1 WHERE group_id = $2 AND requester_id = $3 AND status = 'pending'`
 	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, response.RequesterID)
 	if err != nil {
@@ -139,12 +140,22 @@ func RespondToRequest(response models.GroupResponse) error{
 	return nil
 }
 
-func CancelRequest(GroupID int,userID string) error {
+func CancelRequest(GroupID int, userID string) error {
 	query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1 and group_id = $2`
-	_, err := DB.Exec(context.Background(), query, userID,GroupID)
+	_, err := DB.Exec(context.Background(), query, userID, GroupID)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)
 		return err // Return error if failed to insert post
+	}
+	return nil
+}
+
+func CreateEvent(GroupID int, userID string, Title string, Description string, Eventdate time.Time) error {
+	query := `INSERT INTO event (group_id,creator_id,title,description,event_date) VALUES ($1,$2,$3,$4,$5)`
+	_,err := DB.Exec(context.Background(),query,GroupID,userID,Title,Description,Eventdate)
+	if err != nil {
+		log.Printf("database: Failed to create event: %v",err)
+		return err
 	}
 	return nil
 }

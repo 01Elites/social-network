@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type GroupFeed struct {
 	ID       int      `json:"id,omitempty"`
 	Members  []string `json:"members,omitempty"`
@@ -24,4 +26,11 @@ type GroupResponse struct {
 	RequesterID    string `json:"requester_id,omitempty"`
 	Status         string `json:"status,omitempty"`
 	NotificationID int    `json:"notification_id,omitempty"`
+}
+
+type GroupeEvent struct {
+	GroupID     int       `json:"group_id,omitempty"`
+	Title       string    `json:"title,omitempty"`
+	Description string    `json:"description,omitempty"`
+	EventTime   time.Time `json:"event_date,omitempty"`
 }

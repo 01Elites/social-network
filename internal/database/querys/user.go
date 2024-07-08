@@ -94,7 +94,7 @@ func CreateUserProfile(userProfile models.UserProfile) error {
 
 func UpdateUserProfile(userProfile models.UserProfile) error {
 	// Prepare SQL statement
-	query := `UPDATE public.profile SET 
+	query := `UPDATE public.profile SET
 		first_name = $1,
 		last_name = $2,
 		gender = $3,
@@ -206,7 +206,7 @@ func GetUserIDByUserName(userName string) (string, error) {
 	query := `SELECT user_id FROM public.user WHERE user_name = $1`
 	err := DB.QueryRow(context.Background(), query, userName).Scan(&userID)
 	if err != nil {
-		log.Printf("Failed to fetch user by ID: %v\n", err)
+		log.Printf("Failed to fetch user by username: %v\n", err)
 		return "", err
 	}
 	return userID, nil

@@ -23,11 +23,13 @@ interface NewPostPreviewProps {
 export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const [uploadedImage, setUploadedImage] = createSignal<File | null>(null);
+  const [postText, setPostText] = createSignal<string>('');
 
   // Reset uploaded image when dialog is closed
   createEffect(() => {
     if (props.open) {
       setUploadedImage(null);
+      setPostText('');
     }
   });
 
@@ -92,17 +94,19 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
 
         <PostAuthorCell author={userDetails() as User} date={new Date()} />
 
-        <TextField>
+        <TextField onChange={setPostText} value={postText()}>
           <TextFieldTextArea
-            placeholder='What do you want to say?'
+            placeholder='What do you want to say? you have 500 characters to express yourself.'
             class='resize-none'
+            minLength={1}
+            maxLength={500}
           />
         </TextField>
 
         <Separator />
         <DialogFooter class='!justify-between gap-4'>
           <Button variant={'secondary'}>Post Privacy</Button>
-          <Button>Post</Button>
+          <Button disabled={postText().length < 1}>Post</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

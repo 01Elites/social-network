@@ -10,7 +10,20 @@ import (
 	"social-network/internal/views/middleware"
 )
 
-// CreateLikeHandler handles the creation of a like for posts & comments.
+/*
+CreateLikeHandler adds a like to a post.
+
+This function creates a new like associated with a particular post.
+It requires a valid user session to create a like.
+
+Example:
+
+	    // To create a new like on a post
+	    POST /api/post/like
+Body: {
+    "id": 0,
+     }
+*/
 func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {

@@ -11,18 +11,15 @@ func SetupGroupRoutes() {
 	http.HandleFunc("GET /api/group/{id}", middleware.AllowCORS(middleware.CheckAuth(GetGroupPageHandler)))
 
 	http.HandleFunc("POST /api/invitation", middleware.AllowCORS(middleware.CheckAuth(CreateInvitationHandler)))
-	http.HandleFunc("PATCH /api/invitationresponse", middleware.AllowCORS(middleware.CheckAuth(InvitationResponseHandler)))
+	http.HandleFunc("PATCH /api/invitation_response", middleware.AllowCORS(middleware.CheckAuth(InvitationResponseHandler)))
 
-	http.HandleFunc("POST /api/group_request", middleware.AllowCORS(middleware.CheckAuth(CreateRequestHandler))) //change naming to more standrad format
-	// /api/join_group_req
-	http.HandleFunc("PATCH /api/group_response", middleware.AllowCORS(middleware.CheckAuth(RequestResponseHandler))) //change naming to more standrad format
-	// /api/join_group_res
+	http.HandleFunc("POST /api/join_group_req", middleware.AllowCORS(middleware.CheckAuth(CreateRequestHandler)))
 	http.HandleFunc("PATCH /api/cancel_join_req", middleware.AllowCORS(middleware.CheckAuth(CancelRequestHandler)))
-	http.HandleFunc("POST /api/exitgroup", middleware.AllowCORS(middleware.CheckAuth(ExitGroupHandler)))
+	http.HandleFunc("PATCH /api/join_group_res", middleware.AllowCORS(middleware.CheckAuth(RequestResponseHandler)))
+
+	http.HandleFunc("POST /api/exit_group", middleware.AllowCORS(middleware.CheckAuth(ExitGroupHandler)))
 
 	http.HandleFunc("POST /api/create_event", middleware.AllowCORS(middleware.CheckAuth(CreateEventHandler)))
 	http.HandleFunc("POST /api/event_response", middleware.AllowCORS(middleware.CheckAuth(EventResponseHandler)))
 
-	// http.HandleFunc("POST /api/cancelinvite", middleware.AllowCORS(middleware.CheckAuth(CreateInvitationHandler))) "not needed"
-	// http.HandleFunc("/search_group", m(SearchGroupHandler)) "not needed"
 }

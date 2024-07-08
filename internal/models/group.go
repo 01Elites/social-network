@@ -14,6 +14,7 @@ type CreateGroup struct {
 
 type GroupAction struct {
 	ID         int    `json:"id,omitempty"`
+	Username   string `json:"username,omitempty"`
 	GroupID    int    `json:"group_id,omitempty"`
 	ReceiverID string `json:"receiver_id,omitempty"`
 }

@@ -27,7 +27,11 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "group ID does not exist", http.StatusBadRequest)
 		return
 	}
-
+	invite.ReceiverID, err = database.GetUserIDByUserName(invite.Username)
+	if err != nil {
+		helpers.HTTPError(w, "failed to get user ID", http.StatusBadRequest)
+		return
+	}
 	isMember, err := database.GroupMember(userID, invite.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "check if user is a member error", http.StatusBadRequest)

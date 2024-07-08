@@ -7,23 +7,24 @@ import (
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 /*
 CreateGroupHandler creates a new group.
 
-This function creates a new group using the data provided in the request body. 
+This function creates a new group using the data provided in the request body.
 It requires a valid user session to create a group.
 
 Example:
-    // To create a new group
-    POST /api/group
-   Body: {
-		"title":"string",
-		"description":"string"
-		}
+
+	    // To create a new group
+	    POST /api/group
+	   Body: {
+			"title":"string",
+			"description":"string"
+			}
 */
 func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -58,23 +59,24 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-
 GetGroupPageHandler retrieves a group page by its ID.
-This function retrieves a group based on the provided group ID. 
+This function retrieves a group based on the provided group ID.
 It requires a valid user session to access the group.
 The page defers depending on whether the user a part of the group.
 
 Example:
-    // To retrieve a group with ID 123
-    GET api/group/123
+
+	// To retrieve a group with ID 123
+	GET api/group/123
 
 Response:
-    {
-    "id": 0,
-    "members":"[]string",
-    "posts":"[]posts",
-    "ismember":false
-}
+
+	    {
+	    "id": 0,
+	    "members":"[]string",
+	    "posts":"[]posts",
+	    "ismember":false
+	}
 */
 func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	var group models.GroupFeed
@@ -108,6 +110,36 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	group.Members, err = database.GetGroupMembers(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(group)
+}
+
+func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
+	var group models.GroupFeed
+	var err error
+	err = json.NewDecoder(r.Body).Decode(&group)
+	if err != nil {
+		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	groupExists := database.CheckGroupID(group.ID) // check if the group has been created
+	if !groupExists {
+		http.Error(w, "Invalid group ID", http.StatusBadRequest)
+		return
+	}
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
+	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
+		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
+		return
+	}
+	if !group.IsMember { // to view group page for a non-member
+		helpers.HTTPError(w, "user not part of group", http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

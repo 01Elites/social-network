@@ -34,8 +34,8 @@ CREATE TABLE public.user (
     UNIQUE (email, provider)
 );
 
-CREATE  TABLE public.profile ( 
-    user_id        UUID NOT NULL, 
+CREATE  TABLE public.profile (
+    user_id        UUID NOT NULL,
     first_name     VARCHAR(100),
     last_name      VARCHAR(100),
     gender         public.gender_type,
@@ -44,15 +44,15 @@ CREATE  TABLE public.profile (
     privacy        public.profile_privacy DEFAULT 'public'::profile_privacy NOT NULL,
     FOREIGN KEY (user_id) REFERENCES public.user (user_id)
 );
- 
-CREATE  TABLE public.session ( 
+
+CREATE  TABLE public.session (
     session_uuid         UUID NOT NULL,
     user_id              UUID,
     CONSTRAINT pk_session PRIMARY KEY (session_uuid),
     FOREIGN KEY (user_id) REFERENCES public.user (user_id)
 );
 
- 
+
 CREATE TABLE public.follower (
     follower_id    UUID NOT NULL,
     followed_id    UUID NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE public.comment (
     post_id      INTEGER NOT NULL,
     user_id      UUID NOT NULL,
     content      VARCHAR(255) NOT NULL,
-    image        VARCHAR(255), 
+    image        VARCHAR(255),
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES public.post(post_id),
     FOREIGN KEY (user_id) REFERENCES public.user(user_id)
@@ -173,7 +173,8 @@ CREATE TABLE public.event (
     group_id     INTEGER NOT NULL,
     creator_id   UUID NOT NULL,
     title        VARCHAR(255) NOT NULL,
-    description  TEXT,
+    description  TEXT NOT NULL,
+    event_date   TIMESTAMP NOT NULL,
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (group_id) REFERENCES public.group (group_id) ON DELETE CASCADE,
     FOREIGN KEY (creator_id) REFERENCES public.user (user_id) ON DELETE CASCADE

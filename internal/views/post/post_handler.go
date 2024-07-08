@@ -14,6 +14,24 @@ import (
 	"social-network/internal/views/middleware"
 )
 
+
+/*
+CreatePostHandler creates a new post.
+
+This function creates a new post using the data provided in the request body. 
+It requires a valid user session to create a post.
+
+Example:
+    // To create a new post
+    POST /api/posts
+    Body: {
+    "title": "string",
+    "body": "string",
+    "image_id": "string" // optional
+    "privacy": "private"| "public" | "almost_private",
+    "user_names": "[]string" // only if privacy == "almost_private"
+}
+*/
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -68,6 +86,28 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(postIDjson)
 }
 
+
+/*
+ 
+GetPostsHandler A function that retrieve posts, (used for mainpage posts listing) 
+This function fetches posts based on the user session and on whether the user follows the poster.
+
+Response:
+    {
+    "title": "string",
+    "content": "string",
+    "image_id": "string", // optional
+    "likers_usernames": "[]string",
+    "comments_count": 0,
+    "creation_date": 0 // unix time
+    "poster": {
+        "image_id": "string",
+        "first_name": "string",
+        "last_name": "string",
+        "user_name":"string"
+    }
+}
+*/
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -97,6 +137,33 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts)
 }
 
+
+/*
+
+GetPostByIDHandler retrieves a single post by its ID.
+This function retrieves a post based on the provided post ID. 
+It requires a valid user session to access the post.
+
+Example:
+    // To retrieve a post with ID 123
+    GET api/posts/123
+
+Response:
+    {
+    "title": "string",
+    "content": "string",
+    "image_id": "string", // optional
+    "likers_usernames": "[]string",
+    "comments_count": 0,
+    "creation_date": 0 // unix time
+    "poster": {
+        "image_id": "string",
+        "first_name": "string",
+        "last_name": "string",
+        "user_name":"string"
+    }
+}
+*/
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -120,6 +187,21 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(post)
 }
 
+
+/* 
+
+DeletePostHandler deletes a single post by its ID.
+This function deletes a post based on the provided post ID. 
+It requires a valid user session to access the post.
+
+Example:
+    // To delete a post with ID 123
+    DELETE api/posts/123
+
+Response:
+   Success -> 200 OK 	
+}
+*/
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {

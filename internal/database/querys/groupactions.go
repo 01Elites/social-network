@@ -183,3 +183,25 @@ func RespondToEvent(response models.EventResp, userID string) error {
 	}
 	return nil
 }
+
+func CancelEvent(eventID int) error {
+	query := `DELETE FROM user_choice WHERE event_id = $1`
+	_, err := DB.Exec(context.Background(), query, eventID)
+	if err != nil {
+		log.Printf("database: Failed to cancel event: %v", err)
+		return err
+	}
+	query = `DELETE FROM event_option WHERE event_id = $1`
+	_, err = DB.Exec(context.Background(), query, eventID)
+	if err != nil {
+		log.Printf("database: Failed to cancel event: %v", err)
+		return err
+	}
+	query = `DELETE FROM event WHERE event_id = $1`
+	_, err = DB.Exec(context.Background(), query, eventID)
+	if err != nil {
+		log.Printf("database: Failed to cancel event: %v", err)
+		return err
+	}
+	return nil
+}

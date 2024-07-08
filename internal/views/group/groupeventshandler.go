@@ -93,22 +93,30 @@ func EventResponseHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-/*
 func CancelEventHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	var event models.ID
+	var event models.CancelEvent
 	err := json.NewDecoder(r.Body).Decode(&event)
 	if err != nil {
 		helpers.HTTPError(w, "failed to decode request", http.StatusBadRequest)
 		return
 	}
-	groupId := database.CheckEventID(event.ID)
+	groupId := database.CheckEventID(event.EventID)
 	if groupId == 0 {
 		helpers.HTTPError(w, "Event ID does not exist", http.StatusBadRequest)
+		return
+	}
+	isEventCreator, err := database.EventCreator(userID, event.EventID)
+	if err != nil {
+		helpers.HTTPError(w, "error checking if user is the creator", http.StatusBadRequest)
+		return
+	}
+	if !isEventCreator {
+		helpers.HTTPError(w, "you are not the creator of this event", http.StatusBadRequest)
 		return
 	}
 	isMember, err := database.GroupMember(userID, groupId)
@@ -120,7 +128,7 @@ func CancelEventHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "you are not a memeber", http.StatusBadRequest)
 		return
 	}
-	err = database.CancelEvent(event.ID)
+	err = database.CancelEvent(event.EventID)
 	if err != nil {
 		helpers.HTTPError(w, "error when canceling event", http.StatusNotFound)
 		return
@@ -128,6 +136,7 @@ func CancelEventHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+/*
 func RespondToEventOptionHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {

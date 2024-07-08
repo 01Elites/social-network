@@ -72,6 +72,20 @@ func GroupMember(userID string, groupID int) (bool, error) {
 	return true, nil
 }
 
+func EventCreator(userID string, eventID int) (bool, error) {
+	var creatorID string
+	query := `SELECT creator_id FROM "group" WHERE group_id = (SELECT group_id FROM event WHERE event_id = $1)`
+	err := DB.QueryRow(context.Background(), query, eventID).Scan(&creatorID)
+	if err != nil {
+		log.Printf("database failed to scan event creator: %v\n", err)
+		return false, err
+	}
+	if creatorID != userID {
+		return false, nil
+	}
+	return true, nil
+}
+
 func CheckGroupID(groupID int) bool {
 	var groupExists int
 	query := `SELECT COUNT(*) FROM "group" WHERE group_id = $1`

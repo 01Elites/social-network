@@ -50,3 +50,7 @@ type Event struct {
 	EventTime      time.Time `json:"event_time,omitempty"`
 	RespondedUsers []string  `json:"responded_users,omitempty"`
 }
+
+type CancelEvent struct {
+	EventID int `json:"event_id,omitempty"`
+}

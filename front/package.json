@@ -29,6 +29,7 @@
     "@solidjs/router": "^0.13.6",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "moment": "^2.30.1",
     "solid-js": "^1.8.18",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"

@@ -1,4 +1,4 @@
-import { JSXElement, useContext } from 'solid-js';
+import { createEffect, createSignal, JSXElement, useContext } from 'solid-js';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -22,6 +22,21 @@ interface NewPostPreviewProps {
 
 export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+  const [uploadedImage, setUploadedImage] = createSignal<File | null>(null);
+
+  // Reset uploaded image when dialog is closed
+  createEffect(() => {
+    if (props.open) {
+      setUploadedImage(null);
+    }
+  });
+
+  function handleImageUpload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      setUploadedImage(target.files[0]);
+    }
+  }
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
@@ -35,12 +50,44 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
         </DialogHeader>
 
         <AspectRatio ratio={16 / 9} class='rounded bg-muted'>
-          <Button variant={'secondary'} class='h-full w-full flex-col'>
-            Upload an image
-            <p class='font-light text-muted-foreground'>
-              make sure your image is 16:9 ratio
-            </p>
-          </Button>
+          {uploadedImage() ? (
+            <>
+              <Button
+                class='absolute right-2 top-2 h-6 rounded-full px-2 py-2 text-xs'
+                variant='secondary'
+                onClick={() => setUploadedImage(null)}
+              >
+                X
+              </Button>
+              <img
+                class='size-full rounded-md object-cover'
+                src={URL.createObjectURL(uploadedImage() as File)}
+                alt='selected image'
+              />
+            </>
+          ) : (
+            <>
+              <input
+                class='hidden'
+                type='file'
+                id='postImageUpload'
+                accept='image/*'
+                onChange={handleImageUpload}
+              />
+              <Button
+                variant={'secondary'}
+                class='h-full w-full flex-col'
+                onClick={() =>
+                  document.getElementById('postImageUpload')?.click()
+                }
+              >
+                Upload an image
+                <p class='font-light text-muted-foreground'>
+                  make sure your image is 16:9 ratio
+                </p>
+              </Button>
+            </>
+          )}
         </AspectRatio>
 
         <PostAuthorCell author={userDetails() as User} date={new Date()} />

@@ -7,7 +7,7 @@ import (
 )
 
 func SetupGroupRoutes() {
-	http.HandleFunc("POST /api/group", middleware.AllowCORS(middleware.CheckAuth(CreateGroupHandler)))
+	http.HandleFunc("POST /api/create_group", middleware.AllowCORS(middleware.CheckAuth(CreateGroupHandler)))
 	http.HandleFunc("GET /api/group/{id}", middleware.AllowCORS(middleware.CheckAuth(GetGroupPageHandler)))
 
 	http.HandleFunc("POST /api/invitation", middleware.AllowCORS(middleware.CheckAuth(CreateInvitationHandler)))
@@ -20,6 +20,7 @@ func SetupGroupRoutes() {
 	http.HandleFunc("POST /api/exit_group", middleware.AllowCORS(middleware.CheckAuth(ExitGroupHandler)))
 
 	http.HandleFunc("POST /api/create_event", middleware.AllowCORS(middleware.CheckAuth(CreateEventHandler)))
+	// http.HandleFunc("GET /api/event/{id}", middleware.AllowCORS(middleware.CheckAuth(GetEventHandler)))
 	http.HandleFunc("POST /api/event_response", middleware.AllowCORS(middleware.CheckAuth(EventResponseHandler)))
 
 }

@@ -6,6 +6,7 @@ type GroupFeed struct {
 	ID       int      `json:"id,omitempty"`
 	Members  []string `json:"members,omitempty"`
 	Posts    []Post   `json:"posts,omitempty"`
+	Events   []Event  `json:"events,omitempty"`
 	IsMember bool     `json:"ismember,omitempty"`
 }
 
@@ -32,10 +33,20 @@ type CreateEvent struct {
 	GroupID     int       `json:"group_id,omitempty"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`
+	Options     []string  `json:"options,omitempty"`
 	EventTime   time.Time `json:"event_date,omitempty"`
 }
 
 type EventResp struct {
-	EventID int `json:"event_id,omitempty"`
+	EventID  int `json:"event_id,omitempty"`
 	OptionID int `json:"option_id,omitempty"`
+}
+
+type Event struct {
+	ID             int       `json:"id,omitempty"`
+	Title          string    `json:"title,omitempty"`
+	Description    string    `json:"description,omitempty"`
+	Options        []string  `json:"options,omitempty"`
+	EventTime      time.Time `json:"event_time,omitempty"`
+	RespondedUsers []string  `json:"responded_users,omitempty"`
 }

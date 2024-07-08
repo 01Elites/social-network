@@ -2,6 +2,7 @@ package querys
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"social-network/internal/models"
@@ -121,4 +122,89 @@ func LeaveGroup(userID string, groupID int) error {
 		return err
 	}
 	return nil
+}
+
+func GetGroupEvents(groupID int) ([]models.Event, error) {
+	var events []models.Event
+	query := `SELECT event_id, title, description, event_date FROM event WHERE group_id = $1`
+	rows, err := DB.Query(context.Background(), query, groupID)
+	if err != nil {
+		log.Printf("database failed to query group events: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var event models.Event
+		if err = rows.Scan(&event.ID, &event.Title, &event.Description, &event.EventTime); err != nil {
+			log.Printf("database failed to scan event: %v\n", err)
+			return nil, err
+		}
+
+		// Get options for the event
+		optionQuery := `SELECT name FROM event_option WHERE event_id = $1`
+		optionRows, err := DB.Query(context.Background(), optionQuery, event.ID)
+		if err != nil {
+			log.Printf("database failed to query event options: %v\n", err)
+			return nil, err
+		}
+		defer optionRows.Close()
+
+		for optionRows.Next() {
+			var option string
+			if err = optionRows.Scan(&option); err != nil {
+				log.Printf("database failed to scan event option: %v\n", err)
+				return nil, err
+			}
+			event.Options = append(event.Options, option)
+		}
+
+		// Get responded users for the event
+		responseQuery := `SELECT user_id FROM user_choice WHERE event_id = $1`
+		responseRows, err := DB.Query(context.Background(), responseQuery, event.ID)
+		if err != nil {
+			log.Printf("database failed to query event responses: %v\n", err)
+			return nil, err
+		}
+		defer responseRows.Close()
+
+		for responseRows.Next() {
+			var userID string
+			if err = responseRows.Scan(&userID); err != nil {
+				log.Printf("database failed to scan responded user ID: %v\n", err)
+				return nil, err
+			}
+
+			// Get username for each responded user
+			userQuery := `SELECT user_name FROM "user" WHERE user_id = $1`
+			var username string
+			if err = DB.QueryRow(context.Background(), userQuery, userID).Scan(&username); err != nil {
+				log.Printf("database failed to query user_name: %v\n", err)
+				return nil, err
+			}
+			optionIdQuery := `SELECT option_id FROM user_choice WHERE event_id = $1 and user_id = $2`
+			var OptionID int
+			if err = DB.QueryRow(context.Background(), optionIdQuery, event.ID, userID).Scan(&OptionID); err != nil {
+				log.Printf("database failed to query option_id for user %v: %v\n", userID, err)
+				return nil, err
+			}
+			optionQuery := `SELECT name FROM event_option WHERE option_id = $1`
+			var optionName string
+			fmt.Println(OptionID)
+			if err = DB.QueryRow(context.Background(), optionQuery, OptionID).Scan(&optionName); err != nil {
+				log.Printf("database failed to query reponse type for user %v: %v\n", userID, err)
+				return nil, err
+			}
+			event.RespondedUsers = append(event.RespondedUsers, username, optionName)
+		}
+
+		events = append(events, event)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("database rows error: %v\n", err)
+		return nil, err
+	}
+
+	return events, nil
 }

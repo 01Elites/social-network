@@ -150,21 +150,35 @@ func CancelRequest(GroupID int, userID string) error {
 	return nil
 }
 
-func CreateEvent(GroupID int, userID string, Title string, Description string, Eventdate time.Time) error {
-	query := `INSERT INTO event (group_id,creator_id,title,description,event_date) VALUES ($1,$2,$3,$4,$5)`
-	_,err := DB.Exec(context.Background(),query,GroupID,userID,Title,Description,Eventdate)
+func CreateEvent(GroupID int, userID string, Title string, Description string, Eventdate time.Time) (int, error) {
+	var eventID int
+	query := `INSERT INTO event (group_id, creator_id, title, description, event_date) 
+	          VALUES ($1, $2, $3, $4, $5) RETURNING event_id`
+	err := DB.QueryRow(context.Background(), query, GroupID, userID, Title, Description, Eventdate).Scan(&eventID)
 	if err != nil {
-		log.Printf("database: Failed to create event: %v",err)
-		return err
+		log.Printf("database: Failed to create event: %v", err)
+		return 0, err
+	}
+	return eventID, nil
+}
+
+func CreateEventOptions(eventID int, options []string) error {
+	query := `INSERT INTO event_option (event_id, name) VALUES ($1, $2)`
+	for _, option := range options {
+		_, err := DB.Exec(context.Background(), query, eventID, option)
+		if err != nil {
+			log.Printf("database: Failed to create event options: %v", err)
+			return err
+		}
 	}
 	return nil
 }
 
 func RespondToEvent(response models.EventResp, userID string) error {
 	query := `INSERT INTO user_choice (event_id,user_id,option_id) VALUES ($1,$2,$3)`
-	_,err := DB.Exec(context.Background(),query,response.EventID,userID,response.OptionID)
+	_, err := DB.Exec(context.Background(), query, response.EventID, userID, response.OptionID)
 	if err != nil {
-		log.Printf("database: Failed to respond to event: %v",err)
+		log.Printf("database: Failed to respond to event: %v", err)
 		return err
 	}
 	return nil

@@ -2,6 +2,7 @@ package group
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -113,14 +114,20 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
 		return
 	}
+	fmt.Println(group.ID)
+	group.Events, err = database.GetGroupEvents(group.ID)
+	if err != nil {
+		http.Error(w, "Failed to get group events", http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(group)
 }
 
-
 /*
 ExitGroupHandler exits the group which has the
 group ID provided sent in the request body
+
 	    // To create a new group
 	    POST /api/group
 	   Body: {
@@ -145,7 +152,7 @@ func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	isMember, err := database.GroupMember(userID, group.ID)
-		if err != nil {
+	if err != nil {
 		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
 		return
 	}
@@ -153,7 +160,7 @@ func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "user not part of group", http.StatusBadRequest)
 		return
 	}
-	if err := database.LeaveGroup(userID, group.ID);err != nil {
+	if err := database.LeaveGroup(userID, group.ID); err != nil {
 		helpers.HTTPError(w, "error leaving group", http.StatusNotFound)
 		return
 	}

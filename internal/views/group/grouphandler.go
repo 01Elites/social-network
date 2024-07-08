@@ -3,12 +3,13 @@ package group
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
+
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
-	"strconv"
-	"strings"
 )
 
 /*
@@ -116,10 +117,19 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(group)
 }
 
-func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
-	var group models.GroupFeed
-	var err error
-	err = json.NewDecoder(r.Body).Decode(&group)
+
+/*
+ExitGroupHandler exits the group which has the
+group ID provided sent in the request body
+	    // To create a new group
+	    POST /api/group
+	   Body: {
+			"id":0
+			}
+*/
+func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
+	var group models.ID
+	err := json.NewDecoder(r.Body).Decode(&group)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
@@ -134,12 +144,17 @@ func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
+	isMember, err := database.GroupMember(userID, group.ID)
+		if err != nil {
 		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
 		return
 	}
-	if !group.IsMember { // to view group page for a non-member
+	if !isMember { // to view group page for a non-member
 		helpers.HTTPError(w, "user not part of group", http.StatusBadRequest)
+		return
+	}
+	if err := database.LeaveGroup(userID, group.ID);err != nil {
+		helpers.HTTPError(w, "error leaving group", http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

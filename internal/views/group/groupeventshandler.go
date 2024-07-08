@@ -15,7 +15,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	var request models.GroupeEvent
+	var request models.GroupEvent
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		helpers.HTTPError(w, "failed to decode request", http.StatusBadRequest)

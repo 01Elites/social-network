@@ -98,3 +98,13 @@ func CheckGroupCreator(userID string, groupID int) bool {
 	}
 	return true
 }
+
+func LeaveGroup(userID string, groupID int) error {
+	query := `DELETE FROM group_member WHERE group_id = $1 AND user_id = $2`
+	_, err := DB.Exec(context.Background(), query, groupID, userID)
+	if err != nil {
+		log.Printf("database failed to delete group user: %v\n", err)
+		return err
+	}
+	return nil
+}

@@ -16,8 +16,8 @@ type CreateGroup struct {
 
 type GroupAction struct {
 	ID         int    `json:"id,omitempty"`
-	Username   string `json:"username,omitempty"`
 	GroupID    int    `json:"group_id,omitempty"`
+	Username   string `json:"receiver,omitempty"`
 	ReceiverID string `json:"receiver_id,omitempty"`
 }
 type GroupResponse struct {
@@ -28,7 +28,7 @@ type GroupResponse struct {
 	NotificationID int    `json:"notification_id,omitempty"`
 }
 
-type GroupeEvent struct {
+type GroupEvent struct {
 	GroupID     int       `json:"group_id,omitempty"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`

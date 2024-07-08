@@ -12,13 +12,13 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 	var status string
 	var invitationID int
 	query := `
-	SELECT 
+	SELECT
 		 status,
 		 invitation_id
 		FROM
 			group_invitations
 		WHERE
-		 (group_id = $1 AND receiver_id = $2) 
+		 (group_id = $1 AND receiver_id = $2)
 `
 	err := DB.QueryRow(context.Background(), query, groupID, receiverID).Scan(&status,&invitationID,)
 	if err != nil && err.Error() != "no rows in result set" {
@@ -30,9 +30,9 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 		return invitationID, nil
 	}
 	query = `
-    INSERT INTO 
-        group_invitations (group_id, sender_id, receiver_id) 
-    VALUES 
+    INSERT INTO
+        group_invitations (group_id, sender_id, receiver_id)
+    VALUES
         ($1, $2, $3)
 		RETURNING
 				invitation_id`
@@ -53,16 +53,16 @@ func RespondToInvite(response models.GroupResponse, userID string) error{
 		return err // Return error if failed to update response
 	}
 	if response.Status == "accepted" {
-		query = `INSERT INTO 
+		query = `INSERT INTO
 			group_member (user_id, group_id)
-	VALUES 
+	VALUES
 			($1, $2)`
 		_, err = DB.Exec(context.Background(), query, userID, response.GroupID)
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
 			return err // Return error if failed to insert group member
 		}
-	} 
+	}
 	return nil
 }
 
@@ -71,13 +71,13 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 	var status string
 	var requestID int
 	query := `
-	SELECT 
+	SELECT
 		 status,
 		 request_id
 		FROM
 			group_requests
 		WHERE
-		 requester_id = $1 
+		 requester_id = $1
 `
 	err := DB.QueryRow(context.Background(), query, senderID).Scan(&status,&requestID)
 	if err != nil && err.Error() != "no rows in result set" {
@@ -94,9 +94,9 @@ func CreateRequest(groupID int, senderID string) (int, error) {
 		return 0, nil
 	}
 	query = `
-    INSERT INTO 
-        group_requests (group_id, requester_id) 
-    VALUES 
+    INSERT INTO
+        group_requests (group_id, requester_id)
+    VALUES
         ($1, $2)
 				RETURNING
 				request_id`
@@ -126,15 +126,25 @@ func RespondToRequest(response models.GroupResponse) error{
 		return err // Return error if failed to insert post
 	}
 	if response.Status == "accepted" {
-		query = `INSERT INTO 
-			group_member (user_id, group_id) 
-	VALUES 
+		query = `INSERT INTO
+			group_member (user_id, group_id)
+	VALUES
 			($1, $2)`
 		_, err = DB.Exec(context.Background(), query, response.RequesterID, response.GroupID)
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
 			return err // Return error if failed to insert post
 		}
-	} 
+	}
+	return nil
+}
+
+func CancelRequest(GroupID int,userID string) error {
+	query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1 and group_id = $2`
+	_, err := DB.Exec(context.Background(), query, userID,GroupID)
+	if err != nil {
+		log.Printf("database: Failed to update response in database: %v", err)
+		return err // Return error if failed to insert post
+	}
 	return nil
 }

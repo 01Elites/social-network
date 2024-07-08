@@ -116,7 +116,7 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(group)
 }
 
-func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
+func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 	var group models.GroupFeed
 	var err error
 	err = json.NewDecoder(r.Body).Decode(&group)

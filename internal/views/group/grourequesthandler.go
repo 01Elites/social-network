@@ -12,9 +12,9 @@ import (
 
 /*
 CreateRequestHandler creates a request to a certain group.
-This function creates a new request using the groupID 
+This function creates a new request using the groupID
 provided in the request body.
-It requires a valid user session and the user should not 
+It requires a valid user session and the user should not
 be a member to create a request.
 
 Example:
@@ -122,4 +122,38 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 	// 	helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 	// 	return
 	// }
+}
+
+func CancelRequestHandler(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
+	var request models.GroupAction
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		helpers.HTTPError(w, "failed to decode request", http.StatusBadRequest)
+		return
+	}
+	groupExists := database.CheckGroupID(request.GroupID)
+	if !groupExists {
+		helpers.HTTPError(w, "group ID does not exist", http.StatusBadRequest)
+		return
+	}
+	isMember, err := database.GroupMember(userID, request.GroupID)
+	if err != nil {
+		helpers.HTTPError(w, "error checking if user is a member", http.StatusBadRequest)
+		return
+	}
+	if isMember {
+		helpers.HTTPError(w, "you already a member", http.StatusBadRequest)
+		return
+	}
+	err = database.CancelRequest(request.GroupID, userID)
+	if err != nil {
+		helpers.HTTPError(w, "failed to cancel request", http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

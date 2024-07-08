@@ -1,12 +1,13 @@
 package post
 
 import (
-	"encoding/json"
+	"io"
+	"log"
 	"net/http"
+	"strconv"
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
-	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 )
 
@@ -18,11 +19,8 @@ It requires a valid user session to create a like.
 
 Example:
 
-	    // To create a new like on a post
-	    POST /api/post/like
-Body: {
-    "id": 0,
-     }
+	// To create a new like on a post
+	POST /api/post/{id}/like
 */
 func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -30,25 +28,32 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
-	var post models.ID
-	err := json.NewDecoder(r.Body).Decode(&post)
+	postID, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Failed to decode post id: %v\n", err)
+		helpers.HTTPError(w, "Failed to decode post id", http.StatusBadRequest)
 		return
 	}
 
 	// chaek if the post_id exists
-	count, err := database.GetPostCountByID(post.ID)
-	if err != nil || count == 0 {
-		helpers.HTTPError(w, ("Post not found" + err.Error()), http.StatusBadRequest)
+	exists, err := database.PostExists(postID)
+	if err != nil {
+		log.Printf("Failed to check if post exists: %v\n", err)
+		helpers.HTTPError(w, "Failed to check if post exists:", http.StatusInternalServerError)
+		return
+	}
+	if !exists {
+		helpers.HTTPError(w, "Post does not exist", http.StatusNotFound)
 		return
 	}
 
 	// Update the like in the database
-	err = database.UpDateLikeInDB(userID, post.ID)
+	err = database.UpDateLikeInDB(userID, postID)
 	if err != nil {
-		helpers.HTTPError(w, ("Failed to create like:" + err.Error()), http.StatusInternalServerError)
+		log.Printf("Failed to create like: %v\n", err)
+		helpers.HTTPError(w, "Failed to create like:", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "Like created successfully")
 }

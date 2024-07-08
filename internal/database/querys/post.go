@@ -249,15 +249,15 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 	return post, nil
 }
 
-// GetPostCountByID checks if the postID exists
-func GetPostCountByID(postID int) (int, error) {
+// PostExistsByID checks if a post with the given postID exists
+func PostExists(postID int) (bool, error) {
 	query := "SELECT COUNT(*) FROM post WHERE post_id = $1"
 	var count int
 	if err := DB.QueryRow(context.Background(), query, postID).Scan(&count); err != nil {
-		log.Printf("database: Failed to num of posts: %v\n", err)
-		return 0, err
+		log.Printf("database: Failed to get number of posts: %v\n", err)
+		return false, err
 	}
-	return count, nil
+	return count > 0, nil
 }
 
 // GetPostLikeCountByID gets the like counts for an indivitual post 

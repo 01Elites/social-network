@@ -43,3 +43,7 @@ type Comment struct {
 type Error struct {
 	Reason string `json:"reason"`
 }
+
+type ID struct {
+	ID int `json:"id"`
+}

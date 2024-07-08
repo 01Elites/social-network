@@ -3,6 +3,7 @@ package post
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,23 +15,23 @@ import (
 	"social-network/internal/views/middleware"
 )
 
-
 /*
 CreatePostHandler creates a new post.
 
-This function creates a new post using the data provided in the request body. 
+This function creates a new post using the data provided in the request body.
 It requires a valid user session to create a post.
 
 Example:
-    // To create a new post
-    POST /api/post
-    Body: {
-    "title": string,
-    "body": string,
-    "image_id": string, // optional
-    "privacy": "private"| "public" | "almost_private",
-    "user_names": []string // only if privacy == "almost_private"
-	}
+
+	    // To create a new post
+	    POST /api/post
+	    Body: {
+	    "title": string,
+	    "body": string,
+	    "image_id": string, // optional
+	    "privacy": "private"| "public" | "almost_private",
+	    "user_names": []string // only if privacy == "almost_private"
+		}
 */
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -86,19 +87,19 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(postIDjson)
 }
 
-
 /*
- 
-GetPostsHandler A function that retrieve posts, (used for mainpage posts listing) 
+GetPostsHandler A function that retrieve posts, (used for mainpage posts listing)
 This function fetches posts based on the user session and on whether the user follows the poster.
 
 Example:
-    // To retrieve posts
-    GET api/posts
+
+	// To retrieve posts
+	GET api/posts
 
 Response:
 
 [
+
 	{
 		"post_id": int,
 		"poster": {
@@ -112,8 +113,9 @@ Response:
 		"post_privacy": "private"| "public" | "almost_private",
 		"likes_count": int,
 		"comments_count": int,
-		"likers_usernames": null | []string // optional 
+		"likers_usernames": null | []string // optional
 	}
+
 ]
 */
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -145,32 +147,32 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts)
 }
 
-
 /*
-
 GetPostByIDHandler retrieves a single post by its ID.
-This function retrieves a post based on the provided post ID. 
+This function retrieves a post based on the provided post ID.
 It requires a valid user session to access the post.
 
 Example:
-    // To retrieve a post with ID 123
-    GET api/post/123
+
+	// To retrieve a post with ID 123
+	GET api/post/123
 
 Response:
-{
-    "post_id": int,
-    "poster": {
-        "user_name": string,
-        "first_name": string,
-        "last_name": string
-    },
-    "title": string
-    "content": string
-    "creation_date": "2024-07-07T14:28:45.127591Z", // unix time
-    "likes_count": int,
-    "comments_count": int,
-		"likers_usernames": null | []string // optional 
-}
+
+	{
+	    "post_id": int,
+	    "poster": {
+	        "user_name": string,
+	        "first_name": string,
+	        "last_name": string
+	    },
+	    "title": string
+	    "content": string
+	    "creation_date": "2024-07-07T14:28:45.127591Z", // unix time
+	    "likes_count": int,
+	    "comments_count": int,
+			"likers_usernames": null | []string // optional
+	}
 */
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -195,20 +197,20 @@ func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(post)
 }
 
-
-/* 
-
+/*
 DeletePostHandler deletes a single post by its ID.
-This function deletes a post based on the provided post ID. 
+This function deletes a post based on the provided post ID.
 It requires a valid user session to access the post.
 
 Example:
-    // To delete a post with ID 123
-    DELETE api/posts/123
+
+	// To delete a post with ID 123
+	DELETE api/posts/123
 
 Response:
-   Success -> 200 OK 	
-}
+
+	   Success -> 200 OK
+	}
 */
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -235,4 +237,5 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "Success")
 }

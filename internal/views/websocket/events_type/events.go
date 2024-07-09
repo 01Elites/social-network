@@ -1,4 +1,4 @@
-package event
+package events_type
 
 const (
 	// User events

@@ -1,4 +1,4 @@
-package event
+package events_type
 
 type Message struct {
 	Event   string      `json:"event"`

@@ -9,6 +9,8 @@ import (
 	"social-network/internal/helpers"
 	"social-network/internal/views/middleware"
 
+	database "social-network/internal/database/querys"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -36,7 +38,13 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not open WebSocket connection", http.StatusBadRequest)
 		return
 	}
-	SetClientOnline(conn, userID)
-	
-	go ProcessEvents(conn, userID)
+	userName, err := database.GetUserNameByID(userID)
+	if err != nil {
+		log.Println("Error getting user name:", err)
+		http.Error(w, "Could not get user name", http.StatusInternalServerError)
+		return
+	}
+	SetClientOnline(conn, userName)
+
+	go ProcessEvents(conn, userName)
 }

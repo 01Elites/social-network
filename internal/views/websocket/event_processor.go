@@ -3,17 +3,16 @@ package websocket
 import (
 	"encoding/json"
 	"log"
-
-	"social-network/internal/views/websocket/event"
+	"social-network/internal/views/websocket/events_type"
 
 	"github.com/gorilla/websocket"
 )
 
-func ProcessEvents(conn *websocket.Conn, userID string) {
+func ProcessEvents(conn *websocket.Conn, userName string) {
 	defer func() {
 		// Remove the client from the Clients map when the connection is closed
 		conn.Close()
-		SetClientOffline(userID)
+		SetClientOffline(userName)
 	}()
 
 	for {
@@ -30,7 +29,7 @@ func ProcessEvents(conn *websocket.Conn, userID string) {
 		}
 
 		// Deserialize the message into the Event struct
-		var message event.Message
+		var message events_type.Message
 		err = json.Unmarshal(rawMessage, &message)
 		if err != nil {
 			log.Println("Error unmarshalling JSON message into Event struct:", err)
@@ -39,7 +38,7 @@ func ProcessEvents(conn *websocket.Conn, userID string) {
 
 		// Handle the event based on its type
 		switch message.Event {
-		case event.SEND_MESSAGE:
+		case events_type.SEND_MESSAGE:
 			// Call function for NOTIFICATION
 			log.Println("SEND_MESSAGE")
 		default:

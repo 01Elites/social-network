@@ -186,7 +186,9 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
             variant={'secondary'}
             onClick={() => setPostPrivacyOpen(true)}
           >
-            Post Privacy
+            {postPrivacy() === 'public' && 'Post Privacy'}
+            {postPrivacy() === 'private' && 'Only My Followers'}
+            {postPrivacy() === 'almost_private' && 'Only Selected Users'}
           </Button>
           <Button
             class='gap-2'

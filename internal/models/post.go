@@ -21,9 +21,9 @@ type Create_Post struct {
 	Title     string   `json:"title"`
 	Content   string   `json:"body"`
 	Privacy   string   `json:"privacy"`
-	Image     string   `json:"image_id"`
+	Image     string   `json:"image"`
 	GroupID   int      `json:"group_id"`
-	UserNames []string `json:"user_names"`
+	UserNames []string `json:"usernames"`
 }
 
 type Create_Comment struct {

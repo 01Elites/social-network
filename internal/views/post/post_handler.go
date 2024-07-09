@@ -105,15 +105,18 @@ Response:
 		"poster": {
 				"user_name": string,
 				"first_name": string,
-				"last_name": string
+				"last_name": string,
+				"image": string // optional
 		},
 		"title": string,
 		"content": string,
+		"image": string, // optional
 		"creation_date": "2024-07-07T14:28:45.127591Z", // unix time
 		"post_privacy": "private"| "public" | "almost_private",
 		"likes_count": int,
 		"comments_count": int,
 		"likers_usernames": null | []string // optional
+		"is_liked": bool
 	}
 
 ]
@@ -141,6 +144,11 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Failed to get posts: %v\n", err)
 		helpers.HTTPError(w, "Failed to get posts", http.StatusInternalServerError)
+		return
+	}
+
+	if len(posts) == 0 {
+		helpers.HTTPError(w, "No posts found", http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

@@ -7,13 +7,13 @@ type Post struct {
 	User             PostFeedProfile `json:"poster,omitempty"`
 	Title            string          `json:"title"`
 	Content          string          `json:"content,omitempty"`
-	Image            string          `json:"image_id,omitempty"`
+	Image            string          `json:"image,omitempty"`
 	CreationDate     time.Time       `json:"creation_date"`
 	PostPrivacy      string          `json:"post_privacy,omitempty"`
 	PostLikes        int             `json:"likes_count"`
 	CommentsCount    int             `json:"comments_count"`
 	Likers_Usernames []string        `json:"likers_usernames"`
-	IsLiked          bool            `json:"is_Liked,omitempty"`
+	IsLiked          bool            `json:"is_liked,omitempty"`
 	GroupID          int             `json:"group_id,omitempty"`
 }
 

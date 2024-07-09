@@ -11,10 +11,10 @@ import {
 import { Separator } from '~/components/ui/separator';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import User, { UserDetailsHook } from '~/types/User';
+import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
 import { TextField, TextFieldTextArea } from '../ui/text-field';
 import NewPostPrivacy from './NewPostPrivacy';
-import PostAuthorCell from './PostAuthorCell';
 
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import config from '~/config';

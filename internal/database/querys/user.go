@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"social-network/internal/helpers"
 	"social-network/internal/models"
@@ -315,5 +316,39 @@ func GetUserNameByID(userID string) (string, error) {
 		log.Printf("Failed to fetch user by ID: %v\n", err)
 		return "", err
 	}
+	return username, nil
+}
+
+// Function to check if a username exists in the database
+func usernameExists(username string) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS (SELECT 1 FROM public.user WHERE user_name=$1)`
+	err := DB.QueryRow(context.Background(), query, username).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+// Function to generate a unique username
+func GenerateUniqueUsername(firstName, lastName string) (string, error) {
+	// Create a base username
+	baseUsername := strings.ToLower(fmt.Sprintf("%s.%s", firstName, lastName))
+	username := baseUsername
+	counter := 1
+
+	// Check if the username exists and generate new variations if necessary
+	for {
+		exists, err := usernameExists(username)
+		if err != nil {
+			return "", err
+		}
+		if !exists {
+			break
+		}
+		username = fmt.Sprintf("%s%d", baseUsername, counter)
+		counter++
+	}
+
 	return username, nil
 }

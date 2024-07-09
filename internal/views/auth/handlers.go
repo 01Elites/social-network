@@ -14,8 +14,6 @@ import (
 	"social-network/internal/models"
 	"social-network/internal/views/session"
 
-	"math/rand"
-
 	"github.com/gofrs/uuid"
 )
 
@@ -39,7 +37,6 @@ type SignUpRequst struct {
 	SignUpRequst struct defines the structure of the JSON request body expected for user sign-up.
 
 	Body: {
-		"user_name":  string,
 		"email": string,
 		"password": string,
 		"first_name": string,
@@ -112,12 +109,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	data.Password = hash
 	data.Email = strings.ToLower(data.Email) // Convert email to lowercase for consistency
 
-	// -------- GENERATE A RANDOM USERNAME ---------
-	rand.Seed(time.Now().UnixNano())
-	randomDigits := fmt.Sprintf("%04d", rand.Intn(10000))
-
+	// Generate a unique username
+	username, err := database.GenerateUniqueUsername(data.FirstName, data.LastName)
+	if err != nil {
+		log.Fatalf("Failed to generate unique username: %v", err)
+	}
 	user := models.User{
-		UserName: data.FirstName[:1] + data.LastName + randomDigits,
+		UserName: username,
 		Email:    data.Email,
 		Password: data.Password,
 		Provider: models.Provider.Manual,

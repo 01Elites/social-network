@@ -28,9 +28,9 @@ Example:
 	    Body: {
 	    "title": string,
 	    "body": string,
-	    "image_id": string, // optional
+	    "image": string, // optional
 	    "privacy": "private"| "public" | "almost_private",
-	    "user_names": []string // only if privacy == "almost_private"
+	    "usernames": []string // only if privacy == "almost_private"
 		}
 */
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {

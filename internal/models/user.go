@@ -59,12 +59,12 @@ type ProfilePost struct {
 	ID            int       `json:"post_id"`
 	Title         string    `json:"title"`
 	Content       string    `json:"content,omitempty"`
-	Image         string    `json:"image_id,omitempty"`
+	Image         string    `json:"image,omitempty"`
 	CreationDate  time.Time `json:"creation_date"`
 	PostPrivacy   string    `json:"post_privacy,omitempty"`
 	PostLikes     int       `json:"likes_count"`
 	CommentsCount int       `json:"comments_count"`
-	Likers_ids    []string  `json:"likers_ids"`
+	Likers_ids    []string  `json:"likers_ids,omitempty"`
 	IsLiked       bool      `json:"is_Liked,omitempty"`
 }
 

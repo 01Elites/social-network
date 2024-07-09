@@ -37,6 +37,7 @@ type SignUpRequst struct {
 	SignUpRequst struct defines the structure of the JSON request body expected for user sign-up.
 
 	Body: {
+		"user_name": string, // optional, will be generated if not provided
 		"email": string,
 		"password": string,
 		"first_name": string,
@@ -168,8 +169,8 @@ It reads the request body and responds with a success(200) or Unauthorized(401).
 SignInRequst Body:
 
 	{
-	    "email": "string,"
-	    "password": "string"
+	    "email": string,
+	    "password": string
 	}
 */
 func SignIn(w http.ResponseWriter, r *http.Request) {

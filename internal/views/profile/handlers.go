@@ -17,18 +17,42 @@ import (
 
 type profileData struct {
 	UserName       string    `json:"user_name"`
-	Email          string    `json:"email"`
+	Email          string    `json:"email,omitempty"`
 	NickName       string    `json:"nick_name"`
 	FirstName      string    `json:"first_name"`
 	LastName       string    `json:"last_name"`
-	Gender         string    `json:"gender"`
-	DateOfBirth    time.Time `json:"date_of_birth"`
-	AvatarURL      string    `json:"avatar_url"`
+	Gender         string    `json:"gender,omitempty"`
+	DateOfBirth    time.Time `json:"date_of_birth,omitempty"`
+	Avatar         string    `json:"avatar"`
 	About          string    `json:"about"`
 	ProfilePrivacy string    `json:"profile_privacy"`
-	Follow_status  string    `json:"follow_status"`
+	Follow_status  string    `json:"follow_status,omitempty"`
 }
 
+/*
+getProfile handles the HTTP GET request for retrieving a user's profile.
+It reads the user ID from the request context, fetches the user's details
+and profile data from the database, and returns the profile in JSON format.
+
+Endpoint: GET /api/profile
+
+Response:
+
+	{
+		"user_name": string,
+		"email": string,
+		"nick_name": string,
+		"first_name": string,
+		"last_name": string,
+		"gender": "male" | "female",
+		"date_of_birth": 0, // unix timestamp
+		"avatar": string,
+		"about": string,
+		"profile_privacy": "public" | "private",
+	}
+
+If any error occurs during the process, it returns the corresponding HTTP error status code.
+*/
 func getProfile(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -59,7 +83,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 		LastName:       prof.LastName,
 		Gender:         prof.Gender,
 		DateOfBirth:    prof.DateOfBirth,
-		AvatarURL:      prof.Image,
+		Avatar:         prof.Image,
 		About:          prof.About,
 		ProfilePrivacy: prof.ProfilePrivacy,
 	}
@@ -70,6 +94,27 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
+	patchProfile handles the HTTP PATCH request for updating a user's profile.
+	It reads the user ID from the request context, unmarshals the JSON request body,
+	validates the profile data, updates the user's profile in the database, and returns an appropriate response.
+
+	Endpoint: PATCH /api/profile
+
+	Request Body:
+	{
+		"nick_name": string, // optional
+		"first_name": string,
+		"last_name": string,
+		"gender": "male" | "female",
+		"date_of_birth": string, // ISO 8601 date string
+		"avatar": string, // Base64 encoded image, optional
+		"about": string, // optional
+		"profile_privacy": "public" | "private"
+	}
+
+	If any error occurs during the process, it returns the corresponding HTTP error status code.
+*/
 func patchProfile(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -87,8 +132,8 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if update.AvatarURL != "" { // If the user has no image, use the default image
-		update.AvatarURL, err = helpers.SaveBase64Image(update.AvatarURL)
+	if update.Avatar != "" { // If the user has no image, use the default image
+		update.Avatar, err = helpers.SaveBase64Image(update.Avatar)
 		if err != nil {
 			fmt.Println("Error with Image:", err)
 		}
@@ -101,7 +146,7 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		LastName:       update.LastName,
 		Gender:         update.Gender,
 		DateOfBirth:    update.DateOfBirth,
-		Image:          update.AvatarURL,
+		Image:          update.Avatar,
 		About:          update.About,
 		ProfilePrivacy: update.ProfilePrivacy,
 	}
@@ -122,8 +167,31 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "Profile updated successfully")
 }
 
-// getProfileByID retrieves the profile of a user by their ID
-func getProfileByUserName(w http.ResponseWriter, r *http.Request) {
+/*
+	getProfileByUserName handles the HTTP GET request to retrieve the profile information of a user by their username.
+	It extracts the userID from the request context, fetches the userID of the profile being requested,
+	and then retrieves and returns the profile data in JSON format.
+
+	URL Path: /api/profile/{user_name}
+
+	Path Parameter:
+	- user_name: string - the username of the user whose profile is being requested.
+
+	Response Body:
+	{
+		"user_name": string,
+		"nick_name": string,
+		"first_name": string,
+		"last_name": string,
+		"date_of_birth": "0001-01-01T00:00:00Z",
+		"avatar": string,
+		"about": string,
+		"profile_privacy": "public" | "private",
+		"follow_status": "following" | "not_following" | "pending"
+	}
+
+	If any error occurs during the process, it returns the corresponding HTTP error status code.
+*/func getProfileByUserName(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -162,7 +230,7 @@ func getProfileByUserName(w http.ResponseWriter, r *http.Request) {
 		LastName:  prof.LastName,
 		// Gender:         prof.Gender,
 		// DateOfBirth:    prof.DateOfBirth,
-		AvatarURL:      prof.Image,
+		Avatar:         prof.Image,
 		About:          prof.About,
 		ProfilePrivacy: prof.ProfilePrivacy,
 		Follow_status:  database.GetFollowStatus(userID, UserPageID),
@@ -174,6 +242,34 @@ func getProfileByUserName(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
+	getProfilePosts handles the HTTP GET request to retrieve posts from a user's profile.
+	It extracts the userID from the request context, fetches the userID of the profile being requested,
+	and then retrieves and returns the posts data in JSON format.
+
+	URL Path: /api/profile/{user_name}/posts
+
+	Path Parameter:
+	- user_name: string - the username of the user whose profile posts are being requested.
+
+	Response Body:
+	[
+		{
+			"post_id": int,
+			"title": string,
+			"content": string,
+			"image": string,
+			"creation_date": "2024-07-08T16:09:53.100341Z",
+			"post_privacy": "public" | "private",
+			"likes_count": int,
+			"comments_count": int,
+			"likers_ids": []string,
+			"is_liked": bool
+		}
+	]
+
+	If any error occurs during the process, it returns the corresponding HTTP error status code.
+*/
 func getProfilePosts(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {

@@ -105,12 +105,21 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
         <Separator />
 
         <DialogFooter class='gap-2'>
-          <Button variant='secondary' onClick={props.onlyFollowersCallback}>
+          <Button
+            variant='secondary'
+            onClick={() => {
+              props.onlyFollowersCallback();
+              props.setOpen(false);
+            }}
+          >
             My Followers
           </Button>
           <Button
             disabled={selectedUsers().length < 1}
-            onClick={() => props.onlySelectedCallback(selectedUsers())}
+            onClick={() => {
+              props.onlySelectedCallback(selectedUsers());
+              props.setOpen(false);
+            }}
           >
             Only Selected
           </Button>

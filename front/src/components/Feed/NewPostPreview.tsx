@@ -20,6 +20,7 @@ import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import config from '~/config';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { showToast } from '../ui/toast';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 interface NewPostPreviewProps {
   open: boolean;
@@ -181,15 +182,25 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
 
         <Separator />
         <DialogFooter class='!justify-between gap-4'>
-          <Button
-            disabled={formProcessing()}
-            variant={'secondary'}
-            onClick={() => setPostPrivacyOpen(true)}
-          >
-            {postPrivacy() === 'public' && 'Post Privacy'}
-            {postPrivacy() === 'private' && 'Only My Followers'}
-            {postPrivacy() === 'almost_private' && 'Only Selected Users'}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger
+              as={Button<'button'>}
+              variant='secondary'
+              disabled={formProcessing()}
+              onClick={() => setPostPrivacyOpen(true)}
+            >
+              {postPrivacy() === 'public' && 'Post Privacy'}
+              {postPrivacy() === 'private' && 'Only My Followers'}
+              {postPrivacy() === 'almost_private' && 'Only Selected Users'}
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                Who do you wnat to see your post? we show it to everyone be
+                default.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+
           <Button
             class='gap-2'
             disabled={postText().length < 1 || formProcessing()}

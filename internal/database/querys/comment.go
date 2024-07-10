@@ -70,12 +70,7 @@ func Get_PostComments_from_db(userID string, postID int) ([]models.Comment, erro
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
-		if comment.Image != "" && comment.Image != "null" {
-			comment.Image = comment.Image
-		}
-		if comment.User.Image != "" && comment.Image != "null" {
-			comment.User.Image = comment.User.Image
-		}
+
 		comment.User.UserName, err = GetUserNameByID(userID)
 		if err != nil {
 			log.Printf("database failed to get username: %v\n", err)

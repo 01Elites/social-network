@@ -68,9 +68,6 @@ func GetUserProfile(userID string) (*models.UserProfile, error) {
 		return nil, err
 	}
 
-	if userProfile.Image != "" && userProfile.Image != "null" { // If the user has no image, use the default image
-		userProfile.Image = userProfile.Image
-	}
 	return &userProfile, nil
 }
 

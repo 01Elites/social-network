@@ -114,13 +114,7 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			log.Printf("database failed to scan comments count: %v\n", err)
 			return nil, err
 		}
-		if p.Image != "" && p.Image != "null" {
-			p.Image = p.Image
-		}
-		if p.User.Image != "" && p.Image != "null" {
-			p.User.Image = p.User.Image
 
-		}
 		p.Likers_Usernames, p.IsLiked, err = GetPostLikers(p.ID, loggeduser.UserID)
 		if err != nil {
 			log.Printf("database: Failed to scan likers: %v\n", err)
@@ -217,13 +211,7 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 		log.Printf("database failed to scan comments count: %v\n", err)
 		return models.Post{}, err
 	}
-	if post.Image != "" && post.Image != "null" {
-		post.Image = post.Image
 
-	}
-	if post.User.Image != "" && post.Image != "null" {
-		post.User.Image = post.User.Image
-	}
 	post.Likers_Usernames, post.IsLiked, err = GetPostLikers(post.ID, userid)
 	if err != nil {
 		log.Printf("database: Failed to scan likers: %v\n", err)
@@ -361,12 +349,7 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err
 		}
-		if p.Image != "" && p.Image != "null" {
-			p.Image = p.Image
-		}
-		if p.User.Image != "" && p.Image != "null" {
-			p.User.Image = p.User.Image
-		}
+
 		p.CommentsCount, err = GetCommentsCountByID(p.ID)
 		if err != nil {
 			log.Printf("database failed to scan comments count: %v\n", err)
@@ -435,9 +418,7 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
 			return []models.ProfilePost{}, err
 		}
 		post.PostLikes = len(post.Likers_ids)
-		if post.Image != "" && post.Image != "null" {
-			post.Image = post.Image
-		}
+
 		if userid == loggeduser {
 			posts = append(posts, post)
 			continue

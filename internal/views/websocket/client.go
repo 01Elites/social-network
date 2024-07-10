@@ -5,28 +5,57 @@ import (
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/views/websocket/types"
+	"social-network/internal/views/websocket/types/event"
 
 	"github.com/gorilla/websocket"
 )
 
-func SetClientOffline(userID string) {
+func SetClientOffline(username string) {
 	// Remove the client from the Clients map
 	cmutex.Lock()
-	delete(clients, userID)
+	delete(clients, username)
 	cmutex.Unlock()
 }
 
 func SetClientOnline(conn *websocket.Conn, user *types.User) {
 	// Add the client to the Clients map
 	cmutex.Lock()
-	clients[user.ID] = user
+	clients[user.Username] = user
 	cmutex.Unlock()
-	followees, err := database.GetUsersFollowees(user.ID)
+	sendUserList(conn, user.ID)
+	// followees, err := database.GetUsersFollowees(user.ID)
+	// if err != nil {
+	// 	log.Print(err)
+	// } else {
+	// 	for followee := range followees {
+	// 		sendMessageToWebSocket(conn, "USERLIST", data)
+	// 	}
+	// }
+}
+
+func sendUserList(conn *websocket.Conn, userID string) {
+	// Get the list of users
+	followingUserNames, err := database.GetUserFollowingUserNames(userID)
 	if err != nil {
-		log.Print(err)
-	} else {
-		for followee := range followees {
-			sendMessageToWebSocket(conn, "USERLIST", data)
+		log.Println("Error getting users following:", err)
+		return
+	}
+	listSection := types.Section{
+		Name: "Following",
+	}
+	for _, username := range followingUserNames {
+		if user, ok := clients[username]; ok {
+			listSection.Users = append(listSection.Users, *user)
+		} else {
+			// User doesn't exist, create a new offline user
+			newUser := types.User{
+				Username: username,
+				State:    "offline",
+				Conn:     nil,
+			}
+			listSection.Users = append(listSection.Users, newUser)
 		}
 	}
+	// Send the list of users to the client
+	sendMessageToWebSocket(conn, event.USERLIST, listSection)
 }

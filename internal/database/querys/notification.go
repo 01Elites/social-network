@@ -127,3 +127,33 @@ func UpdateNotificationTable(notificationID int, status string, userID string) e
 }
 
 func ViewNotificationTable() {}
+
+
+func GetUserFollowingUserNames(userID string) ([]string, error) {
+	var following []string
+	query := `
+	SELECT
+    "user".user_name
+	FROM
+			follower
+	INNER JOIN
+			public."user" ON follower.followed_id = public."user".user_id
+	WHERE
+			follower.follower_id = $1
+	`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("database failed to scan followed user: %v\n", err)
+		return nil, err
+	}
+	for rows.Next() {
+		var followedUsername string
+		if err = rows.Scan(&followedUsername); err != nil {
+			log.Printf("database failed to scan followed user: %v\n", err)
+			return nil, err
+		}
+		following = append(following, followedUsername)
+	}
+	return following, nil
+
+}

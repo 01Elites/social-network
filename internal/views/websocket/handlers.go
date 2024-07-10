@@ -40,21 +40,21 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not open WebSocket connection", http.StatusBadRequest)
 		return
 	}
-	userName, err := database.GetUserNameByID(userID)
+	username, err := database.GetUserNameByID(userID)
 	if err != nil {
 		log.Println("Error getting user name:", err)
 		http.Error(w, "Could not get user name", http.StatusInternalServerError)
 		return
 	}
 	user := types.User{
-		UserID:   userID,
-		Username: userName,
+		ID:   userID,
+		Username: username,
 		State:    "online",
 		Conn:     conn,
 	}
 	SetClientOnline(conn, &user)
 
-	go ProcessEvents(conn, userID)
+	go ProcessEvents(conn, username)
 }
 
 // Function to send JSON data to a WebSocket connection

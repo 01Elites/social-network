@@ -54,6 +54,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	SetClientOnline(conn, &user)
 
+	go ProcessNotifications(conn, username)
 	go ProcessEvents(conn, username)
 }
 

@@ -8,7 +8,7 @@ type Section struct {
 }
 
 type User struct {
-	UserID   string          `json:"-"`
+	ID   string          `json:"-"`
 	Username string          `json:"username"`
 	State    string          `json:"state"`
 	Conn     *websocket.Conn `json:"-"`

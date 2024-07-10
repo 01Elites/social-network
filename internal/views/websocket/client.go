@@ -19,9 +19,9 @@ func SetClientOffline(userID string) {
 func SetClientOnline(conn *websocket.Conn, user *types.User) {
 	// Add the client to the Clients map
 	cmutex.Lock()
-	clients[user.UserID] = user
+	clients[user.ID] = user
 	cmutex.Unlock()
-	followees, err := database.GetUsersFollowees(user.UserID)
+	followees, err := database.GetUsersFollowees(user.ID)
 	if err != nil {
 		log.Print(err)
 	} else {

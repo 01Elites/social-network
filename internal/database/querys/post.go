@@ -103,7 +103,7 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			&p.Image,
 			&p.User.FirstName,
 			&p.User.LastName,
-			&p.User.Image,
+			&p.User.Avatar,
 			&p.PostPrivacy,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
@@ -200,7 +200,7 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 		&post.CreationDate,
 		&post.User.FirstName,
 		&post.User.LastName,
-		&post.User.Image,
+		&post.User.Avatar,
 	)
 	if err != nil {
 		log.Printf("database: Failed to scan row: %v", err)
@@ -344,7 +344,7 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			&p.Image,
 			&p.User.UserID,
 			&p.User.UserName,
-			&p.User.Image,
+			&p.User.Avatar,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err

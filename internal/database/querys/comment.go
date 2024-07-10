@@ -3,6 +3,7 @@ package querys
 import (
 	"context"
 	"log"
+
 	"social-network/internal/models"
 )
 
@@ -65,7 +66,7 @@ func Get_PostComments_from_db(userID string, postID int) ([]models.Comment, erro
 			&comment.User.FirstName,
 			&comment.User.LastName,
 			&comment.CreationDate,
-			&comment.User.Image,
+			&comment.User.Avatar,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)
 			return nil, err

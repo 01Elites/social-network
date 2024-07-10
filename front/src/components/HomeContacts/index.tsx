@@ -5,11 +5,11 @@ import { UserDetailsHook } from '~/types/User';
 import Repeat from '../core/repeat';
 import { Skeleton } from '../ui/skeleton';
 
-interface ContactsProps {
+interface HomeContactsProps {
   class?: string;
 }
 
-export default function Contacts(props: ContactsProps): JSXElement {
+export default function HomeContacts(props: HomeContactsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   return (

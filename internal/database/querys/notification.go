@@ -25,6 +25,25 @@ func GetUsersFollowingByID(userID string) (map[string]bool, error) {
 	return Following, nil
 }
 
+func GetUsersFollowees(userID string) (map[string]bool, error) {
+	Followees := make(map[string]bool)
+	query := `SELECT follower_id FROM follower WHERE followed_id = $1`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("database failed to scan follower user: %v\n", err)
+		return nil, err
+	}
+	for rows.Next() {
+		var followerUserID string
+		if err = rows.Scan(&followerUserID); err != nil {
+			log.Printf("database failed to scan follower user: %v\n", err)
+			return nil, err
+		}
+		Followees[followerUserID] = true
+	}
+	return Followees, nil
+}
+
 func CreateFollowRequest(request models.Request) (int, error) {
 	// Check if request already exists
 	query := `

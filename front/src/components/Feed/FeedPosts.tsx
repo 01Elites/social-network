@@ -1,18 +1,58 @@
-import { createSignal, JSXElement, Show, useContext } from 'solid-js';
+import {
+  createEffect,
+  createSignal,
+  For,
+  JSXElement,
+  Show,
+  useContext,
+} from 'solid-js';
+import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { fetchWithAuth } from '~/extensions/fetch';
+import { cn } from '~/lib/utils';
 import { Post } from '~/types/Post';
 import { UserDetailsHook } from '~/types/User';
 import Repeat from '../core/repeat';
 import { Skeleton } from '../ui/skeleton';
+import { showToast } from '../ui/toast';
+import FeedPostCell from './FeedPostCell';
 
-interface FeedPostsProps {}
+interface FeedPostsProps {
+  class?: string;
+}
 
 export default function FeedPosts(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const [posts, setPosts] = createSignal<Post[]>();
 
+  createEffect(() => {
+    if (!userDetails()) return;
+    fetchWithAuth(config.API_URL + '/posts')
+      .then(async (res) => {
+        const body = await res.json();
+        if (res.status === 404) {
+          setPosts([]);
+          return;
+        }
+        if (res.ok) {
+          setPosts(body);
+          return;
+        }
+        throw new Error(
+          body.reason ? body.reason : 'An error occurred while fetching posts',
+        );
+      })
+      .catch((err) => {
+        showToast({
+          title: 'Error fetching posts',
+          description: err.message,
+          variant: 'error',
+        });
+      });
+  });
+
   return (
-    <div class='flex flex-col gap-4'>
+    <div class={cn('flex flex-col gap-4 p-2', props.class)}>
       <Show
         when={posts()}
         fallback={
@@ -30,42 +70,15 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
           </Repeat>
         }
       >
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
-        <h1>asdasd</h1>
+        <Show when={posts()?.length === 0}>
+          <h1 class='text-center font-bold text-muted-foreground'>
+            Hmmm, we don't seem to have any posts :(
+          </h1>
+          <p class='text-center text-muted-foreground'>
+            Maybe you could post some{' '}
+          </p>
+        </Show>
+        <For each={posts()}>{(post) => <FeedPostCell post={post} />}</For>
       </Show>
     </div>
   );

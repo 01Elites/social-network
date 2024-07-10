@@ -16,7 +16,7 @@ export default function Feed(props: FeedProps): JSXElement {
     <section class={cn('flex flex-col gap-3', props.class)}>
       <h1 class='text-xl font-bold'>Feed</h1>
       {userDetails() && <NewPostCell />}
-      <section class='overflow-y-scroll'>
+      <section class='h-full overflow-y-scroll'>
         <FeedPosts />
       </section>
     </section>

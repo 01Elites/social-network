@@ -1,4 +1,5 @@
-import { JSXElement } from 'solid-js';
+import { JSXElement, Show } from 'solid-js';
+import config from '~/config';
 import { Post } from '~/types/Post';
 
 interface FeedPostCellProps {
@@ -6,5 +7,14 @@ interface FeedPostCellProps {
 }
 
 export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
-  return <h1>fuck</h1>;
+  console.log(props.post);
+
+  return (
+    <div class='rounded-lg p-4 shadow-lg'>
+      <p>{props.post.content}</p>
+      <Show when={props.post.image}>
+        <img src={`${config.API_URL}/image/${props.post.image}`} />
+      </Show>
+    </div>
+  );
 }

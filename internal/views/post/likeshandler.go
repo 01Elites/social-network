@@ -30,8 +30,8 @@ func CreateLikeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	postID, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		log.Printf("Failed to decode post id: %v\n", err)
-		helpers.HTTPError(w, "Failed to decode post id", http.StatusBadRequest)
+		log.Println("Failed to convert post ID to int:", err)
+		helpers.HTTPError(w, "Invalid post ID:", http.StatusBadRequest)
 		return
 	}
 

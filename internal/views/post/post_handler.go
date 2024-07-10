@@ -168,18 +168,22 @@ Example:
 Response:
 
 	{
-	    "post_id": int,
-	    "poster": {
-	        "user_name": string,
-	        "first_name": string,
-	        "last_name": string
-	    },
-	    "title": string
-	    "content": string
-	    "creation_date": "2024-07-07T14:28:45.127591Z", // unix time
-	    "likes_count": int,
-	    "comments_count": int,
-			"likers_usernames": null | []string // optional
+		"post_id": int,
+		"poster": {
+				"user_name": string,
+				"first_name": string,
+				"last_name": string,
+				"image": string // optional
+		},
+		"title": string,
+		"content": string,
+		"image": string, // optional
+		"creation_date": "2024-07-07T14:28:45.127591Z", // unix time
+		"post_privacy": "private"| "public" | "almost_private",
+		"likes_count": int,
+		"comments_count": int,
+		"likers_usernames": null | []string // optional
+		"is_liked": bool
 	}
 */
 func GetPostByIDHandler(w http.ResponseWriter, r *http.Request) {

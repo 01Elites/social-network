@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	database "social-network/internal/database/querys"
+	"social-network/internal/helpers"
 	"social-network/internal/views/session"
 )
 
@@ -25,12 +26,12 @@ func CheckAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := session.ExtractToken(r)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			helpers.HTTPError(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
 		userID, err := database.ValidateSessionToken(token)
 		if err != nil {
-			http.Error(w, "Invalid session token", http.StatusUnauthorized)
+			helpers.HTTPError(w, "Invalid session token", http.StatusUnauthorized)
 			return
 		}
 		ctx := context.WithValue(r.Context(), UserIDKey, userID)

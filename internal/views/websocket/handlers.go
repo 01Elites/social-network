@@ -46,7 +46,13 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not get user name", http.StatusInternalServerError)
 		return
 	}
-	SetClientOnline(conn, userName)
+	user := types.User{
+		UserID:   userID,
+		Username: userName,
+		State:    "online",
+		Conn:     conn,
+	}
+	SetClientOnline(conn, &user)
 
 	go ProcessEvents(conn, userName)
 }

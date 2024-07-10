@@ -8,6 +8,7 @@ import (
 
 	"social-network/internal/helpers"
 	"social-network/internal/views/middleware"
+	"social-network/internal/views/websocket/types"
 
 	database "social-network/internal/database/querys"
 
@@ -20,7 +21,7 @@ var (
 			return true
 		},
 	}
-	clients = make(map[string]*websocket.Conn)
+	clients = make(map[string]*types.User)
 	cmutex  sync.Mutex
 )
 

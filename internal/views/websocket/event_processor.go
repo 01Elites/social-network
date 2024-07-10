@@ -3,7 +3,9 @@ package websocket
 import (
 	"encoding/json"
 	"log"
-	"social-network/internal/views/websocket/events_type"
+
+	"social-network/internal/views/websocket/types"
+	"social-network/internal/views/websocket/types/event"
 
 	"github.com/gorilla/websocket"
 )
@@ -29,7 +31,7 @@ func ProcessEvents(conn *websocket.Conn, userName string) {
 		}
 
 		// Deserialize the message into the Event struct
-		var message events_type.Message
+		var message types.Event
 		err = json.Unmarshal(rawMessage, &message)
 		if err != nil {
 			log.Println("Error unmarshalling JSON message into Event struct:", err)
@@ -37,23 +39,23 @@ func ProcessEvents(conn *websocket.Conn, userName string) {
 		}
 
 		// Handle the event based on its type
-		switch message.Event {
-		case events_type.SEND_MESSAGE:
+		switch message.Type {
+		case event.SEND_MESSAGE:
 			// Call function for NOTIFICATION
 			log.Println("SEND_MESSAGE")
-		case events_type.TYPING:
+		case event.TYPING:
 			// Call function for TYPING
 			// Typing(event, user)
-		case events_type.CHAT_OPENED:
+		case event.CHAT_OPENED:
 			// OpenChat(event, user)
-		case events_type.CHAT_CLOSED:
+		case event.CHAT_CLOSED:
 			// CloseChat(user)
-		case events_type.GET_MESSAGES:
+		case event.GET_MESSAGES:
 			// GetMessages(event, user)
-		case events_type.GET_NOTIFICATIONS:
+		case event.GET_NOTIFICATIONS:
 			// GetNotifications(event, user)
 		default:
-			log.Println("Unknown event type:", message.Event)
+			log.Println("Unknown event type:", message.Type)
 		}
 	}
 }

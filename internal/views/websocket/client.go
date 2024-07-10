@@ -1,8 +1,12 @@
 package websocket
 
-import ("github.com/gorilla/websocket"
-				database "social-network/internal/database/querys"
-				"log"
+import (
+	"log"
+
+	database "social-network/internal/database/querys"
+	"social-network/internal/views/websocket/types"
+
+	"github.com/gorilla/websocket"
 )
 
 func SetClientOffline(userName string) {
@@ -15,14 +19,18 @@ func SetClientOffline(userName string) {
 func SetClientOnline(conn *websocket.Conn, userName string) {
 	// Add the client to the Clients map
 	cmutex.Lock()
-	clients[userName] = conn
+	clients[userName] = &types.User{
+		Username: userName,
+		State:    "online",
+		Conn:     conn,
+	}
 	cmutex.Unlock()
 	followees, err := database.GetUsersFollowees(userName)
 	if err != nil {
 		log.Print(err)
-	}else{
-	for followee, _ := range followees {
-		sendMessageToWebSocket(conn, "USERLIST", data)
-	}
+	} else {
+		for followee := range followees {
+			sendMessageToWebSocket(conn, "USERLIST", data)
+		}
 	}
 }

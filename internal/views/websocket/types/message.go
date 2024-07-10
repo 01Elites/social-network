@@ -1,7 +1,7 @@
-package events_type
+package types
 
-type Message struct {
-	Event   string      `json:"event"`
+type Event struct {
+	Type    string      `json:"event"`
 	Id      string      `json:"id"`
 	Payload interface{} `json:"payload"`
 }

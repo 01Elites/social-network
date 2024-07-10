@@ -8,5 +8,5 @@ import (
 
 // SetupImageRoutes sets up the routes for the image handlers
 func SetupImageRoutes() {
-	http.HandleFunc("GET /api/image/{path}", middleware.AllowCORS(middleware.CheckAuth(servesImage)))
+	http.HandleFunc("GET /api/image/{path}", middleware.AllowCORS(servesImage))
 }

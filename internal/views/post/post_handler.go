@@ -55,6 +55,11 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "content cannot be empty", http.StatusBadRequest)
 		return
 	}
+	if len(post.Content) > 255 {
+		log.Printf("Post content is too long\n")
+		helpers.HTTPError(w, "content is too long", http.StatusBadRequest)
+		return
+	}
 	// save the image if it exists
 	if post.Image != "" && post.Image != "null" {
 		post.Image, err = helpers.SaveBase64Image(post.Image)

@@ -9,8 +9,8 @@ export default function HomePage(): JSXElement {
   return (
     <Layout>
       <section class='flex h-full gap-4 px-3'>
-        <HomeEvents class='w-1/3 max-w-60' />
-        <Feed class='grow overflow-hidden' />
+        <HomeEvents class='w-5/12 max-w-60' />
+        <Feed class='overflow-hidden' />
         <HomeContacts class='w-1/3 max-w-52' />
       </section>
     </Layout>

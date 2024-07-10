@@ -10,7 +10,7 @@ export default function HomePage(): JSXElement {
     <Layout>
       <section class='flex h-full gap-4 px-3'>
         <HomeEvents class='w-1/3 max-w-60' />
-        <Feed class='grow' />
+        <Feed class='grow overflow-hidden' />
         <HomeContacts class='w-1/3 max-w-52' />
       </section>
     </Layout>

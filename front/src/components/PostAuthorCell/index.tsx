@@ -12,7 +12,7 @@ export default function PostAuthorCell(props: PostAuthorCellProps): JSXElement {
   return (
     <div class='flex items-center gap-2'>
       <Avatar>
-        <AvatarImage src={props.author.avatar_url}></AvatarImage>
+        <AvatarImage src={props.author.avatar}></AvatarImage>
         <AvatarFallback>
           {props.author.first_name[0].toUpperCase()}
         </AvatarFallback>

@@ -1,3 +1,5 @@
+import User from '../User';
+
 type Post = {
   post_id: number;
   title: string;
@@ -6,12 +8,7 @@ type Post = {
   likers_usernames?: string[];
   comments_count: number;
   creation_date: number; // unix time
-  poster: {
-    image?: string;
-    first_name: string;
-    last_name: string;
-    user_name: string;
-  };
+  poster: User;
 };
 
 export type { Post };

@@ -175,7 +175,7 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
             placeholder='What do you want to say? you have 255 characters to express yourself.'
             class='resize-none'
             minLength={1}
-            maxLength={255}
+            maxLength={400}
             disabled={formProcessing()}
           />
         </TextField>

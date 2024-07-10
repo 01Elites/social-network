@@ -172,10 +172,10 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
 
         <TextField onChange={setPostText} value={postText()}>
           <TextFieldTextArea
-            placeholder='What do you want to say? you have 500 characters to express yourself.'
+            placeholder='What do you want to say? you have 255 characters to express yourself.'
             class='resize-none'
             minLength={1}
-            maxLength={500}
+            maxLength={255}
             disabled={formProcessing()}
           />
         </TextField>

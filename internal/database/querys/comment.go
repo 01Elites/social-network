@@ -3,7 +3,6 @@ package querys
 import (
 	"context"
 	"log"
-	"social-network/internal/helpers"
 	"social-network/internal/models"
 )
 
@@ -72,16 +71,10 @@ func Get_PostComments_from_db(userID string, postID int) ([]models.Comment, erro
 			return nil, err
 		}
 		if comment.Image != "" && comment.Image != "null" {
-			comment.Image, err = helpers.GetImage(comment.Image)
-			if err != nil {
-				log.Printf("failed to get image: %v\n", err)
-			}
+			comment.Image = comment.Image
 		}
 		if comment.User.Image != "" && comment.Image != "null" {
-			comment.User.Image, err = helpers.GetImage(comment.User.Image)
-			if err != nil {
-				log.Printf("failed to get image: %v\n", err)
-			}
+			comment.User.Image = comment.User.Image
 		}
 		comment.User.UserName, err = GetUserNameByID(userID)
 		if err != nil {

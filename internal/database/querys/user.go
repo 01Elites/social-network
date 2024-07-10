@@ -7,7 +7,6 @@ import (
 	"log"
 	"strings"
 
-	"social-network/internal/helpers"
 	"social-network/internal/models"
 
 	"github.com/gofrs/uuid"
@@ -70,11 +69,7 @@ func GetUserProfile(userID string) (*models.UserProfile, error) {
 	}
 
 	if userProfile.Image != "" && userProfile.Image != "null" { // If the user has no image, use the default image
-		userProfile.Image, err = helpers.GetImage(userProfile.Image)
-		if err != nil {
-			fmt.Println("Error getting image:", err)
-			userProfile.Image = ""
-		}
+		userProfile.Image = userProfile.Image
 	}
 	return &userProfile, nil
 }

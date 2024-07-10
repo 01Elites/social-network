@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 
-	"social-network/internal/helpers"
 	"social-network/internal/models"
 )
 
@@ -116,18 +115,11 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 			return nil, err
 		}
 		if p.Image != "" && p.Image != "null" {
-			p.Image, err = helpers.GetImage(p.Image)
-			if err != nil {
-				log.Printf("failed to get image: %v\n", err)
-				p.Image = ""
-			}
+			p.Image = p.Image
 		}
 		if p.User.Image != "" && p.Image != "null" {
-			p.User.Image, err = helpers.GetImage(p.User.Image)
-			if err != nil {
-				log.Printf("failed to get image: %v\n", err)
-				p.User.Image = ""
-			}
+			p.User.Image = p.User.Image
+
 		}
 		p.Likers_Usernames, p.IsLiked, err = GetPostLikers(p.ID, loggeduser.UserID)
 		if err != nil {
@@ -226,18 +218,11 @@ func GetPostByID(postID int, userid string) (models.Post, error) {
 		return models.Post{}, err
 	}
 	if post.Image != "" && post.Image != "null" {
-		post.Image, err = helpers.GetImage(post.Image)
-		if err != nil {
-			log.Printf("failed to get image: %v\n", err)
-			post.Image = ""
-		}
+		post.Image = post.Image
+
 	}
 	if post.User.Image != "" && post.Image != "null" {
-		post.User.Image, err = helpers.GetImage(post.User.Image)
-		if err != nil {
-			log.Printf("failed to get image: %v\n", err)
-			post.User.Image = ""
-		}
+		post.User.Image = post.User.Image
 	}
 	post.Likers_Usernames, post.IsLiked, err = GetPostLikers(post.ID, userid)
 	if err != nil {
@@ -260,7 +245,7 @@ func PostExists(postID int) (bool, error) {
 	return count > 0, nil
 }
 
-// GetPostLikeCountByID gets the like counts for an indivitual post 
+// GetPostLikeCountByID gets the like counts for an indivitual post
 func GetPostLikeCountByID(postID int) (int, error) {
 	query := "SELECT COUNT(*) FROM post_interaction WHERE post_id = $1"
 	var count int
@@ -377,18 +362,10 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			return nil, err
 		}
 		if p.Image != "" && p.Image != "null" {
-			p.Image, err = helpers.GetImage(p.Image)
-			if err != nil {
-				log.Printf("failed to get image: %v\n", err)
-				p.Image = ""
-			}
+			p.Image = p.Image
 		}
 		if p.User.Image != "" && p.Image != "null" {
-			p.User.Image, err = helpers.GetImage(p.User.Image)
-			if err != nil {
-				log.Printf("failed to get image: %v\n", err)
-				p.User.Image = ""
-			}
+			p.User.Image = p.User.Image
 		}
 		p.CommentsCount, err = GetCommentsCountByID(p.ID)
 		if err != nil {
@@ -459,11 +436,7 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
 		}
 		post.PostLikes = len(post.Likers_ids)
 		if post.Image != "" && post.Image != "null" {
-			post.Image, err = helpers.GetImage(post.Image)
-			if err != nil {
-				log.Printf("failed to get image: %v\n", err)
-				post.Image = ""
-			}
+			post.Image = post.Image
 		}
 		if userid == loggeduser {
 			posts = append(posts, post)

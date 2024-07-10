@@ -9,17 +9,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func SetClientOffline(userName string) {
+func SetClientOffline(userID string) {
 	// Remove the client from the Clients map
 	cmutex.Lock()
-	delete(clients, userName)
+	delete(clients, userID)
 	cmutex.Unlock()
 }
 
 func SetClientOnline(conn *websocket.Conn, user *types.User) {
 	// Add the client to the Clients map
 	cmutex.Lock()
-	clients[user.Username] = user
+	clients[user.UserID] = user
 	cmutex.Unlock()
 	followees, err := database.GetUsersFollowees(user.UserID)
 	if err != nil {

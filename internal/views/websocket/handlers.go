@@ -54,7 +54,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	SetClientOnline(conn, &user)
 
-	go ProcessEvents(conn, userName)
+	go ProcessEvents(conn, userID)
 }
 
 // Function to send JSON data to a WebSocket connection

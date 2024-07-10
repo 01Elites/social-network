@@ -10,11 +10,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func ProcessEvents(conn *websocket.Conn, userName string) {
+func ProcessEvents(conn *websocket.Conn, userID string) {
 	defer func() {
 		// Remove the client from the Clients map when the connection is closed
 		conn.Close()
-		SetClientOffline(userName)
+		SetClientOffline(userID)
 	}()
 
 	for {

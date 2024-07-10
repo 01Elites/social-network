@@ -80,6 +80,8 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
         profile USING (user_id)
 		INNER JOIN
 				"user" USING (user_id)
+		ORDER BY
+				created_at DESC
 `
 	rows, err := DB.Query(context.Background(), query)
 	if err != nil {

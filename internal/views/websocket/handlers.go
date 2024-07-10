@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -48,4 +49,29 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	SetClientOnline(conn, userName)
 
 	go ProcessEvents(conn, userName)
+}
+
+// Function to send JSON data to a WebSocket connection
+func sendMessageToWebSocket(conn *websocket.Conn, eventType string, data interface{}) error {
+	// Check if the WebSocket connection is nil
+	if conn == nil {
+		log.Println("Connection is nil")
+		return nil
+	}
+	// Format the message payload according to the given event type and data
+	eventMessage := types.Event{
+		Type:    eventType,
+		Payload: data,
+	}
+	messagesJSON, err := json.Marshal(eventMessage)
+	if err != nil {
+		log.Println("Error marshalling messages to JSON:", err)
+		return nil
+	}
+	// Write the payload to the WebSocket connection as a text message
+	if err := conn.WriteMessage(websocket.TextMessage, []byte(messagesJSON)); err != nil {
+		log.Println("Error writing message to WebSocket:", err)
+		return err
+	}
+	return nil
 }

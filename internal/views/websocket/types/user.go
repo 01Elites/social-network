@@ -3,8 +3,8 @@ package types
 import "github.com/gorilla/websocket"
 
 type Section struct {
-	User         User `json:"user"`
-	Notification bool `json:"notification"`
+	Name  string `json:"name"`
+	Users []User `json:"users"`
 }
 
 type User struct {

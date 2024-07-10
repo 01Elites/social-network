@@ -2,6 +2,7 @@ package views
 
 import (
 	"net/http"
+
 	"social-network/internal/views/auth"
 	"social-network/internal/views/follow"
 	"social-network/internal/views/group"
@@ -22,10 +23,7 @@ func SetupRoutes() {
 		w.Write([]byte("Hello, World!"))
 	})
 
-	// test Handle the OPTIONS request for the root route and return the allowed methods
-	http.HandleFunc("/api/", middleware.AllowCORS(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
-	}))
+	http.HandleFunc("/api/", middleware.AllowCORS(func(w http.ResponseWriter, r *http.Request) {}))
 
 	/********************* Authentication ************************/
 	auth.SetupAuthRoutes()

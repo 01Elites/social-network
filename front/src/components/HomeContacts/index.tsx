@@ -20,7 +20,7 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
           <div class='flex items-center gap-3'>
             <Skeleton height={40} circle animate={false} />
             <div class='grow space-y-2'>
-              <Skeleton height={14} radius={10} class='max-w-32' />
+              <Skeleton height={14} radius={10} />
               <Skeleton height={12} radius={10} class='max-w-20' />
             </div>
           </div>

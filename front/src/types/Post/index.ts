@@ -2,7 +2,7 @@ type Post = {
   post_id: number;
   title: string;
   content: string;
-  image_id?: string;
+  image?: string;
   likers_usernames?: string[];
   comments_count: number;
   creation_date: number; // unix time
@@ -13,6 +13,5 @@ type Post = {
     user_name: string;
   };
 };
-
 
 export type { Post };

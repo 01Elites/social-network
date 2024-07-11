@@ -11,6 +11,7 @@ import logo from '~/assets/logo.svg';
 import rebootLogo from '~/assets/reboot_01_logo.png';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
+import moment from 'moment';
 import { Button } from '~/components/ui/button';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Label } from '~/components/ui/label';
@@ -293,6 +294,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               <TextFieldInput
                 class='block' // without it calendar icon gets ruined
                 type='date'
+                max={moment().subtract(18, 'years').format('YYYY-MM-DD')}
                 id='dob'
                 placeholder='30/6/2024'
               />

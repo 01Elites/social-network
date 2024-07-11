@@ -10,8 +10,6 @@ interface FeedPostCellProps {
 }
 
 export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
-  console.log(props.post);
-
   return (
     <div class='space-y-4 overflow-hidden rounded-md border-[0.5px] pb-4 shadow-lg'>
       <Show when={props.post.image}>

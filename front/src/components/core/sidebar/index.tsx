@@ -3,6 +3,7 @@
 // import PeopleIcon from '@suid/icons-material/People';
 // import GroupsIcon from '@suid/icons-material/Groups';
 // import FlagIcon from '@suid/icons-material/Flag';
+import { showSettings } from '~/pages/settings';
 import Apps_Icon from '../../../components/ui/icons/apps/apps_icon';
 import Flag_Icon from '../../../components/ui/icons/flag/flag_icon';
 import Group_Icon from '../../../components/ui/icons/group/group_icon';
@@ -48,7 +49,7 @@ export default function SideBar(props: SidebarProps) {
         <Settings_Icon
           class='h-9 w-9 cursor-pointer self-center'
           onClick={() => {
-            console.log('settings clicked');
+            showSettings();
           }}
         />
       </div>

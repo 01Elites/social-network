@@ -9,8 +9,6 @@ import (
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
-	"social-network/internal/views/websocket"
-	"social-network/internal/views/websocket/types"
 )
 
 // FollowHandler creates a follow request for a user. It expects a JSON body with the following format:
@@ -78,14 +76,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "Something is Wrong with the Follow Request!!", http.StatusBadRequest)
 			return
 		}
-		// Notifications(request , "followRequest")
-		// Here, insert in Channel1
-		event := types.Event{
-			Type:    "follow request",
-			Payload: request, // You can customize the payload as per your requirements
-		}
-		websocket.FollowRequestChan <- event
-
+		// websocket.FollowRequestNotification(request)
 	} else {
 		err = database.FollowUser(request)
 		if err != nil {

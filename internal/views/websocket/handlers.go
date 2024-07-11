@@ -49,13 +49,12 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	user := types.User{
 		ID:   userID,
 		Username: username,
-		State:    "online",
 		Conn:     conn,
 	}
-	SetClientOnline(conn, &user)
+	SetClientOnline(&user)
 
-	go ProcessNotifications(conn, username)
-	go ProcessEvents(conn, username)
+	go ProcessNotifications(&user)
+	go ProcessEvents(&user)
 }
 
 // Function to send JSON data to a WebSocket connection

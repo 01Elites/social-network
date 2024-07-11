@@ -10,16 +10,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func ProcessEvents(conn *websocket.Conn, username string) {
+func ProcessEvents(user *types.User) {
 	defer func() {
 		// Remove the client from the Clients map when the connection is closed
-		conn.Close()
-		SetClientOffline(username)
+		user.Conn.Close()
+		SetClientOffline(user.ID)
 	}()
 
 	for {
 		// Read message from WebSocket connection
-		messageType, rawMessage, err := conn.ReadMessage()
+		messageType, rawMessage, err := user.Conn.ReadMessage()
 		if err != nil {
 			log.Println("Error reading message from WebSocket:", err)
 			return
@@ -80,3 +80,9 @@ func ProcessEvents(conn *websocket.Conn, username string) {
 //  - invitation to the group
 //  - new reuest to join the group {which the user is the admin}
 //  - new event in the group {which the user is the admin} MAYBE !!!
+
+// required notification types:
+// follow request
+// group invitation
+// request to join group
+// event in the group

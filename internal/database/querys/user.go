@@ -52,7 +52,25 @@ func CreateUser(user models.User) error {
 func GetUserProfile(userID string) (*models.UserProfile, error) {
 	// Fetch user profile from database
 	var userProfile models.UserProfile
-	query := `SELECT first_name, last_name, gender, date_of_birth, image, privacy, nick_name, about FROM public.profile WHERE user_id = $1`
+	query := `
+	SELECT 
+		public.profile.first_name, 
+		public.profile.last_name, 
+		public.profile.gender, 
+		public.profile.date_of_birth, 
+		public.profile.image, 
+		public.profile.privacy, 
+		public.profile.nick_name, 
+		public.profile.about, 
+		public."user".user_name
+	FROM 
+		public.profile 
+	INNER JOIN 
+		public."user" 
+	ON 
+		public.profile.user_id = public."user".user_id 
+	WHERE 
+		public.profile.user_id = $1`
 	err := DB.QueryRow(context.Background(), query, userID).Scan(
 		&userProfile.FirstName,
 		&userProfile.LastName,
@@ -62,6 +80,7 @@ func GetUserProfile(userID string) (*models.UserProfile, error) {
 		&userProfile.ProfilePrivacy,
 		&userProfile.NickName,
 		&userProfile.About,
+		&userProfile.Username,
 	)
 	if err != nil {
 		log.Printf("Failed to fetch user profile: %v\n", err)

@@ -4,19 +4,17 @@ import (
 	"log"
 
 	"social-network/internal/views/websocket/types"
-
-	"github.com/gorilla/websocket"
 )
 
 // Global channels for notifications
 var (
-	FollowRequestChan = make(chan types.Event)
+	FollowRequestChan = make(chan types.Notification)
 	GroupInviteChan   = make(chan types.Event)
 	JoinRequestChan   = make(chan types.Event)
 	EventChan         = make(chan types.Event)
 )
 
-func ProcessNotifications(conn *websocket.Conn, username string) {
+func ProcessNotifications(user *types.User) {
 	// Get the notifications for the user
 	// notifications, err := database.GetUserNotifications(username)
 	// if err != nil {
@@ -29,21 +27,34 @@ func ProcessNotifications(conn *websocket.Conn, username string) {
 	for {
 		select {
 		case FollowRequest := <-FollowRequestChan:
-			if err := sendMessageToWebSocket(conn, "notificationType1", FollowRequest.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "notificationType1", FollowRequest); err != nil {
 				log.Println("Error sending SEND_MESSAGE to WebSocket:", err)
 			}
 		case GroupInvite := <-GroupInviteChan:
-			if err := sendMessageToWebSocket(conn, "notificationType2", GroupInvite.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "notificationType2", GroupInvite.Payload); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case JoinRequest := <-JoinRequestChan:
-			if err := sendMessageToWebSocket(conn, "notificationType3", JoinRequest.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "notificationType3", JoinRequest.Payload); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case Event := <-EventChan:
-			if err := sendMessageToWebSocket(conn, "notificationType4", Event.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "notificationType4", Event.Payload); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		}
 	}
 }
+
+// func FollowRequestNotification(request models.Request) {
+// 	notification := types.Notification{
+// 		Type:    "FOILLOW_REQUEST",
+// 		Message: "You have a new follow request",
+// 		Metadata: types.FollowRequestMetadata{
+// 			UserDetails: types.UserDetails{
+// 				Username: request.Sender,
+// 			},
+// 		},
+// 	}
+// 	FollowRequestChan <- notification
+// }

@@ -296,7 +296,6 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
                 type='date'
                 max={moment().subtract(18, 'years').format('YYYY-MM-DD')}
                 id='dob'
-                placeholder='30/6/2024'
               />
             </TextField>
 

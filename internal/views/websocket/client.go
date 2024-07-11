@@ -8,10 +8,11 @@ import (
 	"social-network/internal/views/websocket/types/event"
 )
 
-func SetClientOffline(userID string) {
+func SetClientOffline(username string) {
 	// Remove the client from the Clients map
+	userID := clients[username].ID
 	cmutex.Lock()
-	delete(clients, userID)
+	delete(clients, username)
 	cmutex.Unlock()
 	updateFollowersUserList(userID)
 }
@@ -19,7 +20,7 @@ func SetClientOffline(userID string) {
 func SetClientOnline(user *types.User) {
 	// Add the client to the Clients map
 	cmutex.Lock()
-	clients[user.ID] = user
+	clients[user.Username] = user
 	cmutex.Unlock()
 	sendUserList(user)
 	updateFollowersUserList(user.ID)
@@ -27,7 +28,7 @@ func SetClientOnline(user *types.User) {
 
 func sendUserList(user *types.User) {
 	// Get the list of users
-	followingIDs, err := database.GetUsersFollowingByID(user.ID)
+	followingUserNames, err := database.GetUserFollowingUserNames(user.ID)
 	if err != nil {
 		log.Println("Error getting users following:", err)
 		return
@@ -35,8 +36,8 @@ func sendUserList(user *types.User) {
 	listSection := types.Section{
 		Name: "Following",
 	}
-	for userID := range followingIDs {
-		userProfile, err := database.GetUserProfile(userID)
+	for _, username := range followingUserNames {
+		userProfile, err := database.GetUserProfileByUserName(username)
 		if err != nil {
 			log.Println("Error getting user profile:", err)
 			return
@@ -46,7 +47,7 @@ func sendUserList(user *types.User) {
 			FirstName: userProfile.FirstName,
 			LastName:  userProfile.LastName,
 		}
-		if _, ok := clients[userID]; ok {
+		if _, ok := clients[username]; ok {
 			userDetails.State = "online"
 		} else {
 			userDetails.State = "offline"
@@ -58,16 +59,16 @@ func sendUserList(user *types.User) {
 }
 
 func updateFollowersUserList(userid string) {
-	followers, err := database.GetUsersFollowees(userid)
+	followers, err := database.GetUserFollowerUserNames(userid)
 	if err != nil {
 		log.Print("error getting followers:", err)
 		return
 	}
-	for followerID := range followers {
-		if clients[followerID] == nil {
+	for _,followerUsername := range followers {
+		if clients[followerUsername] == nil {
 			continue
 		} else {
-			sendUserList(clients[followerID])
+			sendUserList(clients[followerUsername])
 		}
 	}
 }

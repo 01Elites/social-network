@@ -90,6 +90,47 @@ func GetUserProfile(userID string) (*models.UserProfile, error) {
 	return &userProfile, nil
 }
 
+func GetUserProfileByUserName(username string) (*models.UserProfile, error) {
+	// Fetch user profile by username from database
+	var userProfile models.UserProfile
+	query := `
+	SELECT 
+		public.profile.first_name, 
+		public.profile.last_name, 
+		public.profile.gender, 
+		public.profile.date_of_birth, 
+		public.profile.image, 
+		public.profile.privacy, 
+		public.profile.nick_name, 
+		public.profile.about, 
+		public."user".user_name
+	FROM 
+		public.profile 
+	INNER JOIN 
+		public."user" 
+	ON 
+		public.profile.user_id = public."user".user_id 
+	WHERE 
+		public."user".user_name = $1`
+	err := DB.QueryRow(context.Background(), query, username).Scan(
+		&userProfile.FirstName,
+		&userProfile.LastName,
+		&userProfile.Gender,
+		&userProfile.DateOfBirth,
+		&userProfile.Image,
+		&userProfile.ProfilePrivacy,
+		&userProfile.NickName,
+		&userProfile.About,
+		&userProfile.Username,
+	)
+	if err != nil {
+		log.Printf("Failed to fetch user profile by username: %v\n", err)
+		return nil, err
+	}
+
+	return &userProfile, nil
+}
+
 func IsPrivateUser(userID string) (bool, error) {
 	var privacy string
 	query := `SELECT privacy FROM public.profile WHERE user_id = $1`

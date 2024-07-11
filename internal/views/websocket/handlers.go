@@ -47,7 +47,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := types.User{
-		ID:   userID,
+		ID:       userID,
 		Username: username,
 		Conn:     conn,
 	}

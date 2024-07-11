@@ -25,6 +25,73 @@ func GetUsersFollowingByID(userID string) (map[string]bool, error) {
 	return Following, nil
 }
 
+func GetUserFollowingUserNames(userID string) ([]string, error) {
+	var following []string
+	query := `
+	SELECT
+    "user".user_name
+	FROM
+			follower
+	INNER JOIN
+			public."user" ON follower.followed_id = public."user".user_id
+	WHERE
+			follower.follower_id = $1
+	`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("database failed to scan followed user: %v\n", err)
+		return nil, err
+	}
+	for rows.Next() {
+		var followedUsername string
+		if err = rows.Scan(&followedUsername); err != nil {
+			log.Printf("database failed to scan followed user: %v\n", err)
+			return nil, err
+		}
+		following = append(following, followedUsername)
+	}
+	return following, nil
+
+}
+
+
+func GetUserFollowerUserNames(userID string) ([]string, error) {
+	var followers []string
+	query := `
+	SELECT
+		"user".user_name
+	FROM
+		follower
+	INNER JOIN
+		public."user" ON follower.follower_id = public."user".user_id
+	WHERE
+		follower.followed_id = $1
+	`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("database failed to scan followers: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var followerUsername string
+		if err = rows.Scan(&followerUsername); err != nil {
+			log.Printf("database failed to scan follower user: %v\n", err)
+			return nil, err
+		}
+		followers = append(followers, followerUsername)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("rows iteration error: %v\n", err)
+		return nil, err
+	}
+
+	return followers, nil
+}
+
+
 func GetUsersFollowees(userID string) (map[string]bool, error) {
 	Followees := make(map[string]bool)
 	query := `SELECT follower_id FROM follower WHERE followed_id = $1`

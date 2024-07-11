@@ -23,6 +23,7 @@ func SetClientOnline(conn *websocket.Conn, user *types.User) {
 	clients[user.Username] = user
 	cmutex.Unlock()
 	sendUserList(conn, user.ID)
+	updateFollowersUserList(user.ID)
 	// followees, err := database.GetUsersFollowees(user.ID)
 	// if err != nil {
 	// 	log.Print(err)
@@ -58,4 +59,25 @@ func sendUserList(conn *websocket.Conn, userID string) {
 	}
 	// Send the list of users to the client
 	sendMessageToWebSocket(conn, event.USERLIST, listSection)
+}
+
+
+func updateFollowersUserList(userid string){
+	followers, err := database.GetUsersFollowingByID(userid)
+	if err != nil {
+		log.Print("error getting followers:", err)
+		return
+	}
+	for followerID := range followers {
+		followerUsername, err := database.GetUserNameByID(followerID)
+		if err != nil {
+			log.Print("error getting username:", err)
+		return
+		}
+		if clients[followerUsername] == nil {
+			continue
+		} else {
+			sendUserList(clients[followerUsername].Conn, followerID)
+		}
+	}
 }

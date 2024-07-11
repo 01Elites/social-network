@@ -82,13 +82,13 @@ Response:
 		[
 	    {
 	        "comment_id": int,
-	        "image_id": string // optional
+	        "image": string // optional
 					"body": string,
 					"creation_date": "2024-07-08T16:10:12.595563Z", // unix timestamp
 	        "commenter": {
 	            "first_name": string,
 	            "last_name": string,
-	            "image_id": string, //optional
+	            "image": string, //optional
 	            "user_name":string
 	        }
 	    }

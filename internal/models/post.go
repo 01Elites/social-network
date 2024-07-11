@@ -37,7 +37,7 @@ type Comment struct {
 	User         PostFeedProfile `json:"commenter"`
 	Content      string          `json:"body"`
 	CreationDate time.Time       `json:"creation_date"`
-	Image        string          `json:"image_id,omitempty"`
+	Image        string          `json:"image,omitempty"`
 }
 
 type Error struct {

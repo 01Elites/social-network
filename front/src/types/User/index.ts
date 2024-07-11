@@ -1,14 +1,14 @@
 type User = {
-  id: string;
-  username: string;
+  user_name: string;
   email: string;
+  nick_name?: string;
   first_name: string;
   last_name: string;
+  gender: 'male' | 'female';
   date_of_birth: number; // unix timestamp
-  avatar_url?: string;
+  avatar?: string;
   about?: string;
-  nick_name?: string;
-  profile_privacy?: 'public' | 'private';
+  profile_privacy: 'public' | 'private';
 };
 
 interface UserDetailsHook {

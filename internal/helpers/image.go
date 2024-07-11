@@ -95,17 +95,3 @@ func getUniqueNumber() (string, error) {
 	// Return the serial number as a zero-padded string
 	return fmt.Sprintf("%06d", serial), nil
 }
-
-// getImage returns the image in 64bit format.
-func GetImage(fileName string) (string, error) {
-	// Read the image file
-	imageData, err := os.ReadFile(filepath.Join("internal/database/images", fileName))
-	if err != nil {
-		return "", fmt.Errorf("failed to read image file: %w", err)
-	}
-
-	// Encode the image data as a Base64 string
-	base64Image := base64.StdEncoding.EncodeToString(imageData)
-
-	return base64Image, nil
-}

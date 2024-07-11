@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { TextField, TextFieldInput } from '~/components/ui/text-field';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
@@ -48,12 +47,12 @@ export default function Navbar(props: NavbarProps): JSXElement {
           }}
           class='w-20 cursor-pointer'
         />
-        <TextField class='flex basis-1/2 items-center'>
+        {/* <TextField class='flex basis-1/2 items-center'>
           <TextFieldInput
             type='search'
             placeholder='Search friends, groups, posts...'
           />
-        </TextField>
+        </TextField> */}
         {/* If Logged in show details, else show  */}
         {userDetails() ? (
           <DropdownMenu>

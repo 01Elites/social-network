@@ -74,5 +74,5 @@ type PostFeedProfile struct {
 	FirstName      string `db:"first_name" json:"first_name"`
 	LastName       string `db:"last_name" json:"last_name"`
 	ProfilePrivacy string `db:"privacy" json:"post_privacy,omitempty"`
-	Image          string `db:"image" json:"image,omitempty"`
+	Avatar         string `db:"avatar" json:"image,omitempty"`
 }

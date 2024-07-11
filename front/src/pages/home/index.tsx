@@ -1,16 +1,17 @@
 import 'solid-devtools';
 import { JSXElement } from 'solid-js';
 import Feed from '~/components/Feed';
+import HomeContacts from '~/components/HomeContacts';
+import HomeEvents from '~/components/HomeEvents';
 import Layout from '../../Layout';
 
 export default function HomePage(): JSXElement {
   return (
     <Layout>
-      <section class='flex gap-4'>
-        <Feed class='w-3/4' />
-        <div class='grow'>
-          <h1 class='text-xl font-bold'>Contacts</h1>
-        </div>
+      <section class='flex h-full gap-4 px-3'>
+        <HomeEvents class='w-5/12 max-w-60' />
+        <Feed class='grow overflow-hidden' />
+        <HomeContacts class='w-1/3 max-w-52' />
       </section>
     </Layout>
   );

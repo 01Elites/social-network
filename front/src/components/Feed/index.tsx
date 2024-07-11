@@ -2,8 +2,8 @@ import { JSXElement, useContext } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { cn } from '~/lib/utils';
 import { UserDetailsHook } from '~/types/User';
+import FeedPosts from './FeedPosts';
 import NewPostCell from './NewPostCell';
-import PostsCards from './PostsCards';
 
 interface FeedProps {
   class?: string;
@@ -16,7 +16,9 @@ export default function Feed(props: FeedProps): JSXElement {
     <section class={cn('flex flex-col gap-3', props.class)}>
       <h1 class='text-xl font-bold'>Feed</h1>
       {userDetails() && <NewPostCell />}
-      <PostsCards />
+      <section class='h-full overflow-y-scroll'>
+        <FeedPosts />
+      </section>
     </section>
   );
 }

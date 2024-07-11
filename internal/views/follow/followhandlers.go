@@ -84,7 +84,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 			Type:    "follow request",
 			Payload: request, // You can customize the payload as per your requirements
 		}
-		websocket.Channel1 <- event
+		websocket.FollowRequestChan <- event
 
 	} else {
 		err = database.FollowUser(request)

@@ -4,6 +4,7 @@ import { Post } from '~/types/Post';
 import TextBreaker from '../core/textbreaker';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
+import { DropdownMenu, DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 interface FeedPostCellProps {
   post: Post;
@@ -22,10 +23,15 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
         </AspectRatio>
       </Show>
       <div class={props.post.image ? 'space-y-4 px-4' : 'space-y-4 px-4 pt-4'}>
-        <PostAuthorCell
-          author={props.post.poster}
-          date={new Date(props.post.creation_date)}
-        />
+        <div class='flex items-center justify-between'>
+          <PostAuthorCell
+            author={props.post.poster}
+            date={new Date(props.post.creation_date)}
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger>{}</DropdownMenuTrigger>
+          </DropdownMenu>
+        </div>
         <p class='break-words'>
           <TextBreaker text={props.post.content} />
         </p>

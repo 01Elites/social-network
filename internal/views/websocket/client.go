@@ -63,7 +63,7 @@ func sendUserList(conn *websocket.Conn, userID string) {
 
 
 func updateFollowersUserList(userid string){
-	followers, err := database.GetUsersFollowingByID(userid)
+	followers, err := database.GetUsersFollowees(userid)
 	if err != nil {
 		log.Print("error getting followers:", err)
 		return

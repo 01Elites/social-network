@@ -15,6 +15,7 @@ func SetClientOffline(username string) {
 	cmutex.Lock()
 	delete(clients, username)
 	cmutex.Unlock()
+	updateFollowersUserList(clients[username].ID)
 }
 
 func SetClientOnline(conn *websocket.Conn, user *types.User) {
@@ -61,8 +62,7 @@ func sendUserList(conn *websocket.Conn, userID string) {
 	sendMessageToWebSocket(conn, event.USERLIST, listSection)
 }
 
-
-func updateFollowersUserList(userid string){
+func updateFollowersUserList(userid string) {
 	followers, err := database.GetUsersFollowees(userid)
 	if err != nil {
 		log.Print("error getting followers:", err)
@@ -72,7 +72,7 @@ func updateFollowersUserList(userid string){
 		followerUsername, err := database.GetUserNameByID(followerID)
 		if err != nil {
 			log.Print("error getting username:", err)
-		return
+			return
 		}
 		if clients[followerUsername] == nil {
 			continue

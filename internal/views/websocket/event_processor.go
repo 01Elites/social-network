@@ -3,9 +3,12 @@ package websocket
 import (
 	"encoding/json"
 	"log"
+	database "social-network/internal/database/querys"
+	"time"
 
 	"social-network/internal/views/websocket/types"
 	"social-network/internal/views/websocket/types/event"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -14,7 +17,7 @@ func ProcessEvents(user *types.User) {
 	defer func() {
 		// Remove the client from the Clients map when the connection is closed
 		user.Conn.Close()
-		SetClientOffline(user.ID)
+		SetClientOffline(user.Username)
 	}()
 
 	for {
@@ -43,6 +46,7 @@ func ProcessEvents(user *types.User) {
 		case event.SEND_MESSAGE:
 			// Call function for NOTIFICATION
 			log.Println("SEND_MESSAGE")
+			SendMessage(message, user)
 		case event.TYPING:
 			// Call function for TYPING
 			// Typing(event, user)
@@ -86,3 +90,187 @@ func ProcessEvents(user *types.User) {
 // group invitation
 // request to join group
 // event in the group
+
+// SendMessage function
+func SendMessage(RevEvent types.Event, user *types.User) {
+	// Convert map to JSON
+	jsonPayload, err := json.Marshal(RevEvent.Payload)
+	if err != nil {
+		log.Println("Error marshaling payload to JSON:", err)
+		return
+	}
+
+	var message types.Chat
+	if err := json.Unmarshal(jsonPayload, &message); err != nil {
+		log.Println(err, "error unmarshalling message data")
+		return
+	}
+	// Get the user's id by user name
+	userID := user.ID
+	// Get the recipient's id by user name
+	recipetsID, err := database.GetUserIDByUserName(message.Recipient)
+	if err != nil {
+		log.Println(message.Recipient, "not found in database")
+		log.Printf("database: Failed to get recipient: %v", err)
+		return
+	}
+
+	// cheack if message is empty or white space
+	if strings.TrimSpace(message.Message) == "" {
+		log.Println("Message is empty")
+		return
+	}
+
+	hasChat, err := database.HasChat(userID, recipetsID)
+	if err != nil {
+		log.Println("Error checking if has chat:", err)
+		return
+	}
+	chatID := 0
+	if !hasChat {
+		chatID, err = database.CreateChat("private", userID, recipetsID)
+		if err != nil {
+			log.Println("Error creating chat:", err)
+			return
+		} else {
+			hasChat = true
+			// TransferToDMs(user, recipient) // to move the user to the DMs section
+		}
+	}
+
+	// Get the recipient's WebSocket connection
+	recipient, ok := GetClient(message.Recipient)
+	if !ok {
+		log.Printf("Recipient '%s' not found", message.Recipient)
+		return
+	}
+
+	// Check if the recipient's chat is opened
+	if recipient.ChatOpened == user.Username && recipient.Conn != nil {
+		message.Read = true
+	}
+
+	message.Sender = user.Username
+	message.Date = time.Now().Format("2006-01-02 15:04:05")
+
+	// Update the chat in the database
+	err = database.UpdateChatInDB(chatID, message, user.ID, recipient.ID)
+	if err != nil {
+		log.Println("Error updating chat in DataBase:", err)
+		return
+	}
+	var messageResponse struct {
+		// Index    int          `json:"index"`
+		Messages []types.Chat `json:"messages"`
+	}
+
+	messageResponse.Messages = []types.Chat{message}
+
+	// Convert the message struct to JSON
+	jsonData, err := json.Marshal(messageResponse)
+	if err != nil {
+		log.Println(err, "failed to marshal JSON data")
+		return
+	}
+
+	// Write JSON data to the WebSocket connection
+	sendMessageToWebSocket(user.Conn, event.GET_MESSAGES, jsonData)
+
+	// Ensure recipient's WebSocket connection is not nil
+	if recipient.Conn == nil {
+		return
+	}
+
+	// Write JSON data to the WebSocket connection of the recipient
+	sendMessageToWebSocket(recipient.Conn, event.GET_MESSAGES, jsonData)
+
+	// Update the notification field of the recipient in the UserList
+
+	if !message.Read {
+		// updateNotification(events.Clients[recipientdb.ID], user.ID, true)
+	}
+}
+
+func GetClient(userName string) (*types.User, bool) {
+	cmutex.Lock()
+	defer cmutex.Unlock()
+	user, ok := clients[userName]
+	return user, ok
+}
+
+// func TransferToDMs(user, recipient *events.Client) {
+// 	findAndTransferUserToDMs(user, recipient)
+// 	SendUsersListToClient(user.UserID)
+// 	findAndTransferUserToDMs(recipient, user)
+// 	SendUsersListToClient(recipient.UserID)
+// }
+
+// func ReorderList(user, recipient *events.Client) {
+// 	SetAtTheTop(user, recipient)
+// 	SetAtTheTop(recipient, user)
+// 	SendUsersListToClient(user.UserID)
+// 	SendUsersListToClient(recipient.UserID)
+// }
+
+// func SetAtTheTop(user, recipient *events.Client) {
+// 	for i, section := range user.UserList {
+// 		if section.Name == "DMs" {
+// 			for j, userNot := range section.Users {
+// 				if userNot.Client.Details.UserName == recipient.Details.UserName {
+// 					// Remove the user from the sender's user list
+// 					user.UserList[i].Users = append(user.UserList[i].Users[:j], user.UserList[i].Users[j+1:]...)
+// 					user.UserList[i].Users = append([]events.UserNotification{userNot}, user.UserList[i].Users...)
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+
+// func findAndTransferUserToDMs(user, recipient *events.Client) {
+// 	for i, section := range user.UserList {
+// 		if section.Name == "Users" {
+// 			for j, userNot := range section.Users {
+// 				if userNot.Client.Details.UserName == recipient.Details.UserName {
+// 					// Remove the user from the sender's user list
+// 					user.UserList[i].Users = append(user.UserList[i].Users[:j], user.UserList[i].Users[j+1:]...)
+// 					events.Clients[user.UserID].UserList[0].Users = append(events.Clients[user.UserID].UserList[0].Users, userNot)
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+
+// /********************** send users list **************************/
+// func SendUsersList() {
+// 	// send the new list to all clients
+// 	for _, client := range events.Clients {
+// 		if client.Conn != nil {
+// 			// Convert the user list to JSON
+// 			jsonData, err := json.Marshal(client.UserList)
+// 			if err != nil {
+// 				log.Println("Error marshalling user list to JSON:", err)
+// 				return
+// 			}
+// 			// Write JSON data to the WebSocket connection
+// 			sendMessageToWebSocket(client.Conn, "USERS", jsonData)
+// 		}
+// 	}
+// }
+
+// // SendUsersListToClient sends the user list to a specific client
+// func SendUsersListToClient(userID int) {
+// 	// send the new list to all clients
+// 	client := events.Clients[userID]
+// 	if client.Conn == nil {
+// 		// log.Println("Client connection is nil for user:", client.Details.UserName)
+// 		return
+// 	}
+// 	// Convert the user list to JSON
+// 	jsonData, err := json.Marshal(client.UserList)
+// 	if err != nil {
+// 		log.Println("Error marshalling user list to JSON:", err)
+// 		return
+// 	}
+// 	// Write JSON data to the WebSocket connection
+// 	sendMessageToWebSocket(client.Conn, "USERS", jsonData)
+// }

@@ -11,6 +11,8 @@ type User struct {
 	ID       string          `json:"-"`
 	Username string          `json:"username"`
 	Conn     *websocket.Conn `json:"-"`
+	ChatOpened string          `json:"-"`
+
 }
 
 type UserDetails struct {

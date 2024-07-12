@@ -41,3 +41,16 @@ type Commenter struct {
 	ID        string `json:"id"`
 	ImageID   string `json:"image_id"`
 }
+
+type Chat struct {
+	ID        int    `json:"id,omitempty"`
+	Sender    string `json:"sender,omitempty"`
+	Recipient string `json:"recipient,omitempty"`
+	Message   string `json:"message,omitempty"`
+	Date      string `json:"date,omitempty"`
+	Read      bool   `json:"read,omitempty"`
+}
+
+type Typing struct {
+	Recipient string `json:"recipient"`
+}

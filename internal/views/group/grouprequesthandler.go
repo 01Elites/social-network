@@ -9,7 +9,7 @@ import (
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 	"social-network/internal/views/websocket"
-	"social-network/internal/views/websocket/types"
+	"log"
 )
 
 /*
@@ -66,7 +66,7 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("request already made")
 		return
 	}
-	groupCreatorID, err := database.CreateRequest(request.GroupID, userID)
+	groupCreatorID,groupTitle, err := database.CreateRequest(request.GroupID, userID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create request", http.StatusNotFound)
 		return
@@ -76,12 +76,12 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "failed to get Username", http.StatusNotFound)
 		return
 	}
-	event := types.Event{
-		Type:    "JoinRequest",
-		ToUser:  groupCreator,
-		Payload: request, // You can customize the payload as per your requirements
+	requesterProfile, err := database.GetUserProfile(userID)
+	if err != nil {
+		log.Println("Error getting user profile:", err)
+		return
 	}
-	websocket.JoinRequestChan <- event
+	websocket.GroupRequestNotification(groupCreator ,groupTitle, request.GroupID, *requesterProfile)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(groupCreator)
 }

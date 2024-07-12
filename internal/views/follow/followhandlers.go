@@ -121,7 +121,7 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the receiver account is private or public
-	if isPrivateFollowee {
+	if !isPrivateFollowee {
 		helpers.HTTPError(w, "Bro Your account is public, you don't have any follow request!!", http.StatusBadRequest)
 		return
 	}
@@ -143,7 +143,7 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = database.RespondToFollow(response)
 	if err != nil {
-		helpers.HTTPError(w, "Something Went Wrong with the Follow Respons!!", http.StatusBadRequest)
+		helpers.HTTPError(w, "Something Went Wrong with the Follow Response!!", http.StatusBadRequest)
 		return
 	}
 	// requestIDjson := struct {

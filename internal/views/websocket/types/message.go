@@ -3,6 +3,7 @@ package types
 type Event struct {
 	Type    string      `json:"event"`
 	Id      string      `json:"id"`
+	ToUser  string      `json:"username"`
 	Payload interface{} `json:"payload"`
 }
 

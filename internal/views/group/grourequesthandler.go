@@ -3,12 +3,14 @@ package group
 import (
 	"encoding/json"
 	"net/http"
+
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
+	"social-network/internal/views/websocket"
+	"social-network/internal/views/websocket/types"
 )
-
 
 /*
 CreateRequestHandler creates a request to a certain group.
@@ -18,11 +20,14 @@ It requires a valid user session and the user should not
 be a member to create a request.
 
 Example:
-	 // To create a new invite
+
+	// To create a new invite
+
 /api/grouprequest
-		Body:{
-		"group_id":0
-		}
+
+	Body:{
+	"group_id":0
+	}
 */
 func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
@@ -48,18 +53,38 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if isMember {
-		helpers.HTTPError(w, "you already a member", http.StatusBadRequest)
+		helpers.HTTPError(w, "you already are a member", http.StatusBadRequest)
 		return
 	}
-	requestID, err := database.CreateRequest(request.GroupID, userID)
+	requestMade, err := database.CheckForGroupRequest(request.GroupID, userID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create request", http.StatusNotFound)
 		return
 	}
+	if requestMade{
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode("request already made")
+		return
+	}
+	groupCreatorID, err := database.CreateRequest(request.GroupID, userID)
+	if err != nil {
+		helpers.HTTPError(w, "failed to create request", http.StatusNotFound)
+		return
+	}
+	groupCreator,err := database.GetUserNameByID(groupCreatorID)
+	if err != nil {
+		helpers.HTTPError(w, "failed to get Username", http.StatusNotFound)
+		return
+	}
+	event := types.Event{
+		Type:    "JoinRequest",
+		ToUser:  groupCreator,
+		Payload: request, // You can customize the payload as per your requirements
+	}
+	websocket.JoinRequestChan <- event
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(requestID)
+	json.NewEncoder(w).Encode(groupCreator)
 }
-
 
 /*
 RequestResponseHandler responds to a group join request.
@@ -69,6 +94,7 @@ It requires a valid user session and the user should be
 the creator of the group to respond to the request.
 
 Example:
+
 	 // To respond to a request
 	POST /api/groupresponse
 		Body:{

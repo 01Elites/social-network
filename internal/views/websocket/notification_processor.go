@@ -31,15 +31,21 @@ func ProcessNotifications(user *types.User) {
 				log.Println("Error sending SEND_MESSAGE to WebSocket:", err)
 			}
 		case GroupInvite := <-GroupInviteChan:
-			if err := sendMessageToWebSocket(user.Conn, "notificationType2", GroupInvite.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", GroupInvite.Payload); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case JoinRequest := <-JoinRequestChan:
-			if err := sendMessageToWebSocket(user.Conn, "notificationType3", JoinRequest.Payload); err != nil {
+			conn := clients[JoinRequest.ToUser].Conn
+			log.Print(JoinRequest)
+			if conn == nil {
+				log.Println("User not online")
+				return
+			}
+			if err := sendMessageToWebSocket(conn, "NOTIFICATION", JoinRequest.Payload); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case Event := <-EventChan:
-			if err := sendMessageToWebSocket(user.Conn, "notificationType4", Event.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", Event.Payload); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		}

@@ -64,6 +64,7 @@ func sendMessageToWebSocket(conn *websocket.Conn, eventType string, data interfa
 		log.Println("Connection is nil")
 		return nil
 	}
+	fmt.Println(eventType, data)
 	// Format the message payload according to the given event type and data
 	eventMessage := types.Event{
 		Type:    eventType,

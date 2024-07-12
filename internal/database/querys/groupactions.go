@@ -67,56 +67,51 @@ func RespondToInvite(response models.GroupResponse, userID string) error {
 	return nil
 }
 
-// CreateRequest adds a request to the group_requests table
-func CreateRequest(groupID int, senderID string) (int, error) {
-	var status string
+func CheckForGroupRequest(groupID int, senderID string) (bool, error){
 	var requestID int
 	query := `
 	SELECT
-		 status,
 		 request_id
 		FROM
 			group_requests
 		WHERE
-		 requester_id = $1
+		 requester_id = $1 AND status = $2
 `
-	err := DB.QueryRow(context.Background(), query, senderID).Scan(&status, &requestID)
+	err := DB.QueryRow(context.Background(), query, senderID, "pending").Scan(&requestID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
-		return 0, err // Return error if failed to insert post
+		return false, err // Return error if failed to insert post
 	}
-	if status == "pending" {
-		query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1`
-		_, err := DB.Exec(context.Background(), query, senderID)
-		if err != nil {
-			log.Printf("database: Failed to update request in database: %v", err)
-			return 0, err
-		}
-		return 0, nil
+	if requestID != 0 {
+		return true, nil
 	}
-	query = `
+	return false, nil
+}
+// CreateRequest adds a request to the group_requests table
+func CreateRequest(groupID int, senderID string) (string, error) {
+	var creatorID string
+	query := `
     INSERT INTO
         group_requests (group_id, requester_id)
     VALUES
         ($1, $2)
-				RETURNING
-				request_id`
-	err = DB.QueryRow(context.Background(), query, groupID, senderID).Scan(&requestID)
+`
+	_,err := DB.Exec(context.Background(), query, groupID, senderID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return 0, err // Return error if failed to insert post
+		return "", err // Return error if failed to insert post
 	}
-	var creatorID string
 	query = `SELECT creator_id FROM "group" WHERE group_id = $1`
 	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return 0, err // Return error if failed to insert post
+		return "", err // Return error if failed to insert post
 	}
 	// database.AddToNotificationTable()
 	// add to notification table for creator
-	return requestID, nil
+	return creatorID, nil
 }
+
 
 // RespondToRequest responds to a request that already exists in the group_requests table
 func RespondToRequest(response models.GroupResponse) error {

@@ -14,7 +14,7 @@ export default function ProfileDetails(params: params): JSXElement {
   return (
     <div class='flex flex-col'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
-        <AspectRatio ratio={16 / 9} class='m-2'> {/* Profile picture */}
+        <AspectRatio ratio={16 / 9}> {/* Profile picture */}
           <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center rounded-lg'>
             IZ NOT HERE
           </div>

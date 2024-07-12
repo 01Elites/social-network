@@ -202,7 +202,7 @@ CREATE TABLE public.notifications (
     user_id          UUID NOT NULL,
     type             public.notification_type NOT NULL,
     status           public.status_type,
-    related_id       INTEGER,  -- This can store IDs related to the notification (e.g., group_id, event_id)
+    related_id       INTEGER,  -- This can store IDs related to the notification (e.g., group_id, event_id, request_id, invitation_id)
     created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     read             BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES public.user (user_id) ON DELETE CASCADE

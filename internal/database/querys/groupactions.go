@@ -88,24 +88,27 @@ func CheckForGroupRequest(groupID int, senderID string) (bool, error) {
 }
 
 // CreateRequest adds a request to the group_requests table
-func CreateRequest(groupID int, senderID string) (string, string, error) {
+func CreateRequest(groupID int, senderID string) (int, string, string, string, error) {
 	var creatorUsername string
+	var creatorID string
 	var groupTitle string
+	var requestID int
 	query := `
     INSERT INTO
         group_requests (group_id, requester_id)
     VALUES
         ($1, $2)
+		RETURNING
+			request_id
 `
-	_, err := DB.Exec(context.Background(), query, groupID, senderID)
+	err := DB.QueryRow(context.Background(), query, groupID, senderID).Scan(&requestID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return "", "", err // Return error if failed to insert post
+		return 0, "", "","", err // Return error if failed to insert post
 	}
 	query = `SELECT 
+					 public."group".creator_id,
 				   public."user".user_name,
-					 public.profile.first_name, 
-					 public.profile.last_name,
 					 public."group".title
 					 FROM
 						"group"
@@ -115,23 +118,24 @@ func CreateRequest(groupID int, senderID string) (string, string, error) {
 					 public."user".user_id = public.group.creator_id
 					 WHERE
 					 group_id = $1`
-	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorUsername, &groupTitle)
+	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID, &creatorUsername, &groupTitle)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return "", "", err // Return error if failed to insert post
+		return 0, "", "","", err // Return error if failed to insert post
 	}
 	// database.AddToNotificationTable()
 	// add to notification table for creator
-	return creatorUsername, groupTitle, nil
+	return requestID, creatorID, creatorUsername, groupTitle, nil
 }
 
 // RespondToRequest responds to a request that already exists in the group_requests table
-func RespondToRequest(response models.GroupResponse) error {
-	query := `UPDATE group_requests SET status = $1 WHERE group_id = $2 AND requester_id = $3 AND status = 'pending'`
-	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, response.RequesterID)
+func RespondToRequest(response models.GroupResponse) (int, error) {
+	var requestID int
+	query := `UPDATE group_requests SET status = $1 WHERE group_id = $2 AND requester_id = $3 AND status = 'pending' RETURNING request_id`
+	err := DB.QueryRow(context.Background(), query, response.Status, response.GroupID, response.RequesterID).Scan(&requestID)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)
-		return err // Return error if failed to insert post
+		return 0, err // Return error if failed to insert post
 	}
 	if response.Status == "accepted" {
 		query = `INSERT INTO
@@ -141,20 +145,22 @@ func RespondToRequest(response models.GroupResponse) error {
 		_, err = DB.Exec(context.Background(), query, response.RequesterID, response.GroupID)
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
-			return err // Return error if failed to insert post
+			return 0,err // Return error if failed to insert post
 		}
 	}
-	return nil
+	return requestID, nil
 }
 
-func CancelRequest(GroupID int, userID string) error {
-	query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1 and group_id = $2`
-	_, err := DB.Exec(context.Background(), query, userID, GroupID)
+func CancelRequest(GroupID int, userID string) (int, error) {
+	var requestID int
+	query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1 and group_id = $2 RETURNING request_id`
+	err := DB.QueryRow(context.Background(), query, userID, GroupID).Scan(&requestID)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)
-		return err // Return error if failed to insert post
+		return requestID, err // Return error if failed to insert post
 	}
-	return nil
+	
+	return requestID, nil
 }
 
 func CreateEvent(GroupID int, userID string, Title string, Description string, Eventdate time.Time) (int, error) {

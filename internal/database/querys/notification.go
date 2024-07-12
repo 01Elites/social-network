@@ -195,18 +195,17 @@ func AddToNotificationTable(userID string, notificationType string, relatedID in
 	return nil
 }
 
-func UpdateNotificationTable(notificationID int, status string, userID string) error {
-	query := `UPDATE notifications SET status = $1 AND SET read = TRUE WHERE notification_id = $2`
-	_, err := DB.Exec(context.Background(), query, status, notificationID)
+func UpdateNotificationTable(relatedID int, status string, notificationType string, userID string) error {
+	query := `UPDATE notifications SET status = $1, read = true WHERE (related_id = $2 AND type = $3 AND user_id = $4 AND status = $5)`
+	_, err := DB.Exec(context.Background(), query, status, relatedID, notificationType, userID, "pending")
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)
 		return err // Return error if failed to insert post
 	}
-
 	return nil
 }
 
-func GetUserNotifications(userID string)(types.Notification, error) {
+func GetUserNotifications(userID string)([]types.Notification, error) {
 	query := `
 	SELECT 
 			type
@@ -214,12 +213,12 @@ func GetUserNotifications(userID string)(types.Notification, error) {
 			notifications
 	WHERE
 			user_id = $1
-			AND status NOT IN ('accepted', 'rejected' , 'canceled');
+			AND status NOT IN ('accepted', 'rejected', 'canceled');
 `
 rows, err := DB.Query(context.Background(), query, userID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
-		return types.Notification{}, err // Return error if failed to insert post
+		return nil, err // Return error if failed to insert post
 	}
 	for rows.Next(){
 		var notificationType string
@@ -231,6 +230,6 @@ rows, err := DB.Query(context.Background(), query, userID)
 		case "event_notification":
 		}
 	}
-	return types.Notification{}, nil
+	return nil, nil
 }
 

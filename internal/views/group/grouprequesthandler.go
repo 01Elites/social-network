@@ -2,14 +2,15 @@ package group
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"log"
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 	"social-network/internal/views/websocket"
-	"log"
 )
 
 /*
@@ -66,14 +67,9 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("request already made")
 		return
 	}
-	groupCreatorID,groupTitle, err := database.CreateRequest(request.GroupID, userID)
+	requestID, groupCreatorID, groupCreator,groupTitle, err := database.CreateRequest(request.GroupID, userID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create request", http.StatusNotFound)
-		return
-	}
-	groupCreator,err := database.GetUserNameByID(groupCreatorID)
-	if err != nil {
-		helpers.HTTPError(w, "failed to get Username", http.StatusNotFound)
 		return
 	}
 	requesterProfile, err := database.GetUserProfile(userID)
@@ -81,7 +77,13 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error getting user profile:", err)
 		return
 	}
-	websocket.GroupRequestNotification(groupCreator ,groupTitle, request.GroupID, *requesterProfile)
+	err = database.AddToNotificationTable(groupCreatorID, "join_request", requestID)
+	if err != nil {
+		log.Println("error adding notification to database")
+				return
+	}
+	websocket.GroupRequestNotification(groupCreator, groupCreatorID ,groupTitle, request.GroupID, *requesterProfile)
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(groupCreator)
 }
@@ -98,6 +100,7 @@ Example:
 	 // To respond to a request
 	POST /api/groupresponse
 		Body:{
+		"requester":"string" //username
 		"group_id":0
 		"response":"accepted" | "rejected"
 		}
@@ -123,6 +126,11 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "group ID does not exist", http.StatusBadRequest)
 		return
 	}
+	response.RequesterID, err = database.GetUserIDByUserName(response.Requester)
+	if err != nil {
+		helpers.HTTPError(w, "error getting user ID", http.StatusBadRequest)
+		return
+	}
 	isMember, err := database.GroupMember(response.RequesterID, response.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "error checking if user is a member", http.StatusBadRequest)
@@ -132,22 +140,22 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "user already a member", http.StatusBadRequest)
 		return
 	}
-	isCreator := database.CheckGroupCreator(userID, response.GroupID)
-	if !isCreator {
+	creatorID, err := database.GetGroupCreatorID(response.GroupID)
+	if err != nil || creatorID != userID{
 		helpers.HTTPError(w, "only group creator can respond to request", http.StatusBadRequest)
 		return
 	}
-	err = database.RespondToRequest(response)
+	requestID, err := database.RespondToRequest(response)
 	if err != nil {
 		helpers.HTTPError(w, "error when responding to request", http.StatusNotFound)
 		return
 	}
+	err = database.UpdateNotificationTable(requestID, "canceled", "join_request", userID)
+	if err != nil {
+		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
-	// err = database.UpdateNotificationTable(response.NotificationID, response.Status, userID)
-	// if err != nil {
-	// 	helpers.HTTPError(w, err.Error(), http.StatusNotFound)
-	// 	return
-	// }
 }
 
 func CancelRequestHandler(w http.ResponseWriter, r *http.Request) {
@@ -173,12 +181,23 @@ func CancelRequestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if isMember {
-		helpers.HTTPError(w, "you already a member", http.StatusBadRequest)
+		helpers.HTTPError(w, "you already are a member", http.StatusBadRequest)
 		return
 	}
-	err = database.CancelRequest(request.GroupID, userID)
+	requestID, err := database.CancelRequest(request.GroupID, userID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to cancel request", http.StatusNotFound)
+		return
+	}
+	fmt.Println(requestID)
+	creatorID, err := database.GetGroupCreatorID(request.GroupID)
+	if err != nil {
+		helpers.HTTPError(w, "error getting creator ID", http.StatusNotFound)
+		return
+	}
+	err = database.UpdateNotificationTable(requestID, "canceled", "join_request", creatorID)
+	if err != nil {
+		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

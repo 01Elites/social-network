@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"social-network/internal/models"
-	database "social-network/internal/database/querys"
+	// database "social-network/internal/database/querys"
 	"social-network/internal/views/websocket/types"
 )
 
@@ -37,13 +37,7 @@ func ProcessNotifications(user *types.User) {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case JoinRequest := <-JoinRequestChan:
-			conn := clients[JoinRequest.ToUser].Conn
-			log.Print(JoinRequest)
-			if conn == nil {
-				log.Println("User not online")
-				return
-			}
-			if err := sendMessageToWebSocket(conn, "NOTIFICATION", JoinRequest); err != nil {
+			if err := sendMessageToWebSocket(clients[JoinRequest.ToUser].Conn, "NOTIFICATION", JoinRequest); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case Event := <-EventChan:
@@ -67,7 +61,7 @@ func ProcessNotifications(user *types.User) {
 // 	FollowRequestChan <- notification
 // }
 
-func GroupRequestNotification(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile) {
+func GroupRequestNotification(groupCreator string, groupCreatorID string, GroupTitle string, groupID int, requester models.UserProfile) {
 	notification := types.Notification{
 		Type:    "REQUEST_TO_JOIN_GROUP",
 		Message: "You have a new group request",
@@ -84,10 +78,14 @@ func GroupRequestNotification(groupCreator string, GroupTitle string, groupID in
 			},
 		},
 	}
-	err := database.AddToNotificationTable(groupCreator, "join_request", groupID)
-	if err !=nil {
-		log.Println("error adding notification to database")
-				return
+	if len(clients) == 0 {
+		return
 	}
+	conn := clients[groupCreator].Conn
+			log.Print(groupCreator)
+			if conn == nil {
+				log.Println("User not online")
+				return
+			}
 	JoinRequestChan <- notification
 }

@@ -2,8 +2,8 @@ package types
 
 type Event struct {
 	Type    string      `json:"event"`
-	Id      string      `json:"id"`
-	ToUser  string      `json:"username"`
+	Id      string      `json:"id,omitempty"`
+	ToUser  string      `json:"username,omitempty"`
 	Payload interface{} `json:"payload"`
 }
 

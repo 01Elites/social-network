@@ -100,18 +100,15 @@ func CheckGroupID(groupID int) bool {
 	return true
 }
 
-func CheckGroupCreator(userID string, groupID int) bool {
+func GetGroupCreatorID(groupID int) (string, error) {
 	var creatorID string
 	query := `SELECT creator_id FROM "group" WHERE group_id = $1`
 	err := DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID)
 	if err != nil {
 		log.Printf("database failed to scan group creator: %v\n", err)
-		return false
+		return "", err
 	}
-	if creatorID != userID {
-		return false
-	}
-	return true
+	return creatorID, nil
 }
 
 func CheckEventID(eventID int) int {

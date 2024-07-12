@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"social-network/internal/models"
+	database "social-network/internal/database/querys"
 	"social-network/internal/views/websocket/types"
 )
 
@@ -17,7 +18,7 @@ var (
 
 func ProcessNotifications(user *types.User) {
 	// Get the notifications for the user
-	// notifications, err := database.GetUserNotifications(username)
+	// notifications, err := database.GetUserNotifications()
 	// if err != nil {
 	// 	log.Println("Error getting user notifications:", err)
 	// 	return
@@ -82,6 +83,11 @@ func GroupRequestNotification(groupCreator string, GroupTitle string, groupID in
 				Title: GroupTitle,
 			},
 		},
+	}
+	err := database.AddToNotificationTable(groupCreator, "join_request", groupID)
+	if err !=nil {
+		log.Println("error adding notification to database")
+				return
 	}
 	JoinRequestChan <- notification
 }

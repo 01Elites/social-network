@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"social-network/internal/models"
+	"social-network/internal/views/websocket/types"
 )
 
 func GetUsersFollowingByID(userID string) (map[string]bool, error) {
@@ -180,7 +181,19 @@ func RespondToFollow(response models.Response) error {
 	return nil
 }
 
-func AddToNotificationTable() {}
+func AddToNotificationTable(userID string, notificationType string, relatedID int) error {
+	query := `
+	INSERT INTO 
+			notifications (user_id, type, related_id, status) 
+	VALUES 
+			($1, $2, $3, $4)`
+	_, err := DB.Exec(context.Background(), query, userID, notificationType, relatedID, "pending")
+		if err != nil {
+			log.Printf("database: Failed to add notification: %v", err)
+			return err // Return error if failed to insert post
+		}
+	return nil
+}
 
 func UpdateNotificationTable(notificationID int, status string, userID string) error {
 	query := `UPDATE notifications SET status = $1 AND SET read = TRUE WHERE notification_id = $2`
@@ -193,5 +206,31 @@ func UpdateNotificationTable(notificationID int, status string, userID string) e
 	return nil
 }
 
-func ViewNotificationTable() {}
+func GetUserNotifications(userID string)(types.Notification, error) {
+	query := `
+	SELECT 
+			type
+	FROM
+			notifications
+	WHERE
+			user_id = $1
+			AND status NOT IN ('accepted', 'rejected' , 'canceled');
+`
+rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil && err.Error() != "no rows in result set" {
+		log.Printf("database: Failed check for request: %v", err)
+		return types.Notification{}, err // Return error if failed to insert post
+	}
+	for rows.Next(){
+		var notificationType string
+		rows.Scan(&notificationType)
+		switch notificationType{
+		case "follow_request":
+		case "group_invite":
+		case "join_request":
+		case "event_notification":
+		}
+	}
+	return types.Notification{}, nil
+}
 

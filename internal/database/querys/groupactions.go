@@ -5,7 +5,6 @@ import (
 	"log"
 	"social-network/internal/models"
 	"time"
-	// "github.com/jackc/pgx/v5"
 )
 
 // CreateInvite adds an invitation to the group_invitations table
@@ -67,7 +66,7 @@ func RespondToInvite(response models.GroupResponse, userID string) error {
 	return nil
 }
 
-func CheckForGroupRequest(groupID int, senderID string) (bool, error){
+func CheckForGroupRequest(groupID int, senderID string) (bool, error) {
 	var requestID int
 	query := `
 	SELECT
@@ -87,31 +86,44 @@ func CheckForGroupRequest(groupID int, senderID string) (bool, error){
 	}
 	return false, nil
 }
+
 // CreateRequest adds a request to the group_requests table
-func CreateRequest(groupID int, senderID string) (string, error) {
-	var creatorID string
+func CreateRequest(groupID int, senderID string) (string, string, error) {
+	var creatorUsername string
+	var groupTitle string
 	query := `
     INSERT INTO
         group_requests (group_id, requester_id)
     VALUES
         ($1, $2)
 `
-	_,err := DB.Exec(context.Background(), query, groupID, senderID)
+	_, err := DB.Exec(context.Background(), query, groupID, senderID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return "", err // Return error if failed to insert post
+		return "", "", err // Return error if failed to insert post
 	}
-	query = `SELECT creator_id FROM "group" WHERE group_id = $1`
-	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID)
+	query = `SELECT 
+				   public."user".user_name,
+					 public.profile.first_name, 
+					 public.profile.last_name,
+					 public."group".title
+					 FROM
+						"group"
+					 INNER JOIN
+					 public."user"
+					 ON
+					 public."user".user_id = public.group.creator_id
+					 WHERE
+					 group_id = $1`
+	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorUsername, &groupTitle)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return "", err // Return error if failed to insert post
+		return "", "", err // Return error if failed to insert post
 	}
 	// database.AddToNotificationTable()
 	// add to notification table for creator
-	return creatorID, nil
+	return creatorUsername, groupTitle, nil
 }
-
 
 // RespondToRequest responds to a request that already exists in the group_requests table
 func RespondToRequest(response models.GroupResponse) error {

@@ -66,7 +66,7 @@ func sendMessageToWebSocket(conn *websocket.Conn, eventType string, data interfa
 	}
 	fmt.Println(eventType, data)
 	// Format the message payload according to the given event type and data
-	eventMessage := types.Event{
+	eventMessage := types.Notu{
 		Type:    eventType,
 		Payload: data,
 	}

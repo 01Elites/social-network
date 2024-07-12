@@ -11,12 +11,23 @@ type Event struct {
 type Notification struct {
 	Type     string      `json:"type"`
 	Message  string      `json:"message"`
+	ToUser   string      `json:"username,omitempty"`
 	Metadata interface{} `json:"metadata"`
 }
 
 // type FollowRequestMetadata struct {
 // 	UserDetails UserDetails `json:"requester"`
 // }
+
+type GroupRequestMetadata struct {
+	UserDetails UserDetails       `json:"requester"`
+	Group       GroupNotification `json:"group"`
+}
+
+type GroupNotification struct {
+	ID    int    `json:"id"`
+	Title string `json:"title"`
+}
 
 // type comment notification metadata struct
 type CommentMetadata struct {

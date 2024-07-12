@@ -3,15 +3,16 @@ package websocket
 import (
 	"log"
 
+	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
 )
 
 // Global channels for notifications
 var (
 	FollowRequestChan = make(chan types.Notification)
-	GroupInviteChan   = make(chan types.Event)
-	JoinRequestChan   = make(chan types.Event)
-	EventChan         = make(chan types.Event)
+	GroupInviteChan   = make(chan types.Notification)
+	JoinRequestChan   = make(chan types.Notification)
+	EventChan         = make(chan types.Notification)
 )
 
 func ProcessNotifications(user *types.User) {
@@ -31,7 +32,7 @@ func ProcessNotifications(user *types.User) {
 				log.Println("Error sending SEND_MESSAGE to WebSocket:", err)
 			}
 		case GroupInvite := <-GroupInviteChan:
-			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", GroupInvite.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", GroupInvite); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case JoinRequest := <-JoinRequestChan:
@@ -41,11 +42,11 @@ func ProcessNotifications(user *types.User) {
 				log.Println("User not online")
 				return
 			}
-			if err := sendMessageToWebSocket(conn, "NOTIFICATION", JoinRequest.Payload); err != nil {
+			if err := sendMessageToWebSocket(conn, "NOTIFICATION", JoinRequest); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		case Event := <-EventChan:
-			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", Event.Payload); err != nil {
+			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", Event); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 			}
 		}
@@ -64,3 +65,23 @@ func ProcessNotifications(user *types.User) {
 // 	}
 // 	FollowRequestChan <- notification
 // }
+
+func GroupRequestNotification(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile) {
+	notification := types.Notification{
+		Type:    "REQUEST_TO_JOIN_GROUP",
+		Message: "You have a new group request",
+		ToUser:  groupCreator,
+		Metadata: types.GroupRequestMetadata{
+			UserDetails: types.UserDetails{
+				Username:  requester.Username,
+				FirstName: requester.FirstName,
+				LastName:  requester.LastName,
+			},
+			Group: types.GroupNotification{
+				ID:    groupID,
+				Title: GroupTitle,
+			},
+		},
+	}
+	JoinRequestChan <- notification
+}

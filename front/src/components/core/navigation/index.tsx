@@ -1,0 +1,162 @@
+import { A, useNavigate } from '@solidjs/router';
+import { createSignal, For, JSXElement, Show, useContext } from 'solid-js';
+import { showLogin } from '~/components/LoginDialog';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Button, buttonVariants } from '~/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
+import { IconElites, IconElitesSmall } from '~/components/ui/icons/IconElites';
+import IconFlag from '~/components/ui/icons/IconFlag';
+import IconGroup from '~/components/ui/icons/IconGroup';
+import IconHome from '~/components/ui/icons/IconHome';
+import IconLogin from '~/components/ui/icons/IconLogin';
+import IconSettings from '~/components/ui/icons/IconSettings';
+import IconTwoPerson from '~/components/ui/icons/IconTwoPerson';
+import { Separator } from '~/components/ui/separator';
+import config from '~/config';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { fetchWithAuth } from '~/extensions/fetch';
+import { cn } from '~/lib/utils';
+import { showSettings } from '~/pages/settings';
+import { UserDetailsHook } from '~/types/User';
+
+interface NavigationProps {
+  children: JSXElement;
+}
+
+type NavItem = {
+  label: string;
+  href: string;
+  icon?: JSXElement;
+  variant: 'default' | 'ghost';
+};
+
+export default function Navigation(props: NavigationProps): JSXElement {
+  const navigate = useNavigate();
+  const { userDetails, setUserDetails } = useContext(
+    UserDetailsContext,
+  ) as UserDetailsHook;
+
+  const currentPath = window.location.pathname; // Get the current path
+  // eh writing the same line every where? sucks
+  function cpFill(path: string) {
+    return currentPath === path ? 'white' : undefined;
+  }
+
+  // Define the navItems array with default item based on currentPath match
+  const [navItems] = createSignal<NavItem[]>([
+    {
+      label: 'Home',
+      href: '/',
+      icon: <IconHome class='size-4' fill={cpFill('/')} />,
+      variant: currentPath === '/' ? 'default' : 'ghost',
+    },
+    {
+      label: 'Friends',
+      href: '/friends',
+      icon: <IconTwoPerson class='size-4' fill={cpFill('/friends')} />,
+      variant: currentPath === '/friends' ? 'default' : 'ghost',
+    },
+    {
+      label: 'Groups',
+      href: '/groups',
+      icon: <IconGroup class='size-4' fill={cpFill('/groups')} />,
+      variant: currentPath === '/groups' ? 'default' : 'ghost',
+    },
+    {
+      label: 'Events',
+      href: '/events',
+      icon: <IconFlag class='size-4' fill={cpFill('/events')} />,
+      variant: currentPath === '/events' ? 'default' : 'ghost',
+    },
+  ]);
+
+  return (
+    <div class='flex h-screen w-screen flex-row gap-4 p-4'>
+      <nav class='flex min-w-fit max-w-40 flex-col items-center gap-4 overflow-hidden border-r border-border pr-2 md:w-1/4 md:min-w-32'>
+        <div class='mb-4 cursor-pointer'>
+          <IconElites class='hidden h-full w-full md:block' />
+          <IconElitesSmall class='block h-full w-full md:hidden' />
+        </div>
+
+        <For each={navItems()}>
+          {(navItem) => (
+            <A
+              href={navItem.href}
+              class={cn(
+                buttonVariants({ variant: navItem.variant }),
+                'w-fit justify-start gap-2 md:w-full',
+                navItem.variant === 'default' &&
+                  'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
+              )}
+            >
+              {navItem?.icon}
+              <span class='hidden md:block'>{navItem.label}</span>
+            </A>
+          )}
+        </For>
+
+        <Button
+          variant='ghost'
+          class='mt-auto w-fit justify-start gap-2 md:w-full'
+          onClick={showSettings}
+        >
+          <IconSettings class='size-4' />
+          <span class='hidden md:block'>Settings</span>
+        </Button>
+        <Separator />
+        <Show
+          when={userDetails()}
+          fallback={
+            <Button variant='secondary' class='w-full' onClick={showLogin}>
+              <IconLogin class='size-4 justify-start gap-2' />
+              <span class='hidden md:block'>Login</span>
+            </Button>
+          }
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger class='flex w-full flex-row items-center justify-center gap-2 px-2 md:justify-start'>
+              <Avatar>
+                <AvatarImage src={userDetails()?.avatar}></AvatarImage>
+                <AvatarFallback>
+                  {userDetails()?.first_name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span class='hidden md:block'>{userDetails()?.first_name}</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate('/profile');
+                }}
+              >
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  fetchWithAuth(config.API_URL + '/auth/logout', {
+                    method: 'DELETE',
+                  }).finally(() => {
+                    setUserDetails(null);
+                  });
+                }}
+              >
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Show>
+      </nav>
+      <main class='w-full overflow-scroll'>{props.children}</main>
+    </div>
+  );
+}

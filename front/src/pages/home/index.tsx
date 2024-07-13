@@ -8,10 +8,10 @@ import Layout from '../../Layout';
 export default function HomePage(): JSXElement {
   return (
     <Layout>
-      <section class='flex h-full gap-4 px-3'>
-        <HomeEvents class='w-5/12 max-w-60' />
+      <section class='flex h-full gap-4'>
+        <HomeEvents class='hidden w-5/12 max-w-60 md:block' />
         <Feed class='grow overflow-hidden' />
-        <HomeContacts class='w-1/3 max-w-52' />
+        <HomeContacts class='hidden w-1/3 max-w-52 md:block' />
       </section>
     </Layout>
   );

@@ -137,6 +137,10 @@ func CreateFollowRequest(request *models.Request) error {
 			return err
 		}
 		request.Status = "canceled"
+		if err := CancelNotification(request.ID, "follow_request", request.Receiver); err != nil {
+			log.Printf("database: Failed to cancel notification: %v", err)
+			return err
+		}
 		return nil
 	}
 
@@ -190,6 +194,16 @@ func AddToNotificationTable(userID string, notificationType string, relatedID in
 	_, err := DB.Exec(context.Background(), query, userID, notificationType, relatedID, "pending")
 	if err != nil {
 		log.Printf("database: Failed to add notification: %v", err)
+		return err // Return error if failed to insert post
+	}
+	return nil
+}
+
+func CancelNotification(relatedID int, notificationType string, userID string) error {
+	query := `UPDATE notifications SET status = 'canceled' WHERE (related_id = $1 AND type = $2 AND user_id = $3)`
+	_, err := DB.Exec(context.Background(), query, relatedID, notificationType, userID)
+	if err != nil {
+		log.Printf("database: Failed to update response in database: %v", err)
 		return err // Return error if failed to insert post
 	}
 	return nil

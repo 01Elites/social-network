@@ -218,3 +218,31 @@ func CancelEvent(eventID int) error {
 	}
 	return nil
 }
+
+func GetEventOptions(eventID int)([]string, error){
+	var options []string
+	query:=`SELECT name FROM event_option WHERE event_id = $1`
+	rows, err := DB.Query(context.Background(), query, eventID)
+	if err != nil {
+		log.Print("error getting options")
+		return nil, err
+	}
+	for rows.Next(){
+		var option string
+		rows.Scan(&option)
+		options = append(options, option)
+	}
+	return options, nil
+}
+
+func GetEventDetails(eventID int)(string,int, error){
+	var title string
+	var groupID int
+	query:=`SELECT title, group_id FROM event WHERE event_id = $1`
+	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &groupID)
+	if err != nil {
+		log.Print("error scanning title", err)
+		return "",0, err
+	}
+	return title,groupID, nil
+}

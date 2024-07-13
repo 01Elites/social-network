@@ -32,10 +32,6 @@ import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/types/User';
-interface LoginDialogProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}
 
 const loginMessages = [
   'Waste your time here ✨',
@@ -47,12 +43,16 @@ const signUpMessages = [
   'You are just one step away from being a bully 🤩',
 ];
 
-export default function LoginDialog(props: LoginDialogProps): JSXElement {
+const [loginOpen, setLoginOpen] = createSignal(false);
+
+function showLogin() {
+  setLoginOpen(true);
+}
+
+function LoginDialog(): JSXElement {
   const { fetchUserDetails } = useContext(
     UserDetailsContext,
   ) as UserDetailsHook;
-
-  const [showLogin, setShowLogin] = createSignal(true);
 
   const [formProcessing, setFormProcessing] = createSignal(false);
 
@@ -72,7 +72,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         setFormProcessing(false);
         if (res.status === 200) {
           fetchUserDetails();
-          props.setOpen(false);
+          setLoginOpen(false);
           return;
         }
 
@@ -129,7 +129,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             description: 'Your account has been created successfully',
             variant: 'success',
           });
-          setShowLogin(true);
+          setLoginOpen(true);
           setLoginEmail(signupEmail());
           setLoginPassword(signupPassword());
           handleLoginForm();
@@ -155,17 +155,16 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
 
   return (
     <Dialog
-      open={props.open}
+      open={loginOpen()}
       onOpenChange={(isOpen) => {
-        props.setOpen(isOpen);
-        setShowLogin(true);
+        setLoginOpen(isOpen);
       }}
     >
       <DialogContent>
         <DialogHeader>
           <div
             class={
-              showLogin()
+              loginOpen()
                 ? 'flex justify-center'
                 : 'flex justify-center xs:justify-start'
             }
@@ -174,21 +173,21 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
           </div>
           <DialogTitle
             class={
-              showLogin()
+              loginOpen()
                 ? 'text-center text-3xl'
                 : 'text-center text-3xl xs:text-left'
             }
           >
-            {showLogin() ? 'Oh, no life?' : 'Sign Up'}
+            {loginOpen() ? 'Oh, no life?' : 'Sign Up'}
           </DialogTitle>
           <DialogDescription
-            class={showLogin() ? 'text-center' : 'text-center xs:text-left'}
+            class={loginOpen() ? 'text-center' : 'text-center xs:text-left'}
           >
-            {showLogin() ? loginMessages.random() : signUpMessages.random()}
+            {loginOpen() ? loginMessages.random() : signUpMessages.random()}
           </DialogDescription>
         </DialogHeader>
 
-        {showLogin() && (
+        {loginOpen() && (
           <form class='flex flex-col gap-4' onSubmit={handleLoginForm}>
             <Button
               variant='outline'
@@ -238,7 +237,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
               <Button
                 variant='link'
                 class='p-0 text-base underline'
-                onClick={() => setShowLogin(false)}
+                onClick={() => setLoginOpen(false)}
                 disabled={formProcessing()}
               >
                 Sign up for Free
@@ -248,7 +247,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
         )}
 
         {/* Sign up form */}
-        {!showLogin() && (
+        {!loginOpen() && (
           <form
             class='grid w-full grid-cols-1 gap-4 xs:grid-cols-2'
             onSubmit={handleSignupForm}
@@ -374,7 +373,7 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
             <Button
               variant='link'
               class='justify-start p-0 text-base underline'
-              onClick={() => setShowLogin(true)}
+              onClick={() => setLoginOpen(true)}
               disabled={formProcessing()}
             >
               I am already a looser
@@ -385,3 +384,5 @@ export default function LoginDialog(props: LoginDialogProps): JSXElement {
     </Dialog>
   );
 }
+
+export { LoginDialog, showLogin };

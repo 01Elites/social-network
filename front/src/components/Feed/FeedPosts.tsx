@@ -52,7 +52,7 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
   });
 
   return (
-    <div class={cn('flex flex-col gap-4 p-2', props.class)}>
+    <div class={cn('flex flex-col gap-4', props.class)}>
       <Show
         when={posts()}
         fallback={

@@ -4,6 +4,9 @@
 
 @layer base {
   :root {
+    /* The stroke for our elites logo */
+    --logo-fill: 217 33% 17%;
+
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
 
@@ -49,7 +52,10 @@
   }
 
   .dark,
-  [data-kb-theme="dark"] {
+  [data-kb-theme='dark'] {
+    /* The stroke for our elites logo */
+    --logo-fill: 213 27% 84%;
+
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
@@ -103,8 +109,8 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+      'rlig' 1,
+      'calt' 1;
   }
 }
 

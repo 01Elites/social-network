@@ -8,6 +8,8 @@ import (
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
+	"social-network/internal/views/websocket"
+	"social-network/internal/views/websocket/types"
 )
 
 func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,8 +30,8 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "missing required fields", http.StatusBadRequest)
 		return
 	}
-	groupExists := database.CheckGroupID(event.GroupID)
-	if !groupExists {
+	groupTitle, err := database.GetGroupTitle(event.GroupID)
+	if err != nil {
 		helpers.HTTPError(w, "group ID does not exist", http.StatusBadRequest)
 		return
 	}
@@ -39,23 +41,37 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !isMember {
-		helpers.HTTPError(w, "you are not a memeber", http.StatusBadRequest)
+		helpers.HTTPError(w, "you are not a member", http.StatusBadRequest)
 		return
 	}
-
-	var eventID int
-	eventID, err = database.CreateEvent(event.GroupID, userID, event.Title, event.Description, event.EventTime)
+	groupMembers,groupMembersIDs, err := database.GetGroupMembers(event.GroupID)
+	if err != nil {
+		helpers.HTTPError(w, "failed to get group members", http.StatusNotFound)
+		return
+	}
+	eventID, err := database.CreateEvent(event.GroupID, userID, event.Title, event.Description, event.EventTime)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create event", http.StatusNotFound)
 		return
 	}
-
 	err = database.CreateEventOptions(eventID, event.Options)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create event options", http.StatusNotFound)
 		return
 	}
-
+	groupEvent := types.EventDetails{
+		ID:eventID,
+		Title:event.Title,
+		Options: event.Options,
+	}
+	for i,member := range groupMembers{
+	err = database.AddToNotificationTable(groupMembersIDs[i], "event_notification", eventID)
+	if err != nil {
+		log.Println("error adding notification to database")
+			return
+	}
+	websocket.SendGroupEventNotification(database.OrganizeGroupEventRequest(member, groupTitle, event.GroupID, groupEvent))
+}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -90,6 +106,7 @@ func EventResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "error when responding to request", http.StatusNotFound)
 		return
 	}
+	database.UpdateNotificationTable(response.EventID,"accepted","event_notification",userID)
 	w.WriteHeader(http.StatusOK)
 }
 

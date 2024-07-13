@@ -2,7 +2,6 @@ package group
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -109,12 +108,11 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get group post", http.StatusNotFound)
 		return
 	}
-	group.Members, err = database.GetGroupMembers(group.ID)
+	group.Members,_, err = database.GetGroupMembers(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(group.ID)
 	group.Events, err = database.GetGroupEvents(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group events", http.StatusInternalServerError)

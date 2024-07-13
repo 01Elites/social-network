@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	database "social-network/internal/database/querys"
 	"time"
@@ -34,7 +33,6 @@ func ProcessEvents(user *types.User) {
 			continue
 		}
 
-		fmt.Printf("Received message from user %s: %s\n", user.Username, string(rawMessage))
 		// Deserialize the message into the Event struct
 		var message types.Event
 		err = json.Unmarshal(rawMessage, &message)
@@ -42,7 +40,6 @@ func ProcessEvents(user *types.User) {
 			log.Println("Error unmarshalling JSON message into Event struct:", err)
 			return
 		}
-		fmt.Println("message: ", message)
 
 		// Handle the event based on its type
 		switch message.Type {

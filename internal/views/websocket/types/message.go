@@ -19,16 +19,6 @@ type Notification struct {
 // 	UserDetails UserDetails `json:"requester"`
 // }
 
-type GroupRequestMetadata struct {
-	UserDetails UserDetails       `json:"requester"`
-	Group       GroupNotification `json:"group"`
-}
-
-type GroupNotification struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-}
-
 // type comment notification metadata struct
 type CommentMetadata struct {
 	PostID    string    `json:"post_id"`

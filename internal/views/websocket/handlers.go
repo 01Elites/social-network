@@ -52,8 +52,11 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		Conn:     conn,
 	}
 	SetClientOnline(&user)
-
 	go ProcessNotifications(&user)
+	err = SendUsersNotifications(user.ID)
+	if err != nil {
+		log.Printf("error sending notifications:%v", err)
+	}
 	go ProcessEvents(&user)
 }
 

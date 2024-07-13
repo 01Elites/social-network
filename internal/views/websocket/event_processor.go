@@ -40,10 +40,12 @@ func ProcessEvents(user *types.User) {
 
 		// Handle the event based on its type
 		switch message.Type {
-		case event.SEND_MESSAGE:
+		case event.SEND_MESSAGE_TO_USER:
 			// Call function for NOTIFICATION
-			log.Println("SEND_MESSAGE")
 			SendMessage(message, user)
+		case event.SEND_MESSAGE_TO_GROUP:
+			// Call function for NOTIFICATION
+			SendMessageToGroup(message, user)
 		case event.TYPING:
 			// Call function for TYPING
 			// Typing(message, user)
@@ -54,7 +56,7 @@ func ProcessEvents(user *types.User) {
 		// case event.GET_MESSAGES:
 		// 	// GetMessages(message, user)
 		// case event.GET_NOTIFICATIONS:
-			// GetNotifications(message, user)
+		// GetNotifications(message, user)
 		default:
 			log.Println("Unknown event type:", message.Type)
 		}

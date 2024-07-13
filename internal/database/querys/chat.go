@@ -157,7 +157,7 @@ func CreateChat(chatType, userID, recipientID string) (int, error) {
 }
 
 // UpdateChatInDB inserts a new message into the messages table
-func UpdateChatInDB(chatID int, message types.Chat, senderID, recipientID string) error {
+func UpdateChatInDB(chatID int, message types.Chat, senderID string) error {
 	// Insert a new message into the messages table
 	query := `
 	INSERT INTO public.messages (chat_id, user_id, content)

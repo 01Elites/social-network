@@ -2,6 +2,7 @@ package querys
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"social-network/internal/views/websocket/types"
 )
@@ -35,37 +36,40 @@ import (
 // 	FOREIGN KEY (user_id) REFERENCES public.user (user_id) ON DELETE CASCADE
 // );
 
-func HasChat(userID, recipientID string) (bool, error) {
-	// Check if there are any chat messages between the two users
+func HasPrivateChat(userID, recipientID string) (int, error) {
+	// Check if there are any chat messages between the two users and return chat_id if it exists and the chat type is private
 	query := `
-	SELECT chat_id
-	FROM participant
-	WHERE user_id IN ($1, $2)
-	GROUP BY chat_id
-	HAVING COUNT(DISTINCT user_id) = 2;
+	SELECT p.chat_id
+	FROM participant p
+	JOIN chat c ON p.chat_id = c.chat_id
+	WHERE p.user_id IN ($1, $2) AND c.chat_type = 'private'
+	GROUP BY p.chat_id
+	HAVING COUNT(DISTINCT p.user_id) = 2;
 	`
+
+	// Log the query and parameters for debugging
+	// log.Printf("Executing query: %s with parameters userID: %s, recipientID: %s", query, userID, recipientID)
 
 	// Execute the query
 	rows, err := DB.Query(context.Background(), query, userID, recipientID)
 	if err != nil {
 		log.Printf("database: Failed to check chat messages: %v", err)
-		return false, err
+		return 0, err
 	}
 	defer rows.Close()
 
-	// Check if there are any rows returned
-	hasChat := false
-	for rows.Next() {
-		hasChat = true
-		break
+	var chatID int
+	if rows.Next() {
+		if err := rows.Scan(&chatID); err != nil {
+			log.Printf("database: Failed to scan chat ID: %v", err)
+			return 0, err
+		}
+		log.Printf("Found chat ID: %d", chatID)
+		return chatID, nil
 	}
 
-	if err := rows.Err(); err != nil {
-		log.Printf("database: Error iterating over rows: %v", err)
-		return false, err
-	}
-
-	return hasChat, nil
+	log.Printf("No private chat found between users %s and %s", userID, recipientID)
+	return 0, fmt.Errorf("no private chat found between users %s and %s", userID, recipientID)
 }
 
 // CreateChat creates a new chat in the database and assigns the chat ID to the users in the participant table
@@ -104,10 +108,10 @@ func CreateChat(chatType, userID, recipientID string) (int, error) {
 func UpdateChatInDB(chatID int, message types.Chat, senderID, recipientID string) error {
 	// Insert a new message into the messages table
 	query := `
-	INSERT INTO public.messages (chat_id, user_id, content, read)
-	VALUES ($1, $2, $3, $4);
+	INSERT INTO public.messages (chat_id, user_id, content)
+	VALUES ($1, $2, $3);
 	`
-	_, err := DB.Exec(context.Background(), query, chatID, senderID, message.Message, message.Read)
+	_, err := DB.Exec(context.Background(), query, chatID, senderID, message.Message)
 	if err != nil {
 		log.Printf("database: Failed to insert message into database: %v", err)
 		return err

@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	database "social-network/internal/database/querys"
 	"time"
@@ -33,6 +34,7 @@ func ProcessEvents(user *types.User) {
 			continue
 		}
 
+		fmt.Printf("Received message from user %s: %s\n", user.Username, string(rawMessage))
 		// Deserialize the message into the Event struct
 		var message types.Event
 		err = json.Unmarshal(rawMessage, &message)
@@ -40,6 +42,7 @@ func ProcessEvents(user *types.User) {
 			log.Println("Error unmarshalling JSON message into Event struct:", err)
 			return
 		}
+		fmt.Println("message: ", message)
 
 		// Handle the event based on its type
 		switch message.Type {
@@ -105,8 +108,7 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 		log.Println(err, "error unmarshalling message data")
 		return
 	}
-	// Get the user's id by user name
-	userID := user.ID
+
 	// Get the recipient's id by user name
 	recipetsID, err := database.GetUserIDByUserName(message.Recipient)
 	if err != nil {
@@ -121,40 +123,33 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 		return
 	}
 
-	hasChat, err := database.HasChat(userID, recipetsID)
-	if err != nil {
-		log.Println("Error checking if has chat:", err)
-		return
-	}
-	chatID := 0
-	if !hasChat {
-		chatID, err = database.CreateChat("private", userID, recipetsID)
+	// Check if the chat exists
+	chatID, _ := database.HasPrivateChat(user.ID, recipetsID)
+
+	// Create a new chat if it does not exist
+	if chatID == 0 {
+		chatID, err = database.CreateChat("private", user.ID, recipetsID)
 		if err != nil {
 			log.Println("Error creating chat:", err)
 			return
-		} else {
-			hasChat = true
-			// TransferToDMs(user, recipient) // to move the user to the DMs section
 		}
 	}
 
-	// Get the recipient's WebSocket connection
-	recipient, ok := GetClient(message.Recipient)
-	if !ok {
-		log.Printf("Recipient '%s' not found", message.Recipient)
-		return
+	// Get the recipient's client from the Clients map and check if it is online
+	recipient, online := GetClient(message.Recipient)
+	if online {
+		// Check if the recipient's chat is opened
+		if recipient.ChatOpened == user.Username && recipient.Conn != nil {
+			message.Read = true
+		}
 	}
 
-	// Check if the recipient's chat is opened
-	if recipient.ChatOpened == user.Username && recipient.Conn != nil {
-		message.Read = true
-	}
-
+	// Set the message fields
 	message.Sender = user.Username
 	message.Date = time.Now().Format("2006-01-02 15:04:05")
 
 	// Update the chat in the database
-	err = database.UpdateChatInDB(chatID, message, user.ID, recipient.ID)
+	err = database.UpdateChatInDB(chatID, message, user.ID, recipetsID)
 	if err != nil {
 		log.Println("Error updating chat in DataBase:", err)
 		return
@@ -173,22 +168,21 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 		return
 	}
 
-	// Write JSON data to the WebSocket connection
+	// Write JSON data to the WebSocket connection of the user
 	sendMessageToWebSocket(user.Conn, event.GET_MESSAGES, jsonData)
 
-	// Ensure recipient's WebSocket connection is not nil
-	if recipient.Conn == nil {
-		return
+	// Send the message to the recipient if they are online and has connection
+	if online && recipient.Conn != nil {
+		// Write JSON data to the WebSocket connection of the recipient
+		sendMessageToWebSocket(recipient.Conn, event.GET_MESSAGES, jsonData)
+
+		// Update the notification field of the recipient in the UserList
+		if !message.Read {
+			// updateNotification(events.Clients[recipientdb.ID], user.ID, true)
+		}
+
 	}
 
-	// Write JSON data to the WebSocket connection of the recipient
-	sendMessageToWebSocket(recipient.Conn, event.GET_MESSAGES, jsonData)
-
-	// Update the notification field of the recipient in the UserList
-
-	if !message.Read {
-		// updateNotification(events.Clients[recipientdb.ID], user.ID, true)
-	}
 }
 
 func GetClient(userName string) (*types.User, bool) {

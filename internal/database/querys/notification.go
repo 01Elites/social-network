@@ -205,31 +205,73 @@ func UpdateNotificationTable(relatedID int, status string, notificationType stri
 	return nil
 }
 
-func GetUserNotifications(userID string)([]types.Notification, error) {
+func GetUserNotifications(userID string)([]types.Notification,error) {
+	var notifications []types.Notification
 	query := `
 	SELECT 
-			type
+			type,
+			related_id
 	FROM
 			notifications
 	WHERE
 			user_id = $1
-			AND status NOT IN ('accepted', 'rejected', 'canceled');
+			AND status = 'pending';
 `
 rows, err := DB.Query(context.Background(), query, userID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
-		return nil, err // Return error if failed to insert post
-	}
+		return nil,err
+		}
 	for rows.Next(){
 		var notificationType string
-		rows.Scan(&notificationType)
+		var relatedID int
+		rows.Scan(&notificationType, &relatedID)
 		switch notificationType{
 		case "follow_request":
+			
 		case "group_invite":
+
 		case "join_request":
+			notifications = append(notifications, OrganizeGroupRequest(GetGroupRequestData(userID, relatedID)))
 		case "event_notification":
+			notifications = append(notifications,OrganizeGroupEventRequest(GetGroupEventData(userID, relatedID)))
 		}
 	}
-	return nil, nil
+	return notifications, err
 }
 
+func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile)types.Notification{
+	notification := types.Notification{
+		Type:    "REQUEST_TO_JOIN_GROUP",
+		Message: "You have a new group request",
+		ToUser:  groupCreator,
+		Metadata: types.GroupRequestMetadata{
+			UserDetails: types.UserDetails{
+				Username:  requester.Username,
+				FirstName: requester.FirstName,
+				LastName:  requester.LastName,
+			},
+			Group: types.GroupNotification{
+				ID:    groupID,
+				Title: GroupTitle,
+			},
+		},
+	}
+	return notification
+}
+
+func OrganizeGroupEventRequest(member string, groupTitle string, groupID int, groupEvent types.EventDetails)types.Notification {
+	notification := types.Notification{
+		Type:    "EVENT",
+		Message: "You have a new event in the group",
+		ToUser:  member,
+		Metadata: types.GroupEventMetadata{
+			Group: types.GroupNotification{
+				ID:    groupID,
+				Title: groupTitle,
+			},
+			Event: groupEvent,
+		},
+	}
+	return notification
+}

@@ -34,28 +34,30 @@ func CreateGroup(userID string, group models.CreateGroup) (int, error) {
 	return group_id, nil
 }
 
-func GetGroupMembers(groupID int) ([]string, error) {
+func GetGroupMembers(groupID int) ([]string, []string, error) {
 	var users []string
+	var userIDs []string
 	query := `SELECT user_id FROM group_member WHERE group_id = $1`
 	rows, err := DB.Query(context.Background(), query, groupID)
 	if err != nil {
 		log.Printf("database failed to scan group user: %v\n", err)
-		return nil, err
+		return nil, nil, err
 	}
 	for rows.Next() {
 		var userID string
 		if err = rows.Scan(&userID); err != nil {
 			log.Printf("database failed to scan group user: %v\n", err)
-			return nil, err
+			return nil, nil, err
 		}
 		username, err := GetUserNameByID(userID)
 		if err != nil {
 			log.Printf("database failed to get user data: %v\n", err)
-			return nil, err
+			return nil, nil, err
 		}
+		userIDs = append(userIDs, userID)
 		users = append(users, username)
 	}
-	return users, nil
+	return users, userIDs, nil
 }
 
 func GroupMember(userID string, groupID int) (bool, error) {
@@ -98,6 +100,17 @@ func CheckGroupID(groupID int) bool {
 		return false
 	}
 	return true
+}
+
+func GetGroupTitle(groupID int) (string, error) {
+	var groupTitle string
+	query := `SELECT title FROM "group" WHERE group_id = $1`
+	err := DB.QueryRow(context.Background(), query, groupID).Scan(&groupTitle)
+	if err != nil {
+		log.Printf("database failed to get group title: %v\n", err)
+		return "", err
+	}
+	return groupTitle, nil
 }
 
 func GetGroupCreatorID(groupID int) (string, error) {
@@ -218,4 +231,25 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 	}
 
 	return events, nil
+}
+
+func getGroupFromRequest(requestID int) (int, string, error) {
+	var groupID int
+	var groupTitle string
+	query := `SELECT
+						group_id,
+						title
+						FROM
+						group_requests
+						INNER JOIN
+						"group"	USING	(group_id)
+						WHERE
+						request_id = $1
+						`
+	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID,&groupTitle)
+	if err != nil {
+		log.Printf("database failed to scan group user: %v\n", err)
+		return 0, "", err
+	}
+	return groupID, groupTitle, nil
 }

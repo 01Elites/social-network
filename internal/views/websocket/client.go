@@ -8,6 +8,13 @@ import (
 	"social-network/internal/views/websocket/types/event"
 )
 
+func GetClient(userName string) (*types.User, bool) {
+	cmutex.Lock()
+	defer cmutex.Unlock()
+	user, ok := clients[userName]
+	return user, ok
+}
+
 func SetClientOffline(username string) {
 	// Remove the client from the Clients map
 	userID := clients[username].ID
@@ -64,7 +71,7 @@ func updateFollowersUserList(userid string) {
 		log.Print("error getting followers:", err)
 		return
 	}
-	for _,followerUsername := range followers {
+	for _, followerUsername := range followers {
 		if clients[followerUsername] == nil {
 			continue
 		} else {

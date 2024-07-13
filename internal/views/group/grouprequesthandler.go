@@ -62,12 +62,12 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "failed to create request", http.StatusNotFound)
 		return
 	}
-	if requestMade{
+	if requestMade {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode("request already made")
 		return
 	}
-	requestID, groupCreatorID, groupCreator,groupTitle, err := database.CreateRequest(request.GroupID, userID)
+	requestID, groupCreatorID, groupCreator, groupTitle, err := database.CreateRequest(request.GroupID, userID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create request", http.StatusNotFound)
 		return
@@ -80,9 +80,9 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 	err = database.AddToNotificationTable(groupCreatorID, "join_request", requestID)
 	if err != nil {
 		log.Println("error adding notification to database")
-				return
+		return
 	}
-	websocket.GroupRequestNotification(groupCreator, groupCreatorID ,groupTitle, request.GroupID, *requesterProfile)
+	websocket.GroupRequestNotification(groupCreator, groupCreatorID, groupTitle, request.GroupID, *requesterProfile)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(groupCreator)
@@ -141,7 +141,7 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	creatorID, err := database.GetGroupCreatorID(response.GroupID)
-	if err != nil || creatorID != userID{
+	if err != nil || creatorID != userID {
 		helpers.HTTPError(w, "only group creator can respond to request", http.StatusBadRequest)
 		return
 	}

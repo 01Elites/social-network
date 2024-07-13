@@ -3,12 +3,9 @@ package websocket
 import (
 	"encoding/json"
 	"log"
-	database "social-network/internal/database/querys"
-	"time"
 
 	"social-network/internal/views/websocket/types"
 	"social-network/internal/views/websocket/types/event"
-	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -49,15 +46,15 @@ func ProcessEvents(user *types.User) {
 			SendMessage(message, user)
 		case event.TYPING:
 			// Call function for TYPING
-			// Typing(event, user)
+			// Typing(message, user)
 		case event.CHAT_OPENED:
-			// OpenChat(event, user)
+			OpenChat(message, user)
 		case event.CHAT_CLOSED:
-			// CloseChat(user)
-		case event.GET_MESSAGES:
-			// GetMessages(event, user)
-		case event.GET_NOTIFICATIONS:
-			// GetNotifications(event, user)
+			CloseChat(user)
+		// case event.GET_MESSAGES:
+		// 	// GetMessages(message, user)
+		// case event.GET_NOTIFICATIONS:
+			// GetNotifications(message, user)
 		default:
 			log.Println("Unknown event type:", message.Type)
 		}
@@ -90,104 +87,6 @@ func ProcessEvents(user *types.User) {
 // group invitation
 // request to join group
 // event in the group
-
-// SendMessage function
-func SendMessage(RevEvent types.Event, user *types.User) {
-	// Convert map to JSON
-	jsonPayload, err := json.Marshal(RevEvent.Payload)
-	if err != nil {
-		log.Println("Error marshaling payload to JSON:", err)
-		return
-	}
-
-	var message types.Chat
-	if err := json.Unmarshal(jsonPayload, &message); err != nil {
-		log.Println(err, "error unmarshalling message data")
-		return
-	}
-
-	// Get the recipient's id by user name
-	recipetsID, err := database.GetUserIDByUserName(message.Recipient)
-	if err != nil {
-		log.Println(message.Recipient, "not found in database")
-		log.Printf("database: Failed to get recipient: %v", err)
-		return
-	}
-
-	// cheack if message is empty or white space
-	if strings.TrimSpace(message.Message) == "" {
-		log.Println("Message is empty")
-		return
-	}
-
-	// Check if the chat exists
-	chatID, _ := database.HasPrivateChat(user.ID, recipetsID)
-
-	// Create a new chat if it does not exist
-	if chatID == 0 {
-		chatID, err = database.CreateChat("private", user.ID, recipetsID)
-		if err != nil {
-			log.Println("Error creating chat:", err)
-			return
-		}
-	}
-
-	// Get the recipient's client from the Clients map and check if it is online
-	recipient, online := GetClient(message.Recipient)
-	if online {
-		// Check if the recipient's chat is opened
-		if recipient.ChatOpened == user.Username && recipient.Conn != nil {
-			message.Read = true
-		}
-	}
-
-	// Set the message fields
-	message.Sender = user.Username
-	message.Date = time.Now().Format("2006-01-02 15:04:05")
-
-	// Update the chat in the database
-	err = database.UpdateChatInDB(chatID, message, user.ID, recipetsID)
-	if err != nil {
-		log.Println("Error updating chat in DataBase:", err)
-		return
-	}
-	var messageResponse struct {
-		// Index    int          `json:"index"`
-		Messages []types.Chat `json:"messages"`
-	}
-
-	messageResponse.Messages = []types.Chat{message}
-
-	// Convert the message struct to JSON
-	jsonData, err := json.Marshal(messageResponse)
-	if err != nil {
-		log.Println(err, "failed to marshal JSON data")
-		return
-	}
-
-	// Write JSON data to the WebSocket connection of the user
-	sendMessageToWebSocket(user.Conn, event.GET_MESSAGES, jsonData)
-
-	// Send the message to the recipient if they are online and has connection
-	if online && recipient.Conn != nil {
-		// Write JSON data to the WebSocket connection of the recipient
-		sendMessageToWebSocket(recipient.Conn, event.GET_MESSAGES, jsonData)
-
-		// Update the notification field of the recipient in the UserList
-		if !message.Read {
-			// updateNotification(events.Clients[recipientdb.ID], user.ID, true)
-		}
-
-	}
-
-}
-
-func GetClient(userName string) (*types.User, bool) {
-	cmutex.Lock()
-	defer cmutex.Unlock()
-	user, ok := clients[userName]
-	return user, ok
-}
 
 // func TransferToDMs(user, recipient *events.Client) {
 // 	findAndTransferUserToDMs(user, recipient)

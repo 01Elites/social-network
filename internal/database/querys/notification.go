@@ -3,6 +3,7 @@ package querys
 import (
 	"context"
 	"log"
+
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
 )
@@ -52,9 +53,7 @@ func GetUserFollowingUserNames(userID string) ([]string, error) {
 		following = append(following, followedUsername)
 	}
 	return following, nil
-
 }
-
 
 func GetUserFollowerUserNames(userID string) ([]string, error) {
 	var followers []string
@@ -92,7 +91,6 @@ func GetUserFollowerUserNames(userID string) ([]string, error) {
 	return followers, nil
 }
 
-
 func GetUsersFollowees(userID string) (map[string]bool, error) {
 	Followees := make(map[string]bool)
 	query := `SELECT follower_id FROM follower WHERE followed_id = $1`
@@ -112,7 +110,7 @@ func GetUsersFollowees(userID string) (map[string]bool, error) {
 	return Followees, nil
 }
 
-func CreateFollowRequest(request models.Request) (int, error) {
+func CreateFollowRequest(request *models.Request) error {
 	// Check if request already exists
 	query := `
 		SELECT 
@@ -127,7 +125,7 @@ func CreateFollowRequest(request models.Request) (int, error) {
 	err := DB.QueryRow(context.Background(), query, request.Sender, request.Receiver).Scan(&request.ID, &request.Status)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
-		return 0, err // Return error if failed to insert post
+		return err // Return error if failed to insert post
 	}
 
 	// if it is already sent cancel the request by updating the status to canceled
@@ -136,9 +134,10 @@ func CreateFollowRequest(request models.Request) (int, error) {
 		err := DB.QueryRow(context.Background(), query, request.Sender, request.Receiver, request.ID).Scan(&request.ID)
 		if err != nil && err.Error() != "no rows in result set" {
 			log.Printf("database1: Failed to update request in database: %v", err)
-			return 0, err
+			return err
 		}
-		return 0, nil
+		request.Status = "canceled"
+		return nil
 	}
 
 	// Insert request into database
@@ -151,9 +150,10 @@ func CreateFollowRequest(request models.Request) (int, error) {
 	err = DB.QueryRow(context.Background(), query, request.Sender, request.Receiver).Scan(&request.ID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return 0, err // Return error if failed to insert post
+		return err // Return error if failed to insert post
 	}
-	return request.ID, nil
+	request.Status = "pending"
+	return nil
 }
 
 func RespondToFollow(response models.Response) error {
@@ -188,10 +188,10 @@ func AddToNotificationTable(userID string, notificationType string, relatedID in
 	VALUES 
 			($1, $2, $3, $4)`
 	_, err := DB.Exec(context.Background(), query, userID, notificationType, relatedID, "pending")
-		if err != nil {
-			log.Printf("database: Failed to add notification: %v", err)
-			return err // Return error if failed to insert post
-		}
+	if err != nil {
+		log.Printf("database: Failed to add notification: %v", err)
+		return err // Return error if failed to insert post
+	}
 	return nil
 }
 
@@ -205,7 +205,18 @@ func UpdateNotificationTable(relatedID int, status string, notificationType stri
 	return nil
 }
 
-func GetUserNotifications(userID string)([]types.Notification,error) {
+func GetFollowRequest(requestID int) (*models.Request, error) {
+	request := models.Request{ID: requestID}
+	query := `SELECT sender_id, receiver_id, status FROM follow_requests WHERE request_id = $1`
+	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.Status)
+	if err != nil {
+		log.Println("Failed to get follow request")
+		return nil, err
+	}
+	return &request, nil
+}
+
+func GetUserNotifications(userID string) ([]types.Notification, error) {
 	var notifications []types.Notification
 	query := `
 	SELECT 
@@ -217,30 +228,56 @@ func GetUserNotifications(userID string)([]types.Notification,error) {
 			user_id = $1
 			AND status = 'pending';
 `
-rows, err := DB.Query(context.Background(), query, userID)
+	rows, err := DB.Query(context.Background(), query, userID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
-		return nil,err
-		}
-	for rows.Next(){
+		return nil, err
+	}
+	for rows.Next() {
 		var notificationType string
 		var relatedID int
 		rows.Scan(&notificationType, &relatedID)
-		switch notificationType{
+		switch notificationType {
 		case "follow_request":
-			
+			request, err := GetFollowRequest(relatedID)
+			if err != nil {
+				log.Println("Failed to get follow request")
+				continue
+			}
+			followNotification, err := GetFollowRequestNotification(*request)
+			if err != nil {
+				log.Println("Failed to get follow request")
+				continue
+			}
+			notifications = append(notifications, *followNotification)
 		case "group_invite":
 
 		case "join_request":
 			notifications = append(notifications, OrganizeGroupRequest(GetGroupRequestData(userID, relatedID)))
 		case "event_notification":
-			notifications = append(notifications,OrganizeGroupEventRequest(GetGroupEventData(userID, relatedID)))
+			notifications = append(notifications, OrganizeGroupEventRequest(GetGroupEventData(userID, relatedID)))
 		}
 	}
 	return notifications, err
 }
 
-func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile)types.Notification{
+func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile) types.Notification {
+	notification := types.Notification{
+		Type:    "FOLLOW_REQUEST",
+		Message: "You have a new follow request",
+		ToUser:  recieverUsername,
+		Metadata: types.FollowRequestMetadata{
+			UserDetails: types.UserDetails{
+				Username:  sender.Username,
+				FirstName: sender.FirstName,
+				LastName:  sender.LastName,
+			},
+		},
+	}
+	return notification
+}
+
+func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile) types.Notification {
 	notification := types.Notification{
 		Type:    "REQUEST_TO_JOIN_GROUP",
 		Message: "You have a new group request",
@@ -260,7 +297,7 @@ func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, r
 	return notification
 }
 
-func OrganizeGroupEventRequest(member string, groupTitle string, groupID int, groupEvent types.EventDetails)types.Notification {
+func OrganizeGroupEventRequest(member string, groupTitle string, groupID int, groupEvent types.EventDetails) types.Notification {
 	notification := types.Notification{
 		Type:    "EVENT",
 		Message: "You have a new event in the group",

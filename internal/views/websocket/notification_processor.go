@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"log"
+
 	database "social-network/internal/database/querys"
 	"social-network/internal/views/websocket/types"
 )
@@ -21,8 +22,8 @@ func ProcessNotifications(user *types.User) {
 	for {
 		select {
 		case FollowRequest := <-FollowRequestChan:
-			if err := sendMessageToWebSocket(user.Conn, "notificationType1", FollowRequest); err != nil {
-				log.Println("Error sending SEND_MESSAGE to WebSocket:", err)
+			if err := sendMessageToWebSocket(clients[FollowRequest.ToUser].Conn, "NOTIFICATION", FollowRequest); err != nil {
+				log.Println("Error sending follow request notification to WebSocket:", err)
 				return
 			}
 		case GroupInvite := <-GroupInviteChan:
@@ -44,18 +45,16 @@ func ProcessNotifications(user *types.User) {
 	}
 }
 
-// func FollowRequestNotification(request models.Request) {
-// 	notification := types.Notification{
-// 		Type:    "FOILLOW_REQUEST",
-// 		Message: "You have a new follow request",
-// 		Metadata: types.FollowRequestMetadata{
-// 			UserDetails: types.UserDetails{
-// 				Username: request.Sender,
-// 			},
-// 		},
-// 	}
-// 	FollowRequestChan <- notification
-// }
+func SendNotificationToChannel(notification types.Notification, notificationChan chan types.Notification) {
+	if len(clients) == 0 {
+		return
+	}
+	if clients[notification.ToUser] == nil {
+		log.Println("User not online")
+		return
+	}
+	notificationChan <- notification
+}
 
 func SendGroupRequestNotification(notification types.Notification) {
 	if len(clients) == 0 {
@@ -68,34 +67,33 @@ func SendGroupRequestNotification(notification types.Notification) {
 	JoinRequestChan <- notification
 }
 
-
 func SendGroupEventNotification(notification types.Notification) {
 	if len(clients) == 0 {
 		return
 	}
-			if clients[notification.ToUser] == nil {
-				log.Println("User not online")
-				return
-			}
+	if clients[notification.ToUser] == nil {
+		log.Println("User not online")
+		return
+	}
 	EventChan <- notification
 }
 
-func SendUsersNotifications(userID string)error{
+func SendUsersNotifications(userID string) error {
 	notifications, err := database.GetUserNotifications(userID)
 	if err != nil {
 		log.Println("Error getting user notifications:", err)
 		return err
 	}
 	for _, notification := range notifications {
-	switch notification.Type{
-	case "FOLLOW_REQUEST":
-		
-	case "GROUP_INVITATION":
-	case "REQUEST_TO_JOIN_GROUP":
-		SendGroupRequestNotification(notification)
-	case "EVENT":
-		SendGroupEventNotification(notification)
+		switch notification.Type {
+		case "FOLLOW_REQUEST":
+			SendNotificationToChannel(notification, FollowRequestChan)
+		case "GROUP_INVITATION":
+		case "REQUEST_TO_JOIN_GROUP":
+			SendGroupRequestNotification(notification)
+		case "EVENT":
+			SendGroupEventNotification(notification)
+		}
 	}
-}
-return nil
+	return nil
 }

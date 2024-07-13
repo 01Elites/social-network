@@ -15,9 +15,9 @@ type Notification struct {
 	Metadata interface{} `json:"metadata"`
 }
 
-// type FollowRequestMetadata struct {
-// 	UserDetails UserDetails `json:"requester"`
-// }
+type FollowRequestMetadata struct {
+	UserDetails UserDetails `json:"requester"`
+}
 
 // type comment notification metadata struct
 type CommentMetadata struct {

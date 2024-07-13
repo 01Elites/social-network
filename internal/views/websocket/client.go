@@ -8,6 +8,11 @@ import (
 	"social-network/internal/views/websocket/types/event"
 )
 
+func IsUserConnected(username string) bool {
+	_, ok := clients[username]
+	return ok
+}
+
 func GetClient(userName string) (*types.User, bool) {
 	cmutex.Lock()
 	defer cmutex.Unlock()

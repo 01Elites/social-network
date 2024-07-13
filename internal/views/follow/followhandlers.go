@@ -9,6 +9,7 @@ import (
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
+	"social-network/internal/views/websocket"
 )
 
 // FollowHandler creates a follow request for a user. It expects a JSON body with the following format:
@@ -70,21 +71,45 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Check if the receiver account is private or public
-	if isPrivateReceiver {
-		request.ID, err = database.CreateFollowRequest(request)
-		if err != nil {
-			helpers.HTTPError(w, "Something is Wrong with the Follow Request!!", http.StatusBadRequest)
-			return
-		}
-		// websocket.FollowRequestNotification(request)
-	} else {
+	if !isPrivateReceiver {
 		err = database.FollowUser(request)
 		if err != nil {
 			helpers.HTTPError(w, "Something Went Wrong with the Following Request!!", http.StatusBadRequest)
 			return
 		}
-		// Notifications(request , "follow")
-
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	// If the receiver account is private, create a follow request
+	if err := database.CreateFollowRequest(&request); err != nil {
+		helpers.HTTPError(w, "Something is Wrong with the Follow Request!!", http.StatusBadRequest)
+		return
+	}
+	if request.Status != "canceled" {
+		err = database.AddToNotificationTable(request.Receiver, "follow_request", request.ID)
+		if err != nil {
+			log.Println("error adding notification to database:", err)
+			helpers.HTTPError(w, "Something Went Wrong with the Follow Request!!", http.StatusBadRequest)
+			return
+		}
+		recieverUsername, err := database.GetUserNameByID(request.Receiver)
+		if err != nil {
+			log.Println("Error getting user name:", err)
+			helpers.HTTPError(w, "Something Went Wrong with the Follow Request!!", http.StatusBadRequest)
+			return
+		}
+		recieverConnected := websocket.IsUserConnected(recieverUsername)
+		if !recieverConnected {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		notification, err := database.GetFollowRequestNotification(request)
+		if err != nil {
+			log.Println("Failed to get follow request")
+			helpers.HTTPError(w, "Something Went Wrong with the Follow Request!!", http.StatusBadRequest)
+			return
+		}
+		websocket.SendNotificationToChannel(*notification, websocket.FollowRequestChan)
 	}
 	// requestIDjson := struct {
 	// 	ID int `json:"id"`

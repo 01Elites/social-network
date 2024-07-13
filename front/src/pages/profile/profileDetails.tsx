@@ -1,9 +1,9 @@
 import { JSXElement, useContext } from 'solid-js';
-import { AspectRatio } from "~/components/ui/aspect-ratio"
-import { Button } from "~/components/ui/button"
-import follow from "~/assets/icons_svgs/follow.svg"
-import globe from "~/assets/icons_svgs/globe.svg"
-import github from "~/assets/icons_svgs/github.svg"
+import { AspectRatio } from "~/components/ui/aspect-ratio";
+import { Button } from "~/components/ui/button";
+import Follow_Icon from '~/components/ui/icons/follow_icon';
+import Globe_Icon from '~/components/ui/icons/globe_icon';
+import Message_Icon from '~/components/ui/icons/message_icon';
 
 interface params {
   username: string;
@@ -14,7 +14,7 @@ export default function ProfileDetails(params: params): JSXElement {
   return (
     <div class='flex flex-col'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
-        <AspectRatio ratio={16 / 9} class='m-2'> {/* Profile picture */}
+        <AspectRatio ratio={16 / 9}> {/* Profile picture */}
           <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center rounded-lg'>
             IZ NOT HERE
           </div>
@@ -31,30 +31,14 @@ export default function ProfileDetails(params: params): JSXElement {
         </div> {/* Bio */}
         <div class='flex flex-row w-full justify-between gap-2 m-4'>
           <Button class="flex grow" variant="default">
-            <img
-              src={follow}
-              alt='Apps'
-              onClick={() => { }}
-              class='m-2'
-            />Follow
+            <Follow_Icon /> Follow
           </Button>
           <div class='flex gap-2'> {/* Follow button */}
             <Button variant="default">
-              <img
-                src={globe}
-                alt='Apps'
-                onClick={() => { }}
-                class='m-2'
-              />
+              <Globe_Icon class='w-5 justify-center' />
             </Button>
             <Button variant="default">
-              <img
-                src={github}
-                alt='Apps'
-                onClick={() => { }}
-                width={20}
-                class='m-2'
-              />
+              <Message_Icon class='w-5 justify-center' />
             </Button>
           </div> {/* Follow button */}
         </div>

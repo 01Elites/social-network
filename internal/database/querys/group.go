@@ -33,6 +33,16 @@ func CreateGroup(userID string, group models.CreateGroup) (int, error) {
 	return group_id, nil
 }
 
+func CreatGroupChat(groupID int)error{
+		query := `INSERT INTO "chat" (group_id, chat_type) VALUES ($1, $2)`
+		_, err := DB.Exec(context.Background(), query, groupID, "group")
+	if err != nil {
+		log.Printf("database: Failed to insert group into database: %v", err)
+		return err // Return error if failed to insert group member
+	}
+	return nil
+}
+
 func GetGroupMembers(groupID int) ([]string, []string, error) {
 	var users []string
 	var userIDs []string
@@ -163,4 +173,8 @@ func getGroupFromInvitation(invitationID int) (string, int, string, error) {
 		return "", 0, "", err
 	}
 	return invitedUser, groupID, groupTitle, nil
+}
+
+func GetAllGroups(){
+
 }

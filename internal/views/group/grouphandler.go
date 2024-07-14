@@ -50,6 +50,11 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "failed to create group", http.StatusBadRequest)
 		return
 	}
+	err = database.CreatGroupChat(groupID)
+	if err != nil {
+		helpers.HTTPError(w, "failed to create group chat", http.StatusBadRequest)
+		return
+	}
 	groupIDjson := struct {
 		ID int `json:"id"`
 	}{

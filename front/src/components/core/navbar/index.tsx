@@ -1,7 +1,6 @@
 import { useNavigate } from '@solidjs/router';
 import { JSXElement, createSignal, useContext } from 'solid-js';
 import logo from '~/assets/logo.svg';
-import LoginDialog from '~/components/LoginDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import {
@@ -29,10 +28,6 @@ export default function Navbar(props: NavbarProps): JSXElement {
 
   return (
     <>
-      <LoginDialog
-        open={loginDialogVisible()}
-        setOpen={setLoginDialogVisible}
-      />
       <header
         style={{
           width: 'calc(100% - 40px)',
@@ -58,7 +53,7 @@ export default function Navbar(props: NavbarProps): JSXElement {
           <DropdownMenu>
             <DropdownMenuTrigger class='flex flex-row items-center gap-2'>
               <Avatar>
-                <AvatarImage src={userDetails()?.avatar_url}></AvatarImage>
+                <AvatarImage src={userDetails()?.avatar}></AvatarImage>
                 <AvatarFallback>
                   {userDetails()?.first_name.charAt(0).toUpperCase()}
                 </AvatarFallback>

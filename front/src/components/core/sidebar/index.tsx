@@ -1,7 +1,7 @@
 import { showSettings } from '~/pages/settings';
-import IconApps from '../../ui/icons/IconApps';
 import IconFlag from '../../ui/icons/IconFlag';
 import IconGroup from '../../ui/icons/IconGroup';
+import IconHome from '../../ui/icons/IconHome';
 import IconSettings from '../../ui/icons/IconSettings';
 import IconTwoPerson from '../../ui/icons/IconTwoPerson';
 
@@ -14,7 +14,7 @@ export default function SideBar(props: SidebarProps) {
     <div class='flex h-full flex-col'>
       {/* This div is for Navigation */}
       <div class='flex h-full flex-col justify-center gap-10'>
-        <IconApps
+        <IconHome
           class='h-8 w-8 cursor-pointer self-center'
           onClick={() => {
             console.log('apps clicked');

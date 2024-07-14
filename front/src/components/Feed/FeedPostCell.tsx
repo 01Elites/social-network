@@ -12,7 +12,7 @@ interface FeedPostCellProps {
 
 export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
   return (
-    <div class='space-y-4 overflow-hidden rounded-md border-[0.5px] pb-4 shadow-lg'>
+    <div class='space-y-4 overflow-hidden rounded border-[0.5px] pb-4 shadow-lg'>
       <Show when={props.post.image}>
         <AspectRatio ratio={16 / 9}>
           <img
@@ -22,7 +22,7 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
           />
         </AspectRatio>
       </Show>
-      <div class={props.post.image ? 'space-y-4 px-4' : 'space-y-4 px-4 pt-4'}>
+      <div class={props.post.image ? 'space-y-4 px-2' : 'space-y-4 px-2 pt-4'}>
         <div class='flex items-center justify-between'>
           <PostAuthorCell
             author={props.post.poster}

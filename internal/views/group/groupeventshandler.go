@@ -70,7 +70,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("error adding notification to database")
 			return
 	}
-	websocket.SendGroupEventNotification(database.OrganizeGroupEventRequest(member, groupTitle, event.GroupID, groupEvent))
+	websocket.SendNotificationToChannel(database.OrganizeGroupEventRequest(member, groupTitle, event.GroupID, groupEvent), websocket.JoinRequestChan)
 }
 	w.WriteHeader(http.StatusOK)
 }

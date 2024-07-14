@@ -82,7 +82,7 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("error adding notification to database")
 		return
 	}
-	websocket.SendGroupRequestNotification(database.OrganizeGroupRequest(groupCreator, groupTitle, request.GroupID, *requesterProfile))
+	websocket.SendNotificationToChannel(database.OrganizeGroupRequest(groupCreator, groupTitle, request.GroupID, *requesterProfile),websocket.JoinRequestChan)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(groupCreator)

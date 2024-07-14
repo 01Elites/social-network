@@ -56,28 +56,6 @@ func SendNotificationToChannel(notification types.Notification, notificationChan
 	notificationChan <- notification
 }
 
-func SendGroupRequestNotification(notification types.Notification) {
-	if len(clients) == 0 {
-		return
-	}
-	if clients[notification.ToUser] == nil {
-		log.Println("User not online")
-		return
-	}
-	JoinRequestChan <- notification
-}
-
-func SendGroupEventNotification(notification types.Notification) {
-	if len(clients) == 0 {
-		return
-	}
-	if clients[notification.ToUser] == nil {
-		log.Println("User not online")
-		return
-	}
-	EventChan <- notification
-}
-
 func SendUsersNotifications(userID string) error {
 	notifications, err := database.GetUserNotifications(userID)
 	if err != nil {
@@ -90,9 +68,9 @@ func SendUsersNotifications(userID string) error {
 			SendNotificationToChannel(notification, FollowRequestChan)
 		case "GROUP_INVITATION":
 		case "REQUEST_TO_JOIN_GROUP":
-			SendGroupRequestNotification(notification)
+			SendNotificationToChannel(notification, JoinRequestChan)
 		case "EVENT":
-			SendGroupEventNotification(notification)
+			SendNotificationToChannel(notification, EventChan)
 		}
 	}
 	return nil

@@ -67,6 +67,7 @@ func SendUsersNotifications(userID string) error {
 		case "FOLLOW_REQUEST":
 			SendNotificationToChannel(notification, FollowRequestChan)
 		case "GROUP_INVITATION":
+			SendNotificationToChannel(notification, GroupInviteChan)
 		case "REQUEST_TO_JOIN_GROUP":
 			SendNotificationToChannel(notification, JoinRequestChan)
 		case "EVENT":

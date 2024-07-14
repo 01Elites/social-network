@@ -8,6 +8,7 @@ import (
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
+	"social-network/internal/views/websocket"
 )
 
 /*
@@ -70,9 +71,19 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to create invitation", http.StatusNotFound)
 		return
 	}
+	err = database.AddToNotificationTable(userID, "group_invite", inviteID)
+	if err != nil {
+		log.Println("error adding notification to database")
+		return
+	}
+	notification, err := database.GetGroupInvitationData(userID, inviteID)
+		if err != nil {
+			log.Println("Failed to get group invitation")
+			helpers.HTTPError(w, "Something Went Wrong with the group invite!!", http.StatusBadRequest)
+			return
+		}
+	websocket.SendNotificationToChannel(*notification,websocket.GroupInviteChan)
 	w.WriteHeader(http.StatusOK)
-	log.Print(inviteID)
-	// database.AddToNotificationTable(inviteID)
 }
 
 /*

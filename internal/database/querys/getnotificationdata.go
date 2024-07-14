@@ -22,46 +22,69 @@ func GetFollowRequestNotification(request models.Request) (*types.Notification, 
 	return &notification, nil
 }
 
-func GetGroupRequestData(userID string, requestID int) (string, string, int, models.UserProfile) {
-	groupID, groupTitle, err := getGroupFromRequest(requestID)
+func GetGroupRequestData(userID string, requestID int) (*types.Notification, error) {
+	groupID, groupTitle,groupCreatorID, err := getGroupFromRequest(requestID)
 	if err != nil {
 		log.Print("error getting groupID")
-		return "", "", 0, models.UserProfile{}
+		return nil, err
+	}
+	groupCreator, err := GetUserNameByID(groupCreatorID)
+	if err != nil {
+		log.Print("error getting group creator username")
+		return nil, err
 	}
 	user, err := GetUserProfile(userID)
 	if err != nil {
-		log.Print("error getting groupID")
-		return "", "", 0, models.UserProfile{}
+		log.Print("error getting user profile")
+		return nil, err
 	}
-	return user.Username, groupTitle, groupID, *user
+	notification := OrganizeGroupRequest(groupCreator, groupTitle, groupID, *user)
+	return &notification, nil
 }
 
-func GetGroupEventData(userID string, eventID int) (string, string, int, types.EventDetails) {
+func GetGroupEventData(userID string, eventID int) (*types.Notification, error) {
 	username, err := GetUserNameByID(userID)
 	if err != nil {
 		log.Print("failed to get username", err)
-		return "", "", 0, types.EventDetails{}
+		return nil, err
 	}
 
 	options, err := GetEventOptions(eventID)
 	if err != nil {
 		log.Print("error getting event options")
-		return "", "", 0, types.EventDetails{}
+		return nil, err
 	}
 	title, groupID, err := GetEventDetails(eventID)
 	if err != nil {
 		log.Print("error getting event title", err)
-		return "", "", 0, types.EventDetails{}
+		return nil, err
 	}
 	groupTitle, err := GetGroupTitle(groupID)
 	if err != nil {
 		log.Print("error getting group title", err)
-		return "", "", 0, types.EventDetails{}
+		return nil, err
 	}
 	eventDetails := types.EventDetails{
 		ID:      eventID,
 		Title:   title,
 		Options: options,
 	}
-	return username, groupTitle, groupID, eventDetails
+	notification := OrganizeGroupEventRequest(username, groupTitle, groupID, eventDetails)
+	return &notification, nil
+}
+
+
+func GetGroupInvitationData(userID string, invitationID int) (*types.Notification, error) {
+	groupID, groupTitle, err := getGroupFromInvitation(invitationID)
+	if err != nil {
+		log.Print("error getting groupID")
+		return nil, err
+	}
+	user, err := GetUserProfile(userID)
+	if err != nil {
+		log.Print("error getting user profile")
+		return nil, err
+	}
+	notification := OrganizeGroupInvitation(user.Username, groupID,groupTitle)
+	return &notification, nil
 }

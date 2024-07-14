@@ -113,10 +113,10 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
           <TextBreaker text={props.post.content} />
         </p>
 
-        <div class='flex flex-col gap-2 xs:block'>
+        <div class='flex gap-2 xs:block'>
           <Button
             variant='ghost'
-            class='w-full gap-2 xs:w-fit'
+            class='flex-1 gap-2'
             disabled={!userDetails()}
             onClick={handleLike}
           >
@@ -129,7 +129,7 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
 
           <Button
             variant='ghost'
-            class='w-full gap-2 xs:w-fit'
+            class='flex-1 gap-2'
             onClick={() => console.log('// TODO: Implement comments')}
           >
             <IconComments class='size-4' />

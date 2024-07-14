@@ -53,13 +53,13 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	SetClientOnline(&user)
 	go ProcessNotifications(&user)
+	go ProcessEvents(&user)
 
-	// send all the notifications in databse to the user
+	// send all the notifications in database to the user
 	err = SendUsersNotifications(user.ID)
 	if err != nil {
 		log.Printf("error sending notifications:%v", err)
 	}
-	go ProcessEvents(&user)
 }
 
 // Function to send JSON data to a WebSocket connection

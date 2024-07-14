@@ -48,7 +48,6 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 		log.Print("failed to get username", err)
 		return nil, err
 	}
-
 	options, err := GetEventOptions(eventID)
 	if err != nil {
 		log.Print("error getting event options")
@@ -85,6 +84,6 @@ func GetGroupInvitationData(userID string, invitationID int) (*types.Notificatio
 		log.Print("error getting user name")
 		return nil, err
 	}
-	notification := OrganizeGroupInvitation(invitedUser, groupID,groupTitle)
+	notification := OrganizeGroupInvitation(invitedUser, groupID, groupTitle)
 	return &notification, nil
 }

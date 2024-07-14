@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import IconComments from '../ui/icons/IconComments';
 import IconEllipsis from '../ui/icons/IconEllipsis';
 import IconThumb from '../ui/icons/IconThumb';
 import { showToast } from '../ui/toast';
@@ -112,10 +113,10 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
           <TextBreaker text={props.post.content} />
         </p>
 
-        <div>
+        <div class='flex flex-col gap-2 xs:block'>
           <Button
             variant='ghost'
-            class='justify-start gap-2'
+            class='w-full gap-2 xs:w-fit'
             disabled={!userDetails()}
             onClick={handleLike}
           >
@@ -124,6 +125,15 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
               variant={isLiked() ? 'solid' : 'outline'}
             />
             {props.post.likers_usernames?.length ?? 0}
+          </Button>
+
+          <Button
+            variant='ghost'
+            class='w-full gap-2 xs:w-fit'
+            onClick={() => console.log('// TODO: Implement comments')}
+          >
+            <IconComments class='size-4' />
+            {props.post.comments_count}
           </Button>
         </div>
       </div>

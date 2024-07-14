@@ -1,15 +1,12 @@
-import { JSXElement, useContext } from 'solid-js';
+import { JSXElement } from 'solid-js';
 import { AspectRatio } from "~/components/ui/aspect-ratio";
 import { Button } from "~/components/ui/button";
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
+import User from '~/types/User';
 
-interface params {
-  username: string;
-}
-export default function ProfileDetails(params: params): JSXElement {
-
+export default function ProfileDetails(props: { targetUser: () => User }): JSXElement {
 
   return (
     <div class='flex flex-col'> {/* Left div */}
@@ -20,18 +17,18 @@ export default function ProfileDetails(params: params): JSXElement {
           </div>
         </AspectRatio> {/* Profile picture */}
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}
-          <p class='text-2xl font-bold m-2'>{params.username}</p>
+          <p class='text-2xl font-bold m-2'>{props.targetUser().first_name} {props.targetUser().last_name}</p>
           <div class='grid w-full grid-cols-2 text-sm m-2'>
             <p class='flex justify-center'>Followers -2</p>
             <p class='flex justify-center'>Following 9999999</p>
           </div>
         </div> {/* Username, followers, following */}
         <div class='m-4'> {/* Bio */}
-          <p>I am the go-to one stop and the best lorem ipsum you can find in the not sum of the roughsum in the dorem</p>
+          <p>{props.targetUser().about}</p>
         </div> {/* Bio */}
         <div class='flex flex-row w-full justify-between gap-2 m-4'>
           <Button class="flex grow" variant="default">
-            <Follow_Icon /> Follow
+            <Follow_Icon /> {props.targetUser().follow_status === 'following' ? 'Unfollow' : 'Follow'}
           </Button>
           <div class='flex gap-2'> {/* Follow button */}
             <Button variant="default">

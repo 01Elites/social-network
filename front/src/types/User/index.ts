@@ -9,6 +9,7 @@ type User = {
   avatar?: string;
   about?: string;
   profile_privacy: 'public' | 'private';
+  follow_status: string;
 };
 
 interface UserDetailsHook {

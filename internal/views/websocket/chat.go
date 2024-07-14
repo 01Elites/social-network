@@ -183,41 +183,96 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 		if online && recipient.Conn != nil {
 			// Write JSON data to the WebSocket connection of the recipient
 			sendMessageToWebSocket(recipient.Conn, event.GET_MESSAGES, jsonData)
+
+			// Update the notification field of the recipient in the UserList
+			// if !message.Read {
+			// 	updateNotification(events.Clients[recipientdb.ID], user.ID, true)
+			// }
+
 		}
 	}
 }
 
-// // Function to handle the TYPING event type
-// func Typing(RevEvent types.Event, user *types.User) {
-// 	// Convert map to JSON
-// 	jsonPayload, err := json.Marshal(RevEvent.Payload)
-// 	if err != nil {
-// 		log.Println("Error marshaling payload to JSON:", err)
-// 		return
-// 	}
+// Function to handle the TYPING event type
+func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
+	// Convert map to JSON
+	jsonPayload, err := json.Marshal(RevEvent.Payload)
+	if err != nil {
+		log.Println("Error marshaling payload to JSON:", err)
+		return
+	}
 
-// 	// Unmarshal event payload to get recipient
-// 	var payload struct {
-// 		Recipient string `json:"recipient"`
-// 		IsGroup   bool   `json:"is_group"`
-// 	}
-// 	if err := json.Unmarshal(jsonPayload, &payload); err != nil {
-// 		log.Println("Error decoding event payload:", err)
-// 		return
-// 	}
+	var typing types.Typing
 
-// 	if payload.Recipient == "" {
-// 		log.Println("Recipient is empty")
-// 		return
-// 	}
+	if err := json.Unmarshal(jsonPayload, &typing); err != nil {
+		log.Println("Error decoding event typing:", err)
+		return
+	}
 
-// 	// Get the recipient's client from the Clients map
-// 	recipient, online := GetClient(payload.Recipient)
-// 	if online {
-// 		// Write JSON data to the WebSocket connection of the recipient
-// 		sendMessageToWebSocket(recipient.Conn, event.TYPING, user.Username)
-// 	}
-// }
+	if typing.Recipient == "" {
+		log.Println("Recipient is empty")
+		return
+	}
+	if !IsGroup { // if it is a private chat
+
+		_, err := database.GetUserIDByUserName(typing.Recipient)
+		if err != nil {
+			log.Println(typing.Recipient, "not found in database")
+			log.Printf("database: Failed to get recipient: %v", err)
+			return
+		}
+
+		// Get the recipient's client from the Clients map
+		recipient, online := GetClient(typing.Recipient)
+		if online && recipient.Conn != nil {
+
+			typing.Recipient = user.Username
+
+			// Convert the typing struct to JSON
+			jsonData, err := json.Marshal(typing)
+			if err != nil {
+				log.Println(err, "failed to marshal JSON data")
+				return
+			}
+			// Write JSON data to the WebSocket connection of the recipient
+			sendMessageToWebSocket(recipient.Conn, event.TYPING, jsonData)
+		}
+	} else { // if it is a group chat
+		groupID, err := strconv.Atoi(typing.Recipient)
+		if err != nil {
+			log.Println(typing.Recipient, "not a valid group ID")
+			log.Printf("Error converting group ID to int: %v", err)
+			return
+		}
+		members, _, err := database.GetGroupMembers(groupID)
+		if err != nil {
+			log.Println("Error getting group members:", err)
+			return
+		}
+		var GroupTyping struct {
+			Recipient string `json:"recipient"`
+			GroupID   string `json:"group_id"`
+		}
+		GroupTyping.Recipient = user.Username
+		GroupTyping.GroupID = typing.Recipient
+
+		// Convert the typing struct to JSON
+		jsonData, err := json.Marshal(GroupTyping)
+		if err != nil {
+			log.Println(err, "failed to marshal JSON data")
+			return
+		}
+
+		for _, member := range members {
+			// Get the recipient's client from the Clients map
+			recipient, online := GetClient(member)
+			if online && recipient.Conn != nil {
+				// Write JSON data to the WebSocket connection of the recipient
+				sendMessageToWebSocket(recipient.Conn, event.TYPING, jsonData)
+			}
+		}
+	}
+}
 
 // Function to handle the CHAT_OPENED event type
 func OpenChat(RevEvent types.Event, user *types.User) {

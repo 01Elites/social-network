@@ -40,19 +40,30 @@ func ProcessEvents(user *types.User) {
 
 		// Handle the event based on its type
 		switch message.Type {
-		case event.SEND_MESSAGE_TO_USER:
-			// Call function for NOTIFICATION
-			SendMessage(message, user)
-		case event.SEND_MESSAGE_TO_GROUP:
-			// Call function for NOTIFICATION
-			SendMessageToGroup(message, user)
-		case event.TYPING:
-			// Call function for TYPING
-			// Typing(message, user)
+
 		case event.CHAT_OPENED:
 			OpenChat(message, user)
 		case event.CHAT_CLOSED:
 			CloseChat(user)
+		case event.SEND_MESSAGE:
+			// Call function for NOTIFICATION
+			if user.ChatOpened == "" {
+				return
+			} else if user.ChatOpenedIsGroup {
+				SendMessageToGroup(message, user)
+			} else {
+				SendMessage(message, user)
+			}
+		case event.TYPING:
+			// Call function for TYPING
+			if user.ChatOpened == "" {
+				return
+			} else if user.ChatOpenedIsGroup {
+				Typing(message, user, true)
+			} else {
+				Typing(message, user, false)
+			}
+
 		// case event.GET_MESSAGES:
 		// 	// GetMessages(message, user)
 		// case event.GET_NOTIFICATIONS:

@@ -1,13 +1,13 @@
 package event
 
 const (
-	// SEND_MESSAGE      = "SEND_MESSAGE"
+	SEND_MESSAGE = "SEND_MESSAGE"
 
 	// User events
-	SEND_MESSAGE_TO_USER = "SEND_MESSAGE_TO_USER"
+	// SEND_MESSAGE_TO_USER = "SEND_MESSAGE_TO_USER"
 
-	// Group events
-	SEND_MESSAGE_TO_GROUP = "SEND_MESSAGE_TO_GROUP"
+	// // Group events
+	// SEND_MESSAGE_TO_GROUP = "SEND_MESSAGE_TO_GROUP"
 
 	// chat events
 	TYPING       = "TYPING"

@@ -7,17 +7,17 @@ interface Array<T> {
    * Removes the first occurrence of a specific object from the array.
    * @param item The item to remove from the array.
    */
-  remove(item: T): boolean;
+  remove(item: T): T[];
 }
 
-Array.prototype.random = function <T>(): T {
+Array.prototype.random = function <T>() {
   const randomIndex = Math.floor(Math.random() * this.length);
   return this[randomIndex];
 };
 
-Array.prototype.remove = function <T>(item: T): boolean {
+Array.prototype.remove = function <T>(item: T) {
   const index = this.indexOf(item);
-  if (index === -1) return false;
+  if (index === -1) return this;
   this.splice(index, 1);
-  return true;
+  return this;
 };

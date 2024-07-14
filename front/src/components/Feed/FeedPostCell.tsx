@@ -1,6 +1,7 @@
 import { JSXElement, Show, useContext } from 'solid-js';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { fetchWithAuth } from '~/extensions/fetch';
 import { Post } from '~/types/Post';
 import { UserDetailsHook } from '~/types/User';
 import TextBreaker from '../core/textbreaker';
@@ -16,9 +17,11 @@ import {
 } from '../ui/dropdown-menu';
 import IconEllipsis from '../ui/icons/IconEllipsis';
 import IconThumb from '../ui/icons/IconThumb';
+import { showToast } from '../ui/toast';
 
 interface FeedPostCellProps {
   post: Post;
+  updatePost: (updatedPost: Post) => void;
 }
 
 export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
@@ -28,6 +31,46 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
     return props.post.likers_usernames?.includes(
       userDetails()?.user_name ?? '',
     );
+  }
+
+  function handleLike() {
+    fetchWithAuth(`${config.API_URL}/post/${props.post.post_id}/like`, {
+      method: 'POST',
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(
+            body.reason ?? 'An error occurred while (un)liking the post',
+          );
+        }
+      })
+      .catch((err) => {
+        showToast({
+          title: 'Error (un)liking post',
+          description: err.message,
+          variant: 'error',
+        });
+      });
+
+    if (isLiked()) {
+      props.updatePost({
+        ...props.post,
+        likers_usernames: props.post.likers_usernames?.remove(
+          userDetails()?.user_name!,
+        ),
+      });
+    } else {
+      const currentUser = userDetails()?.user_name!;
+      const newLikers = props.post.likers_usernames
+        ? [...props.post.likers_usernames, currentUser]
+        : [currentUser];
+
+      props.updatePost({
+        ...props.post,
+        likers_usernames: newLikers,
+      });
+    }
   }
 
   return (
@@ -74,18 +117,7 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
             variant='ghost'
             class='justify-start gap-2'
             disabled={!userDetails()}
-            onClick={() => {
-              console.log('like');
-              if (isLiked()) {
-                props.post.likers_usernames?.remove(userDetails()?.user_name!);
-              } else {
-                if (!props.post.likers_usernames) {
-                  props.post.likers_usernames = [];
-                }
-                props.post.likers_usernames?.push(userDetails()?.user_name!);
-              }
-              console.log(props.post.likers_usernames);
-            }}
+            onClick={handleLike}
           >
             <IconThumb
               class='size-4'

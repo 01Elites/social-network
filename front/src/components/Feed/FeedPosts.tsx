@@ -25,6 +25,13 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const [posts, setPosts] = createSignal<Post[]>();
 
+  function updatePost(updatedPost: Post) {
+    const updatedPosts = posts()?.map((post) =>
+      post.post_id === updatedPost.post_id ? updatedPost : post,
+    );
+    setPosts(updatedPosts);
+  }
+
   createEffect(() => {
     if (!userDetails()) return;
     fetchWithAuth(config.API_URL + '/posts')
@@ -78,7 +85,9 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
             Maybe you could post some{' '}
           </p>
         </Show>
-        <For each={posts()}>{(post) => <FeedPostCell post={post} />}</For>
+        <For each={posts()}>
+          {(post) => <FeedPostCell post={post} updatePost={updatePost} />}
+        </For>
       </Show>
     </div>
   );

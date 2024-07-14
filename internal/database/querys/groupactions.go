@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"social-network/internal/models"
-	"time"
 )
 
 // CreateInvite adds an invitation to the group_invitations table
@@ -88,10 +87,9 @@ func CheckForGroupRequest(groupID int, senderID string) (bool, error) {
 }
 
 // CreateRequest adds a request to the group_requests table
-func CreateRequest(groupID int, senderID string) (int, string, string, string, error) {
+func CreateRequest(groupID int, senderID string) (int, string, string, error) {
 	var creatorUsername string
 	var creatorID string
-	var groupTitle string
 	var requestID int
 	query := `
     INSERT INTO
@@ -104,12 +102,11 @@ func CreateRequest(groupID int, senderID string) (int, string, string, string, e
 	err := DB.QueryRow(context.Background(), query, groupID, senderID).Scan(&requestID)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return 0, "", "","", err // Return error if failed to insert post
+		return 0, "", "", err // Return error if failed to insert post
 	}
 	query = `SELECT 
 					 public."group".creator_id,
-				   public."user".user_name,
-					 public."group".title
+				   public."user".user_name
 					 FROM
 						"group"
 					 INNER JOIN
@@ -118,14 +115,14 @@ func CreateRequest(groupID int, senderID string) (int, string, string, string, e
 					 public."user".user_id = public.group.creator_id
 					 WHERE
 					 group_id = $1`
-	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID, &creatorUsername, &groupTitle)
+	err = DB.QueryRow(context.Background(), query, groupID).Scan(&creatorID, &creatorUsername)
 	if err != nil {
 		log.Printf("database: Failed to insert request into database: %v", err)
-		return 0, "", "","", err // Return error if failed to insert post
+		return 0, "", "", err // Return error if failed to insert post
 	}
 	// database.AddToNotificationTable()
 	// add to notification table for creator
-	return requestID, creatorID, creatorUsername, groupTitle, nil
+	return requestID, creatorID, creatorUsername, nil
 }
 
 // RespondToRequest responds to a request that already exists in the group_requests table
@@ -161,88 +158,4 @@ func CancelRequest(GroupID int, userID string) (int, error) {
 	}
 	
 	return requestID, nil
-}
-
-func CreateEvent(GroupID int, userID string, Title string, Description string, Eventdate time.Time) (int, error) {
-	var eventID int
-	query := `INSERT INTO event (group_id, creator_id, title, description, event_date) 
-	          VALUES ($1, $2, $3, $4, $5) RETURNING event_id`
-	err := DB.QueryRow(context.Background(), query, GroupID, userID, Title, Description, Eventdate).Scan(&eventID)
-	if err != nil {
-		log.Printf("database: Failed to create event: %v", err)
-		return 0, err
-	}
-	return eventID, nil
-}
-
-func CreateEventOptions(eventID int, options []string) error {
-	query := `INSERT INTO event_option (event_id, name) VALUES ($1, $2)`
-	for _, option := range options {
-		_, err := DB.Exec(context.Background(), query, eventID, option)
-		if err != nil {
-			log.Printf("database: Failed to create event options: %v", err)
-			return err
-		}
-	}
-	return nil
-}
-
-func RespondToEvent(response models.EventResp, userID string) error {
-	query := `INSERT INTO user_choice (event_id,user_id,option_id) VALUES ($1,$2,$3)`
-	_, err := DB.Exec(context.Background(), query, response.EventID, userID, response.OptionID)
-	if err != nil {
-		log.Printf("database: Failed to respond to event: %v", err)
-		return err
-	}
-	return nil
-}
-
-func CancelEvent(eventID int) error {
-	query := `DELETE FROM user_choice WHERE event_id = $1`
-	_, err := DB.Exec(context.Background(), query, eventID)
-	if err != nil {
-		log.Printf("database: Failed to cancel event: %v", err)
-		return err
-	}
-	query = `DELETE FROM event_option WHERE event_id = $1`
-	_, err = DB.Exec(context.Background(), query, eventID)
-	if err != nil {
-		log.Printf("database: Failed to cancel event: %v", err)
-		return err
-	}
-	query = `DELETE FROM event WHERE event_id = $1`
-	_, err = DB.Exec(context.Background(), query, eventID)
-	if err != nil {
-		log.Printf("database: Failed to cancel event: %v", err)
-		return err
-	}
-	return nil
-}
-
-func GetEventOptions(eventID int)([]string, error){
-	var options []string
-	query:=`SELECT name FROM event_option WHERE event_id = $1`
-	rows, err := DB.Query(context.Background(), query, eventID)
-	if err != nil {
-		log.Print("error getting options")
-		return nil, err
-	}
-	for rows.Next(){
-		var option string
-		rows.Scan(&option)
-		options = append(options, option)
-	}
-	return options, nil
-}
-
-func GetEventDetails(eventID int)(string,int, error){
-	var title string
-	var groupID int
-	query:=`SELECT title, group_id FROM event WHERE event_id = $1`
-	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &groupID)
-	if err != nil {
-		log.Print("error scanning title", err)
-		return "",0, err
-	}
-	return title,groupID, nil
 }

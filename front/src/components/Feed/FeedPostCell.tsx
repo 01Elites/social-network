@@ -19,6 +19,7 @@ import IconComments from '../ui/icons/IconComments';
 import IconEllipsis from '../ui/icons/IconEllipsis';
 import IconThumb from '../ui/icons/IconThumb';
 import { showToast } from '../ui/toast';
+import { showComments } from './PostCommentsDialog';
 
 interface FeedPostCellProps {
   post: Post;
@@ -130,7 +131,7 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
           <Button
             variant='ghost'
             class='flex-1 gap-2'
-            onClick={() => console.log('// TODO: Implement comments')}
+            onClick={() => showComments(props.post)}
           >
             <IconComments class='size-4' />
             {props.post.comments_count}

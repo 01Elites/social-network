@@ -16,6 +16,7 @@ import Repeat from '../core/repeat';
 import { Skeleton } from '../ui/skeleton';
 import { showToast } from '../ui/toast';
 import FeedPostCell from './FeedPostCell';
+import { PostCommentsDialog } from './PostCommentsDialog';
 
 interface FeedPostsProps {
   class?: string;
@@ -60,6 +61,7 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
 
   return (
     <div class={cn('flex flex-col gap-4', props.class)}>
+      <PostCommentsDialog />
       <Show
         when={posts()}
         fallback={

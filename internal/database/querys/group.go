@@ -142,10 +142,12 @@ func getGroupFromRequest(requestID int) (int, string, string, error) {
 	return groupID, groupTitle, creator_id, nil
 }
 
-func getGroupFromInvitation(invitationID int) (int, string, error) {
+func getGroupFromInvitation(invitationID int) (string, int, string, error) {
 	var groupID int
 	var groupTitle string
+	var invitedUser string
 	query := `SELECT
+						receiver_id,
 						group_id,
 						title
 						FROM
@@ -155,10 +157,10 @@ func getGroupFromInvitation(invitationID int) (int, string, error) {
 						WHERE
 						invitation_id = $1
 						`
-	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&groupID, &groupTitle)
+	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser,&groupID, &groupTitle)
 	if err != nil {
 		log.Printf("database failed to scan group user: %v\n", err)
-		return 0, "", err
+		return "", 0, "", err
 	}
-	return groupID, groupTitle, nil
+	return invitedUser, groupID, groupTitle, nil
 }

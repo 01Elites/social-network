@@ -71,7 +71,7 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to create invitation", http.StatusNotFound)
 		return
 	}
-	err = database.AddToNotificationTable(userID, "group_invite", inviteID)
+	err = database.AddToNotificationTable(invite.ReceiverID, "group_invite", inviteID)
 	if err != nil {
 		log.Println("error adding notification to database")
 		return
@@ -113,7 +113,7 @@ func InvitationResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if response.Status != "accepted" && response.Status != "rejected" {
-		helpers.HTTPError(w, "status can only be rejected or accepted", http.StatusBadRequest)
+		helpers.HTTPError(w, "response can only be rejected or accepted", http.StatusBadRequest)
 		return
 	}
 	groupExists := database.CheckGroupID(response.GroupID)
@@ -131,9 +131,14 @@ func InvitationResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "user already a member", http.StatusBadRequest)
 		return
 	}
-	err = database.RespondToInvite(response, userID)
+	inviteID, err := database.RespondToInvite(response, userID)
 	if err != nil {
 		helpers.HTTPError(w, "Failed to respond to invite", http.StatusNotFound)
+		return
+	}
+	err = database.UpdateNotificationTable(inviteID, response.Status, "group_invite", userID)
+	if err != nil {
+		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

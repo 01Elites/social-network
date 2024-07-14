@@ -75,16 +75,16 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 
 
 func GetGroupInvitationData(userID string, invitationID int) (*types.Notification, error) {
-	groupID, groupTitle, err := getGroupFromInvitation(invitationID)
+	invitedUserID,groupID, groupTitle, err := getGroupFromInvitation(invitationID)
 	if err != nil {
 		log.Print("error getting groupID")
 		return nil, err
 	}
-	user, err := GetUserProfile(userID)
+	invitedUser, err := GetUserNameByID(invitedUserID)
 	if err != nil {
-		log.Print("error getting user profile")
+		log.Print("error getting user name")
 		return nil, err
 	}
-	notification := OrganizeGroupInvitation(user.Username, groupID,groupTitle)
+	notification := OrganizeGroupInvitation(invitedUser, groupID,groupTitle)
 	return &notification, nil
 }

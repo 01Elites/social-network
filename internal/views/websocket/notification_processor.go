@@ -27,7 +27,7 @@ func ProcessNotifications(user *types.User) {
 				return
 			}
 		case GroupInvite := <-GroupInviteChan:
-			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", GroupInvite); err != nil {
+			if err := sendMessageToWebSocket(clients[GroupInvite.ToUser].Conn, "NOTIFICATION", GroupInvite); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 				return
 			}
@@ -37,7 +37,7 @@ func ProcessNotifications(user *types.User) {
 				return
 			}
 		case Event := <-EventChan:
-			if err := sendMessageToWebSocket(user.Conn, "NOTIFICATION", Event); err != nil {
+			if err := sendMessageToWebSocket(clients[Event.ToUser].Conn, "NOTIFICATION", Event); err != nil {
 				log.Println("Error sending TYPING to WebSocket:", err)
 				return
 			}

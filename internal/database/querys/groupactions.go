@@ -44,12 +44,13 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 }
 
 // RespondToInvite responds to an invitation that already exists in the group_invitations table
-func RespondToInvite(response models.GroupResponse, userID string) error {
-	query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending'`
-	_, err := DB.Exec(context.Background(), query, response.Status, response.GroupID, userID)
+func RespondToInvite(response models.GroupResponse, userID string) (int,error) {
+	var inviteID int
+	query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending' RETURNING invitation_id`
+	err := DB.QueryRow(context.Background(), query, response.Status, response.GroupID, userID).Scan(&inviteID)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)
-		return err // Return error if failed to update response
+		return 0, err // Return error if failed to update response
 	}
 	if response.Status == "accepted" {
 		query = `INSERT INTO
@@ -59,10 +60,10 @@ func RespondToInvite(response models.GroupResponse, userID string) error {
 		_, err = DB.Exec(context.Background(), query, userID, response.GroupID)
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
-			return err // Return error if failed to insert group member
+			return 0, err // Return error if failed to insert group member
 		}
 	}
-	return nil
+	return inviteID, nil
 }
 
 func CheckForGroupRequest(groupID int, senderID string) (bool, error) {

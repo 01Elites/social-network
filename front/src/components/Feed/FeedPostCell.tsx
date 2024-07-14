@@ -1,16 +1,35 @@
-import { JSXElement, Show } from 'solid-js';
+import { JSXElement, Show, useContext } from 'solid-js';
 import config from '~/config';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { Post } from '~/types/Post';
+import { UserDetailsHook } from '~/types/User';
 import TextBreaker from '../core/textbreaker';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
-import { DropdownMenu, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Button, buttonVariants } from '../ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import IconEllipsis from '../ui/icons/IconEllipsis';
+import IconThumb from '../ui/icons/IconThumb';
 
 interface FeedPostCellProps {
   post: Post;
 }
 
 export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
+  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+
+  function isLiked() {
+    return props.post.likers_usernames?.includes(
+      userDetails()?.user_name ?? '',
+    );
+  }
+
   return (
     <div class='space-y-4 overflow-hidden rounded border-[0.5px] pb-4 shadow-lg'>
       <Show when={props.post.image}>
@@ -29,12 +48,52 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
             date={new Date(props.post.creation_date)}
           />
           <DropdownMenu>
-            <DropdownMenuTrigger>{}</DropdownMenuTrigger>
+            <DropdownMenuTrigger class={buttonVariants({ variant: 'ghost' })}>
+              <IconEllipsis
+                class='size-4'
+                fill='hsl(var(--muted-foreground))'
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={console.log}>
+                <span class='w-full'>Report</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={console.log}>
+                <span class='w-full text-error-foreground'>Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <p class='break-words'>
+        <p class='text- break-words text-primary/70'>
           <TextBreaker text={props.post.content} />
         </p>
+
+        <div>
+          <Button
+            variant='ghost'
+            class='justify-start gap-2'
+            disabled={!userDetails()}
+            onClick={() => {
+              console.log('like');
+              if (isLiked()) {
+                props.post.likers_usernames?.remove(userDetails()?.user_name!);
+              } else {
+                if (!props.post.likers_usernames) {
+                  props.post.likers_usernames = [];
+                }
+                props.post.likers_usernames?.push(userDetails()?.user_name!);
+              }
+              console.log(props.post.likers_usernames);
+            }}
+          >
+            <IconThumb
+              class='size-4'
+              variant={isLiked() ? 'solid' : 'outline'}
+            />
+            {props.post.likers_usernames?.length ?? 0}
+          </Button>
+        </div>
       </div>
     </div>
   );

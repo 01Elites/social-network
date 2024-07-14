@@ -53,6 +53,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	SetClientOnline(&user)
 	go ProcessNotifications(&user)
+
+	// send all the notifications in databse to the user
 	err = SendUsersNotifications(user.ID)
 	if err != nil {
 		log.Printf("error sending notifications:%v", err)

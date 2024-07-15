@@ -35,24 +35,39 @@ func SetClientOnline(user *types.User) {
 	clients[user.Username] = user
 	cmutex.Unlock()
 	sendUserList(user)
+	dmUserList(user)
 	updateFollowersUserList(user.ID)
 }
 
-func sendUserList(user *types.User) {
-	// Get the list of users
-	followingUserNames, err := database.GetUserFollowingUserNames(user.ID)
+func dmUserList(user *types.User) {
+	usernames, err := database.GetPrivateChatUsernames(user.ID)
 	if err != nil {
-		log.Println("Error getting users following:", err)
+		log.Println("Error getting direct message users:", err)
 		return
 	}
-	listSection := types.Section{
-		Name: "Following",
+	listSection := buildUserListSection("Direct Messages", usernames)
+	sendMessageToWebSocket(user, event.USERLIST, listSection)
+}
+
+func sendUserList(user *types.User) {
+	usernames, err := database.GetUserFollowingUserNames(user.ID)
+	if err != nil {
+		log.Println("Error getting following users:", err)
+		return
 	}
-	for _, username := range followingUserNames {
+	listSection := buildUserListSection("Following", usernames)
+	sendMessageToWebSocket(user, event.USERLIST, listSection)
+}
+
+func buildUserListSection(sectionName string, usernames []string) types.Section {
+	listSection := types.Section{
+		Name: sectionName,
+	}
+	for _, username := range usernames {
 		userProfile, err := database.GetUserProfileByUserName(username)
 		if err != nil {
-			log.Println("Error getting user profile:", err)
-			return
+			log.Printf("Error getting user profile for %s: %v", username, err)
+			continue
 		}
 		userDetails := types.UserDetails{
 			Username:  userProfile.Username,
@@ -66,8 +81,7 @@ func sendUserList(user *types.User) {
 		}
 		listSection.Users = append(listSection.Users, userDetails)
 	}
-	// // Send the list of users to the client
-	sendMessageToWebSocket(user, event.USERLIST, listSection)
+	return listSection
 }
 
 func updateFollowersUserList(userid string) {
@@ -77,9 +91,7 @@ func updateFollowersUserList(userid string) {
 		return
 	}
 	for _, followerUsername := range followers {
-		if clients[followerUsername] == nil {
-			continue
-		} else {
+		if clients[followerUsername] != nil {
 			sendUserList(clients[followerUsername])
 		}
 	}

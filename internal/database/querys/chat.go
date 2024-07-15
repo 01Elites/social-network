@@ -7,6 +7,51 @@ import (
 	"social-network/internal/views/websocket/types"
 )
 
+func GetPrivateChatUsernames(userID string) ([]string, error) {
+	query := `
+	SELECT 
+			p.user_id,
+			u.user_name
+	FROM 
+			chat c
+	INNER JOIN 
+			participant p ON p.chat_id = c.chat_id
+	INNER JOIN
+			"user" u ON p.user_id = u.user_id
+	WHERE 
+			c.chat_type = 'private'
+			AND c.chat_id IN (
+					SELECT 
+							chat_id 
+					FROM 
+							participant 
+					WHERE 
+							user_id = $1
+			)
+			AND p.user_id != $1
+	`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("database: Failed to get private chat usernames: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var usernames []string
+	for rows.Next() {
+		var username string
+		if err := rows.Scan(&userID, &username); err != nil {
+			log.Printf("database: Failed to scan private chat usernames: %v", err)
+			return nil, err
+		}
+		usernames = append(usernames, username)
+	}
+	if err := rows.Err(); err != nil {
+		log.Printf("database: Failed to iterate over private chat usernames: %v", err)
+		return nil, err
+	}
+	return usernames, nil
+}
+
 // CREATE TABLE public.chat (
 // 	chat_id       SERIAL PRIMARY KEY,
 // 	chat_type     public.chat_type NOT NULL,

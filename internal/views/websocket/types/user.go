@@ -1,6 +1,10 @@
 package types
 
-import "github.com/gorilla/websocket"
+import (
+	"sync"
+
+	"github.com/gorilla/websocket"
+)
 
 type Section struct {
 	Name  string        `json:"name"`
@@ -11,6 +15,7 @@ type User struct {
 	ID                string          `json:"-"`
 	Username          string          `json:"username"`
 	Conn              *websocket.Conn `json:"-"`
+	Mutex             *sync.Mutex     `json:"-"`
 	ChatOpened        string          `json:"-"`
 	ChatOpenedIsGroup bool            `json:"-"`
 }

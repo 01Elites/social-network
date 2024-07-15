@@ -67,7 +67,7 @@ func sendUserList(user *types.User) {
 		listSection.Users = append(listSection.Users, userDetails)
 	}
 	// // Send the list of users to the client
-	sendMessageToWebSocket(user.Conn, event.USERLIST, listSection)
+	sendMessageToWebSocket(user, event.USERLIST, listSection)
 }
 
 func updateFollowersUserList(userid string) {

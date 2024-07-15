@@ -85,12 +85,12 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 	}
 
 	// Write JSON data to the WebSocket connection of the user
-	sendMessageToWebSocket(user.Conn, event.GET_MESSAGES, jsonData)
+	sendMessageToWebSocket(user, event.GET_MESSAGES, jsonData)
 
 	// Send the message to the recipient if they are online and has connection
 	if online && recipient.Conn != nil {
 		// Write JSON data to the WebSocket connection of the recipient
-		sendMessageToWebSocket(recipient.Conn, event.GET_MESSAGES, jsonData)
+		sendMessageToWebSocket(recipient, event.GET_MESSAGES, jsonData)
 
 		// Update the notification field of the recipient in the UserList
 		// if !message.Read {
@@ -167,7 +167,7 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 	}
 
 	// Write JSON data to the WebSocket connection of the user
-	sendMessageToWebSocket(user.Conn, event.GET_MESSAGES, jsonData)
+	sendMessageToWebSocket(user, event.GET_MESSAGES, jsonData)
 
 	// Send the message to the group members if they are online and has
 	// connection
@@ -182,7 +182,7 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 		recipient, online := GetClient(member)
 		if online && recipient.Conn != nil {
 			// Write JSON data to the WebSocket connection of the recipient
-			sendMessageToWebSocket(recipient.Conn, event.GET_MESSAGES, jsonData)
+			sendMessageToWebSocket(recipient, event.GET_MESSAGES, jsonData)
 
 			// Update the notification field of the recipient in the UserList
 			// if !message.Read {
@@ -235,7 +235,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 				return
 			}
 			// Write JSON data to the WebSocket connection of the recipient
-			sendMessageToWebSocket(recipient.Conn, event.TYPING, jsonData)
+			sendMessageToWebSocket(recipient, event.TYPING, jsonData)
 		}
 	} else { // if it is a group chat
 		groupID, err := strconv.Atoi(typing.Recipient)
@@ -268,7 +268,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 			recipient, online := GetClient(member)
 			if online && recipient.Conn != nil {
 				// Write JSON data to the WebSocket connection of the recipient
-				sendMessageToWebSocket(recipient.Conn, event.TYPING, jsonData)
+				sendMessageToWebSocket(recipient, event.TYPING, jsonData)
 			}
 		}
 	}
@@ -382,7 +382,7 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		}
 
 		if len(messages) != 0 {
-			sendMessageToWebSocket(user.Conn, event.GET_MESSAGES, messagesJSON)
+			sendMessageToWebSocket(user, event.GET_MESSAGES, messagesJSON)
 		}
 		// updateNotification(clients[user.ID], recipientID, false)
 	}

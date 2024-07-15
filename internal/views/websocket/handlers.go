@@ -50,6 +50,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		ID:       userID,
 		Username: username,
 		Conn:     conn,
+		Mutex:    &sync.Mutex{},
 	}
 	SetClientOnline(&user)
 	go ProcessNotifications(&user)
@@ -63,9 +64,9 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 // Function to send JSON data to a WebSocket connection
-func sendMessageToWebSocket(conn *websocket.Conn, eventType string, data interface{}) error {
+func sendMessageToWebSocket(user *types.User, eventType string, data interface{}) error {
 	// Check if the WebSocket connection is nil
-	if conn == nil {
+	if user.Conn == nil {
 		log.Println("Connection is nil")
 		return nil
 	}
@@ -80,8 +81,12 @@ func sendMessageToWebSocket(conn *websocket.Conn, eventType string, data interfa
 		log.Println("Error marshalling messages to JSON:", err)
 		return nil
 	}
+
+	// Use the mutex to ensure only one goroutine writes at a time
+	user.Mutex.Lock()
+	defer user.Mutex.Unlock()
 	// Write the payload to the WebSocket connection as a text message
-	if err := conn.WriteMessage(websocket.TextMessage, []byte(messagesJSON)); err != nil {
+	if err := user.Conn.WriteMessage(websocket.TextMessage, []byte(messagesJSON)); err != nil {
 		log.Println("Error writing message to WebSocket:", err)
 		return err
 	}

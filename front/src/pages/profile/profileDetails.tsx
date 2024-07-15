@@ -1,5 +1,6 @@
 import { JSXElement } from 'solid-js';
 import { AspectRatio } from "~/components/ui/aspect-ratio";
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from "~/components/ui/button";
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
@@ -12,8 +13,10 @@ export default function ProfileDetails(props: { targetUser: () => User }): JSXEl
     <div class='flex flex-col'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
         <AspectRatio ratio={16 / 9}> {/* Profile picture */}
-          <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center rounded-lg'>
-            IZ NOT HERE
+          <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-end rounded-lg'>
+            <Avatar class='w-[5rem] h-[5rem] mb-2'>
+              <AvatarFallback>{props.targetUser().first_name[0]}</AvatarFallback>
+            </Avatar>
           </div>
         </AspectRatio> {/* Profile picture */}
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}

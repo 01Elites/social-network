@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"log"
 
 	database "social-network/internal/database/querys"
@@ -75,4 +76,31 @@ func SendUsersNotifications(userID string) error {
 		}
 	}
 	return nil
+}
+
+// Notification function to handle notification events
+func Notification(RevEvent types.Event, user *types.User) {
+	// Convert map to JSON
+	jsonPayload, err := json.Marshal(RevEvent.Payload)
+	if err != nil {
+		log.Println("Error marshaling payload to JSON:", err)
+		return
+	}
+
+	// Unmarshal event payload to get recipient
+	var payload struct {
+		NotificationID int `json:"notification_id"`
+	}
+
+	if err := json.Unmarshal(jsonPayload, &payload); err != nil {
+		log.Println("Error decoding event typing:", err)
+		return
+	}
+
+	// Set notification as read in database
+	if err := database.SetNotificationAsRead(payload.NotificationID); err != nil {
+		log.Println("Error setting notification as read:", err)
+		return
+	}
+
 }

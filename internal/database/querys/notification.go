@@ -165,15 +165,26 @@ func OrganizeGroupEventRequest(member string, groupTitle string, groupID int, gr
 	return notification
 }
 
-func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle string)types.Notification{
+func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle string) types.Notification {
 	notification := types.Notification{
-		Type: "GROUP_INVITATION",
+		Type:    "GROUP_INVITATION",
 		Message: "You have a new group invitation",
-		ToUser: recieverUsername,
-					Metadata: types.GroupNotification{
-									ID: groupID,
-									Title: groupTitle,
-					},
+		ToUser:  recieverUsername,
+		Metadata: types.GroupNotification{
+			ID:    groupID,
+			Title: groupTitle,
+		},
+	}
+	return notification
 }
-return notification
+
+// SetNotificationAsRead sets the notification with the given ID as read in the database
+func SetNotificationAsRead(notificationID int) error {
+	query := `UPDATE notifications SET read = TRUE WHERE notification_id = $1`
+	_, err := DB.Exec(context.Background(), query, notificationID)
+	if err != nil {
+		log.Printf("database: Failed to update notification in database: %v", err)
+		return err // Return error if failed to update notification
+	}
+	return nil
 }

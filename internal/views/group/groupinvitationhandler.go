@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
@@ -19,6 +20,7 @@ It requires a valid user session and the user should be a member
 to create an invite.
 
 Example:
+
 	 // To create a new invite
 	 POST /api/invitation
 		Body:{
@@ -71,18 +73,19 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to create invitation", http.StatusNotFound)
 		return
 	}
-	err = database.AddToNotificationTable(invite.ReceiverID, "group_invite", inviteID)
+	notificationID, err := database.AddToNotificationTable(invite.ReceiverID, "group_invite", inviteID)
 	if err != nil {
 		log.Println("error adding notification to database")
 		return
 	}
 	notification, err := database.GetGroupInvitationData(userID, inviteID)
-		if err != nil {
-			log.Println("Failed to get group invitation")
-			helpers.HTTPError(w, "Something Went Wrong with the group invite!!", http.StatusBadRequest)
-			return
-		}
-	websocket.SendNotificationToChannel(*notification,websocket.GroupInviteChan)
+	if err != nil {
+		log.Println("Failed to get group invitation")
+		helpers.HTTPError(w, "Something Went Wrong with the group invite!!", http.StatusBadRequest)
+		return
+	}
+	notification.ID = notificationID
+	websocket.SendNotificationToChannel(*notification, websocket.GroupInviteChan)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -93,6 +96,7 @@ provided in the request body.
 It requires a valid user session to respond to an invite.
 
 Example:
+
 	 // To respond to an invite
 	 POST /api/invitationresponse
 		Body:{

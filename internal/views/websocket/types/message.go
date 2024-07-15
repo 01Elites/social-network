@@ -11,7 +11,9 @@ type Event struct {
 type Notification struct {
 	Type     string      `json:"type"`
 	Message  string      `json:"message"`
-	ToUser   string      `json:"username,omitempty"`
+	ToUser   string      `json:"-"`
+	ID       int         `json:"notification_id"`
+	Read     bool        `json:"read"`
 	Metadata interface{} `json:"metadata"`
 }
 

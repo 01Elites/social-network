@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
@@ -44,7 +45,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "you are not a member", http.StatusBadRequest)
 		return
 	}
-	groupMembers,groupMembersIDs, err := database.GetGroupMembers(event.GroupID)
+	groupMembers, groupMembersIDs, err := database.GetGroupMembers(event.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to get group members", http.StatusNotFound)
 		return
@@ -60,18 +61,20 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	groupEvent := types.EventDetails{
-		ID:eventID,
-		Title:event.Title,
+		ID:      eventID,
+		Title:   event.Title,
 		Options: event.Options,
 	}
-	for i,member := range groupMembers{
-	err = database.AddToNotificationTable(groupMembersIDs[i], "event_notification", eventID)
-	if err != nil {
-		log.Println("error adding notification to database")
+	for i, member := range groupMembers {
+		notificationID, err := database.AddToNotificationTable(groupMembersIDs[i], "event_notification", eventID)
+		if err != nil {
+			log.Println("error adding notification to database")
 			return
+		}
+		notification := database.OrganizeGroupEventRequest(member, groupTitle, event.GroupID, groupEvent)
+		notification.ID = notificationID
+		websocket.SendNotificationToChannel(notification, websocket.JoinRequestChan)
 	}
-	websocket.SendNotificationToChannel(database.OrganizeGroupEventRequest(member, groupTitle, event.GroupID, groupEvent), websocket.JoinRequestChan)
-}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -106,7 +109,7 @@ func EventResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "error when responding to request", http.StatusNotFound)
 		return
 	}
-	database.UpdateNotificationTable(response.EventID,"accepted","event_notification",userID)
+	database.UpdateNotificationTable(response.EventID, "accepted", "event_notification", userID)
 	w.WriteHeader(http.StatusOK)
 }
 

@@ -3,9 +3,9 @@ package group
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
-	"log"
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
@@ -72,18 +72,19 @@ func CreateRequestHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "failed to create request", http.StatusNotFound)
 		return
 	}
-	err = database.AddToNotificationTable(groupCreatorID, "join_request", requestID)
+	notificationID, err := database.AddToNotificationTable(groupCreatorID, "join_request", requestID)
 	if err != nil {
 		log.Println("error adding notification to database")
 		return
 	}
 	notification, err := database.GetGroupRequestData(userID, requestID)
-		if err != nil {
-			log.Println("Failed to get group request")
-			helpers.HTTPError(w, "Something Went Wrong with the group Request!!", http.StatusBadRequest)
-			return
-		}
-	websocket.SendNotificationToChannel(*notification,websocket.JoinRequestChan)
+	if err != nil {
+		log.Println("Failed to get group request")
+		helpers.HTTPError(w, "Something Went Wrong with the group Request!!", http.StatusBadRequest)
+		return
+	}
+	notification.ID = notificationID
+	websocket.SendNotificationToChannel(*notification, websocket.JoinRequestChan)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(groupCreator)
 }

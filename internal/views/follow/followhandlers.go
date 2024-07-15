@@ -86,7 +86,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if request.Status != "canceled" {
-		err = database.AddToNotificationTable(request.Receiver, "follow_request", request.ID)
+		notificationID, err := database.AddToNotificationTable(request.Receiver, "follow_request", request.ID)
 		if err != nil {
 			log.Println("error adding notification to database:", err)
 			helpers.HTTPError(w, "Something Went Wrong with the Follow Request!!", http.StatusBadRequest)
@@ -109,18 +109,10 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "Something Went Wrong with the Follow Request!!", http.StatusBadRequest)
 			return
 		}
+		notification.ID = notificationID
 		websocket.SendNotificationToChannel(*notification, websocket.FollowRequestChan)
 	}
-	// requestIDjson := struct {
-	// 	ID int `json:"id"`
-	// }{
-	// 	ID: request.ID,
-	// }
-
-	// Notifications(request , "follow")
-
 	w.WriteHeader(http.StatusOK)
-	// json.NewEncoder(w).Encode(requestIDjson)
 }
 
 // RespondToFollowHandler responds to a follow request. It expects a JSON body with the following format:

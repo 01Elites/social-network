@@ -8,18 +8,20 @@ import (
 	"social-network/internal/views/websocket/types"
 )
 
-func AddToNotificationTable(userID string, notificationType string, relatedID int) error {
+func AddToNotificationTable(userID string, notificationType string, relatedID int) (int, error) {
+	var notificationID int
 	query := `
 	INSERT INTO 
 			notifications (user_id, type, related_id, status) 
 	VALUES 
-			($1, $2, $3, $4)`
-	_, err := DB.Exec(context.Background(), query, userID, notificationType, relatedID, "pending")
+			($1, $2, $3, $4)
+	RETURNING notification_id`
+	err := DB.QueryRow(context.Background(), query, userID, notificationType, relatedID, "pending").Scan(&notificationID)
 	if err != nil {
 		log.Printf("database: Failed to add notification: %v", err)
-		return err // Return error if failed to insert post
+		return 0, err // Return error if failed to insert post
 	}
-	return nil
+	return notificationID, nil
 }
 
 func CancelNotification(relatedID int, notificationType string, userID string) error {
@@ -57,8 +59,10 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 	var notifications []types.Notification
 	query := `
 	SELECT 
+			notification_id,
 			type,
-			related_id
+			related_id,
+			read
 	FROM
 			notifications
 	WHERE
@@ -71,9 +75,16 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 		return nil, err
 	}
 	for rows.Next() {
+		var notificationID int
 		var notificationType string
 		var relatedID int
-		rows.Scan(&notificationType, &relatedID)
+		var read bool
+		err := rows.Scan(&notificationID, &notificationType, &relatedID, &read)
+		if err != nil {
+			log.Printf("database: Failed to scan notification row: %v", err)
+			continue
+		}
+		var notification *types.Notification
 		switch notificationType {
 		case "follow_request":
 			request, err := GetFollowRequest(relatedID)
@@ -81,34 +92,42 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 				log.Println("Failed to get follow request")
 				continue
 			}
-			followNotification, err := GetFollowRequestNotification(*request)
+			notification, err = GetFollowRequestNotification(*request)
 			if err != nil {
 				log.Println("Failed to get follow request")
 				continue
 			}
-			notifications = append(notifications, *followNotification)
 		case "group_invite":
-			invitationNotification, err := GetGroupInvitationData(userID, relatedID)
+			notification, err = GetGroupInvitationData(userID, relatedID)
 			if err != nil {
 				log.Println("Failed to get invitation Data")
 				continue
 			}
-			notifications = append(notifications, *invitationNotification)
 		case "join_request":
-			groupRequestNotification, err := GetGroupRequestData(userID, relatedID)
+			notification, err = GetGroupRequestData(userID, relatedID)
 			if err != nil {
 				log.Println("Failed to get group request Data")
 				continue
 			}
-			notifications = append(notifications, *groupRequestNotification)
 		case "event_notification":
-			eventNotification, err := GetGroupEventData(userID, relatedID)
+			notification, err = GetGroupEventData(userID, relatedID)
 			if err != nil {
 				log.Println("Failed to get group event Data")
 				continue
 			}
-			notifications = append(notifications, *eventNotification)
+		default:
+			log.Printf("Unknown notification type: %s", notificationType)
+			continue
 		}
+		if notification != nil {
+			notification.ID = notificationID
+			notification.Read = read
+			notifications = append(notifications, *notification)
+		}
+	}
+	if err = rows.Err(); err != nil {
+		log.Printf("database: Failed during row iteration: %v", err)
+		return nil, err
 	}
 	return notifications, err
 }

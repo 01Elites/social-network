@@ -13,9 +13,9 @@ import { cn } from '~/lib/utils';
 import { Post } from '~/types/Post';
 import { UserDetailsHook } from '~/types/User';
 import Repeat from '../core/repeat';
-import { Skeleton } from '../ui/skeleton';
 import { showToast } from '../ui/toast';
 import FeedPostCell from './FeedPostCell';
+import FeedPostCellSkeleton from './FeedPostCellSkeleton';
 import { PostCommentsDialog } from './PostCommentsDialog';
 
 interface FeedPostsProps {
@@ -66,16 +66,7 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
         when={posts()}
         fallback={
           <Repeat count={10}>
-            <div class='space-y-4'>
-              <div class='flex items-center space-x-4'>
-                <Skeleton height={40} circle animate={false} />
-                <div class='w-full space-y-2'>
-                  <Skeleton height={16} radius={10} class='max-w-40' />
-                  <Skeleton height={16} radius={10} class='max-w-32' />
-                </div>
-              </div>
-              <Skeleton height={150} radius={10} />
-            </div>
+            <FeedPostCellSkeleton />
           </Repeat>
         }
       >

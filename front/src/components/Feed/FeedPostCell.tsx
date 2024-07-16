@@ -35,6 +35,13 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
     );
   }
 
+  function updateCommentsCount() {
+    props.updatePost({
+      ...props.post,
+      comments_count: props.post.comments_count + 1,
+    });
+  }
+
   function handleLike() {
     fetchWithAuth(`${config.API_URL}/post/${props.post.post_id}/like`, {
       method: 'POST',
@@ -131,7 +138,7 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
           <Button
             variant='ghost'
             class='flex-1 gap-2'
-            onClick={() => showComments(props.post)}
+            onClick={() => showComments(props.post, updateCommentsCount)}
           >
             <IconComments class='size-4' />
             {props.post.comments_count}

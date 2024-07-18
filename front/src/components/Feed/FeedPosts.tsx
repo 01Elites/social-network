@@ -6,6 +6,7 @@ import {
   Show,
   useContext,
 } from 'solid-js';
+import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { cn } from '~/lib/utils';
@@ -16,7 +17,6 @@ import { showToast } from '../ui/toast';
 import FeedPostCell from './FeedPostCell';
 import FeedPostCellSkeleton from './FeedPostCellSkeleton';
 import { PostCommentsDialog } from './PostCommentsDialog';
-import config from '~/config';
 
 interface FeedPostsProps {
   class?: string;
@@ -35,7 +35,7 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
   }
   createEffect(() => {
     if (!userDetails()) return;
-    fetchWithAuth(config.API_URL+props.path)
+    fetchWithAuth(config.API_URL + props.path)
       .then(async (res) => {
         const body = await res.json();
         if (res.status === 404) {

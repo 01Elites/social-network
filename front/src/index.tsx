@@ -11,6 +11,7 @@ import '~/extensions';
 import './index.css';
 import HomePage from './pages/home';
 import Profile from './pages/profile';
+import Group from './pages/group';
 
 const root = document.getElementById('root');
 
@@ -35,7 +36,7 @@ function App() {
       {/* <AuthGuard> */}
       <Route path='/' component={HomePage} />
       {/* </AuthGuard> */}
-      {/* <Route path='/login' component={HomePage} /> */}
+       <Route path='/group' component={Group} /> 
       {/* <AuthGuard> */}
       <Route path='/profile/:username' component={Profile} />
       {/* </AuthGuard> */}

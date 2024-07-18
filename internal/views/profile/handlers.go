@@ -85,7 +85,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 		LastName:       prof.LastName,
 		Gender:         prof.Gender,
 		DateOfBirth:    prof.DateOfBirth,
-		Avatar:         prof.Image,
+		Avatar:         prof.Avatar,
 		About:          prof.About,
 		ProfilePrivacy: prof.ProfilePrivacy,
 	}
@@ -149,7 +149,7 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		LastName:       update.LastName,
 		Gender:         update.Gender,
 		DateOfBirth:    update.DateOfBirth,
-		Image:          update.Avatar,
+		Avatar:         update.Avatar,
 		About:          update.About,
 		ProfilePrivacy: update.ProfilePrivacy,
 	}
@@ -247,7 +247,7 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		LastName:  prof.LastName,
 		// Gender:         prof.Gender,
 		// DateOfBirth:    prof.DateOfBirth,
-		Avatar:         prof.Image,
+		Avatar:         prof.Avatar,
 		About:          prof.About,
 		ProfilePrivacy: prof.ProfilePrivacy,
 		Follow_status:  database.GetFollowStatus(userID, UserPageID),
@@ -276,14 +276,20 @@ Response Body:
 
 	{
 		"post_id": int,
+		"poster": {
+				"user_name": string,
+				"first_name": string,
+				"last_name": string,
+				"avatar": string // optional
+		},
 		"title": string,
 		"content": string,
-		"image": string,
-		"creation_date": "2024-07-08T16:09:53.100341Z",
-		"post_privacy": "public" | "private",
+		"image": string, // optional
+		"creation_date": "2024-07-07T14:28:45.127591Z", // unix time
+		"post_privacy": "private"| "public" | "almost_private",
 		"likes_count": int,
 		"comments_count": int,
-		"likers_ids": []string,
+		"likers_usernames": null | []string // optional
 		"is_liked": bool
 	}
 

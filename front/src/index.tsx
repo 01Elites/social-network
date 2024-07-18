@@ -36,7 +36,7 @@ function App() {
       {/* <AuthGuard> */}
       <Route path='/' component={HomePage} />
       {/* </AuthGuard> */}
-       <Route path='/group' component={Group} /> 
+       <Route path='/group/:id' component={Group} /> 
       {/* <AuthGuard> */}
       <Route path='/profile/:username' component={Profile} />
       {/* </AuthGuard> */}

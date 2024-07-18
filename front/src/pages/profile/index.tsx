@@ -20,6 +20,7 @@ export default function Profile(): JSXElement {
   createEffect(() => {
     console.log('Profile page mounted');
 
+    // Fetch user profile details
     fetchWithAuth(config.API_URL + '/profile/' + params.username).then(async (res) => {
       const body = await res.json();
       if (res.status === 404) {
@@ -28,6 +29,7 @@ export default function Profile(): JSXElement {
       }
       if (res.ok) {
         setTargetUser(body);
+        console.log(body);
         return;
       }
 

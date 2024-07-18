@@ -175,10 +175,6 @@ func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
 func getGroupPostsHandler(w http.ResponseWriter, r *http.Request) {
 	groupIDstr := r.PathValue("id")
 	groupID, err := strconv.Atoi(groupIDstr)
-	if err != nil {
-		helpers.HTTPError(w, "Invalid group ID", http.StatusBadRequest)
-		return
-	}
 	groupExists := database.CheckGroupID(groupID) // check if the group has been created
 	if groupID == 0 || err != nil || !groupExists {
 		http.Error(w, "Invalid group ID", http.StatusBadRequest)

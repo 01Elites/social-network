@@ -43,6 +43,17 @@ func CreatGroupChat(groupID int)error{
 	return nil
 }
 
+func GetGroupInfo(groupID int) (string, string, error) {
+	var title, description string
+	query := `SELECT title, description FROM "group" WHERE group_id = $1`
+	err := DB.QueryRow(context.Background(), query, groupID).Scan(&title, &description)
+	if err != nil {
+		log.Printf("database failed to get group info: %v\n", err)
+		return "", "", err
+	}
+	return title, description, nil
+}
+
 func GetGroupMembers(groupID int) ([]string, []string, error) {
 	var users []string
 	var userIDs []string

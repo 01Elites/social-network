@@ -76,13 +76,13 @@ Example:
 	GET api/group/123
 
 Response:
-
-	    {
-	    "id": 0,
-	    "members":"[]string",
-	    "posts":"[]posts",
-	    "ismember":false
-	}
+{"id":1,
+"title": string,
+"description": string,
+"members":[]string,
+"ismember":true,
+"events":[]Events
+}
 */
 func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	var group models.GroupFeed
@@ -99,6 +99,12 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
+	group.Title, group.Description, err = database.GetGroupInfo(group.ID)
+	if err != nil {
+		http.Error(w, "Failed to get group info", http.StatusInternalServerError)
+		return
+	}
+
 	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
 		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
 		return
@@ -106,11 +112,6 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	if !group.IsMember { // to view group page for a non-member
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(group)
-		return
-	}
-	group.Posts, err = database.GetGroupPosts(group.ID)
-	if err != nil {
-		http.Error(w, "Failed to get group post", http.StatusNotFound)
 		return
 	}
 	group.Members,_, err = database.GetGroupMembers(group.ID)
@@ -169,4 +170,25 @@ func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	// json.NewEncoder(w).Encode(group)
+}
+
+func getGroupPostsHandler(w http.ResponseWriter, r *http.Request) {
+	groupIDstr := r.PathValue("id")
+	groupID, err := strconv.Atoi(groupIDstr)
+	if err != nil {
+		helpers.HTTPError(w, "Invalid group ID", http.StatusBadRequest)
+		return
+	}
+	groupExists := database.CheckGroupID(groupID) // check if the group has been created
+	if groupID == 0 || err != nil || !groupExists {
+		http.Error(w, "Invalid group ID", http.StatusBadRequest)
+		return
+	}
+	posts, err := database.GetGroupPosts(groupID)
+	if err != nil {
+		helpers.HTTPError(w, "Failed to get group posts", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(posts)
 }

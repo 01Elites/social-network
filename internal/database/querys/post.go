@@ -369,7 +369,12 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 }
 
 // GetUserPosts gets the posts created by a single user
-func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.ProfilePost, error) {
+func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Post, error) {
+	user, err := GetUserProfile(userid)
+	if err != nil {
+		log.Printf("database: Failed to get user profile: %v\n", err)
+		return nil, err
+	}
 	// Query the database
 	query := `
     SELECT 
@@ -394,10 +399,17 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
 	defer rows.Close()
 
 	// Create a slice to hold the results
-	posts := make([]models.ProfilePost, 0)
+	posts := make([]models.Post, 0)
 	// Iterate through the rows
 	for rows.Next() {
-		var post models.ProfilePost
+		post := models.Post{
+			User: models.PostFeedProfile{
+				UserName:  user.Username,
+				FirstName: user.FirstName,
+				LastName:  user.LastName,
+				Avatar:    user.Avatar,
+			},
+		}
 		if err := rows.Scan(
 			&post.ID,
 			&post.Title,
@@ -414,12 +426,12 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pro
 			log.Printf("database failed to scan comments count: %v\n", err)
 			return nil, err
 		}
-		post.Likers_ids, post.IsLiked, err = GetPostLikers(post.ID, loggeduser)
+		post.Likers_Usernames, post.IsLiked, err = GetPostLikers(post.ID, loggeduser)
 		if err != nil {
 			log.Printf("database: Failed to scan likers: %v\n", err)
-			return []models.ProfilePost{}, err
+			return []models.Post{}, err
 		}
-		post.PostLikes = len(post.Likers_ids)
+		post.PostLikes = len(post.Likers_Usernames)
 
 		if userid == loggeduser {
 			posts = append(posts, post)

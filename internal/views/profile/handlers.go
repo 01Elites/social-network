@@ -27,6 +27,8 @@ type profileData struct {
 	About          string    `json:"about"`
 	ProfilePrivacy string    `json:"profile_privacy"`
 	Follow_status  string    `json:"follow_status,omitempty"`
+	FollowingCount int       `json:"following_count,omitempty"`
+	FollowerCount  int       `json:"follower_count,omitempty"`
 }
 
 /*
@@ -95,13 +97,14 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-	patchProfile handles the HTTP PATCH request for updating a user's profile.
-	It reads the user ID from the request context, unmarshals the JSON request body,
-	validates the profile data, updates the user's profile in the database, and returns an appropriate response.
+patchProfile handles the HTTP PATCH request for updating a user's profile.
+It reads the user ID from the request context, unmarshals the JSON request body,
+validates the profile data, updates the user's profile in the database, and returns an appropriate response.
 
-	Endpoint: PATCH /api/profile
+Endpoint: PATCH /api/profile
 
-	Request Body:
+Request Body:
+
 	{
 		"nick_name": string, // optional
 		"first_name": string,
@@ -113,7 +116,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 		"profile_privacy": "public" | "private"
 	}
 
-	If any error occurs during the process, it returns the corresponding HTTP error status code.
+If any error occurs during the process, it returns the corresponding HTTP error status code.
 */
 func patchProfile(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
@@ -188,6 +191,8 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		"about": string,
 		"profile_privacy": "public" | "private",
 		"follow_status": "following" | "not_following" | "pending"
+		"following_count": int,
+		"follower_count": int
 	}
 
 	If any error occurs during the process, it returns the corresponding HTTP error status code.
@@ -221,7 +226,19 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
+	followingCount, err := database.GetFollowingCount(UserPageID)
+	if err != nil {
+		log.Printf("Failed to get following count: %v\n", err)
+		helpers.HTTPError(w, "Failed to get following count", http.StatusInternalServerError)
+		return
+	}
 
+	followerCount, err := database.GetFollowerCount(UserPageID)
+	if err != nil {
+		log.Printf("Failed to get follower count: %v\n", err)
+		helpers.HTTPError(w, "Failed to get follower count", http.StatusInternalServerError)
+		return
+	}
 	profile = profileData{
 		UserName: user.UserName,
 		// Email:     user.Email,
@@ -234,6 +251,8 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		About:          prof.About,
 		ProfilePrivacy: prof.ProfilePrivacy,
 		Follow_status:  database.GetFollowStatus(userID, UserPageID),
+		FollowingCount: followingCount,
+		FollowerCount:  followerCount,
 	}
 	if err := json.NewEncoder(w).Encode(profile); err != nil {
 		log.Printf("Failed to encode profile data: %v\n", err)
@@ -243,32 +262,34 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-	getProfilePosts handles the HTTP GET request to retrieve posts from a user's profile.
-	It extracts the userID from the request context, fetches the userID of the profile being requested,
-	and then retrieves and returns the posts data in JSON format.
+getProfilePosts handles the HTTP GET request to retrieve posts from a user's profile.
+It extracts the userID from the request context, fetches the userID of the profile being requested,
+and then retrieves and returns the posts data in JSON format.
 
-	URL Path: /api/profile/{user_name}/posts
+URL Path: /api/profile/{user_name}/posts
 
-	Path Parameter:
-	- user_name: string - the username of the user whose profile posts are being requested.
+Path Parameter:
+- user_name: string - the username of the user whose profile posts are being requested.
 
-	Response Body:
-	[
-		{
-			"post_id": int,
-			"title": string,
-			"content": string,
-			"image": string,
-			"creation_date": "2024-07-08T16:09:53.100341Z",
-			"post_privacy": "public" | "private",
-			"likes_count": int,
-			"comments_count": int,
-			"likers_ids": []string,
-			"is_liked": bool
-		}
-	]
+Response Body:
+[
 
-	If any error occurs during the process, it returns the corresponding HTTP error status code.
+	{
+		"post_id": int,
+		"title": string,
+		"content": string,
+		"image": string,
+		"creation_date": "2024-07-08T16:09:53.100341Z",
+		"post_privacy": "public" | "private",
+		"likes_count": int,
+		"comments_count": int,
+		"likers_ids": []string,
+		"is_liked": bool
+	}
+
+]
+
+If any error occurs during the process, it returns the corresponding HTTP error status code.
 */
 func getProfilePosts(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)

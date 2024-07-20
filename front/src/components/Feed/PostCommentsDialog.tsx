@@ -1,6 +1,7 @@
 import {
   createEffect,
   createSignal,
+  For,
   JSXElement,
   Show,
   useContext,
@@ -24,6 +25,7 @@ import { Separator } from '../ui/separator';
 import { TextField, TextFieldTextArea } from '../ui/text-field';
 import { showToast } from '../ui/toast';
 import FeedPostCellSkeleton from './FeedPostCellSkeleton';
+import PostCommentCell from './PostCommentCell';
 
 const [post, setPost] = createSignal<Post>();
 let newCommentCallback: () => void;
@@ -108,13 +110,7 @@ export function PostCommentsDialog(): JSXElement {
   return (
     <Dialog open={open()} onOpenChange={close}>
       <Show when={post()}>
-        <DialogContent
-          // a hack to now make the dialog full height
-          class='max-h-[70%] overflow-hidden'
-          // style={{
-          //   height: 'calc(100% - 2rem)',
-          // }}
-        >
+        <DialogContent class='h-full max-h-[70%] overflow-hidden'>
           <DialogHeader>
             <DialogTitle>
               Comments{' '}
@@ -123,18 +119,16 @@ export function PostCommentsDialog(): JSXElement {
               </span>
             </DialogTitle>
           </DialogHeader>
-          <div class='flex max-h-full flex-col overflow-hidden bg-red-300'>
-            <div class='flex flex-1 flex-col gap-4 overflow-hidden overflow-scroll bg-blue-400'>
+          <div class='flex max-h-full flex-col gap-2 overflow-hidden'>
+            {/* // TODO: check this */}
+            <div class='flex flex-1 flex-col gap-4 overflow-y-scroll'>
               <Show when={postComments() === undefined}>
                 <Repeat count={10}>
                   <FeedPostCellSkeleton />
                 </Repeat>
               </Show>
-              <Repeat count={20}>
-                <h1>Comment</h1>
-              </Repeat>
 
-              {/* <Show
+              <Show
                 when={post()!.comments_count > 0}
                 fallback={
                   <h1 class='text-center text-primary/60'>No comments yet</h1>
@@ -143,12 +137,12 @@ export function PostCommentsDialog(): JSXElement {
                 <For each={postComments()}>
                   {(comment) => <PostCommentCell comment={comment} />}
                 </For>
-              </Show> */}
+              </Show>
             </div>
 
             <DialogFooter class='flex !flex-col gap-4'>
               <Separator />
-              <form class='flex !flex-col gap-4' onSubmit={postComment}>
+              <form class='!m-1 flex !flex-col gap-4' onSubmit={postComment}>
                 <TextField
                   onChange={setComment}
                   value={comment()}

@@ -66,7 +66,7 @@ func ProcessEvents(user *types.User) {
 
 		// case event.GET_MESSAGES:
 		// 	// GetMessages(message, user)
-		case event.NOTIFICATION:
+		case event.NOTIFICATION_READ:
 			Notification(message, user)
 		default:
 			log.Println("Unknown event type:", message.Type)

@@ -105,18 +105,23 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	group.Members,_, err = database.GetGroupMembers(group.ID)
+	if err != nil {
+		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
+		return
+	}
 	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
 		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
 		return
 	}
 	if !group.IsMember { // to view group page for a non-member
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(group)
+		group.RequestMade, err = database.CheckForGroupRequest(group.ID, userID)
+	if err != nil {
+		helpers.HTTPError(w, "failed to check for request", http.StatusNotFound)
 		return
 	}
-	group.Members,_, err = database.GetGroupMembers(group.ID)
-	if err != nil {
-		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(group)
 		return
 	}
 	group.Events, err = database.GetGroupEvents(group.ID)

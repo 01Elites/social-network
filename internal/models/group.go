@@ -9,6 +9,7 @@ type GroupFeed struct {
 	Members     []string `json:"members,omitempty"`
 	Events      []Event  `json:"events,omitempty"`
 	IsMember    bool     `json:"ismember,omitempty"`
+	RequestMade bool     `json:"request_made,omitempty"`
 }
 
 type CreateGroup struct {

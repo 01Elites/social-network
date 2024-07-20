@@ -192,12 +192,18 @@ export function PostCommentsDialog(): JSXElement {
                   <Button
                     class='w-full self-end sm:w-fit'
                     variant='secondary'
-                    onClick={() =>
-                      document.getElementById('commentImageUpload')?.click()
-                    }
+                    onClick={() => {
+                      if (uploadedImage()) {
+                        setUploadedImage(null);
+                      } else {
+                        document.getElementById('commentImageUpload')?.click();
+                      }
+                    }}
                     disabled={!userDetails() || commentPosting()}
                   >
-                    upload image
+                    <Show when={!uploadedImage()} fallback={'Remove Image'}>
+                      Upload Image
+                    </Show>
                   </Button>
 
                   <Button

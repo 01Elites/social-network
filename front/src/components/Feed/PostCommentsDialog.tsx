@@ -40,12 +40,16 @@ export function PostCommentsDialog(): JSXElement {
 
   const [open, setOpen] = createSignal(false);
   const [comment, setComment] = createSignal('');
+  const [uploadedImage, setUploadedImage] = createSignal<File | null>(null);
+
   const [commentPosting, setCommentPosting] = createSignal(false);
   const [postComments, setPostComments] = createSignal<Comment[]>();
 
   function close() {
     setOpen(false);
     setPost(undefined);
+    setComment('');
+    setUploadedImage(null);
     newCommentCallback = () => {};
   }
 
@@ -80,17 +84,40 @@ export function PostCommentsDialog(): JSXElement {
     }
   });
 
-  function postComment(e: SubmitEvent) {
+  function handleImageUpload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      setUploadedImage(target.files[0]);
+    }
+  }
+
+  async function postComment(e: SubmitEvent) {
     setCommentPosting(true);
     e.preventDefault();
 
+    const payload = {
+      body: comment(),
+      image: '',
+    };
+
+    if (uploadedImage()) {
+      try {
+        const base64 = await uploadedImage()?.toBase64();
+        payload.image = base64 as string;
+      } catch (error) {
+        console.error('Error converting image to base64:', error);
+      }
+    }
+
     fetchWithAuth(`${config.API_URL}/post/${post()?.post_id}/comments`, {
       method: 'POST',
-      body: JSON.stringify({ body: comment() }),
+      body: JSON.stringify(payload),
     })
       .then(async (res) => {
         setCommentPosting(false);
         setComment('');
+        setUploadedImage(null);
+
         if (!res.ok) {
           const body = await res.json();
           throw new Error(body.reason || 'Failed to post comment');
@@ -120,7 +147,6 @@ export function PostCommentsDialog(): JSXElement {
             </DialogTitle>
           </DialogHeader>
           <div class='flex max-h-full flex-col gap-2 overflow-hidden'>
-            {/* // TODO: check this */}
             <div class='flex flex-1 flex-col gap-4 overflow-y-scroll'>
               <Show when={postComments() === undefined}>
                 <Repeat count={10}>
@@ -156,9 +182,19 @@ export function PostCommentsDialog(): JSXElement {
                 </TextField>
 
                 <div class='flex w-full flex-col justify-between gap-4 sm:flex-row'>
+                  <input
+                    class='hidden'
+                    type='file'
+                    id='commentImageUpload'
+                    accept='image/*'
+                    onChange={handleImageUpload}
+                  />
                   <Button
                     class='w-full self-end sm:w-fit'
                     variant='secondary'
+                    onClick={() =>
+                      document.getElementById('commentImageUpload')?.click()
+                    }
                     disabled={!userDetails() || commentPosting()}
                   >
                     upload image

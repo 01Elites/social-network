@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -16,6 +17,7 @@ var (
 
 // SaveBase64Image decodes the Base64 image and saves it with a unique code as the name.
 func SaveBase64Image(base64Image string) (string, error) {
+
 	// Generate a unique serial number for the image
 	uniqueCode, err := getUniqueNumber()
 	if err != nil {
@@ -28,8 +30,14 @@ func SaveBase64Image(base64Image string) (string, error) {
 		return "", fmt.Errorf("failed to decode base64 image: %w", err)
 	}
 
-	// Define the file path
-	fileName := uniqueCode + ".webp" // or any other appropriate extension
+	// Get the image format
+	extension := getImageFormat([]byte(imageData))
+	if extension == "unknown format" {
+		return "", fmt.Errorf("unknown image format")
+	}
+
+	// Define the file path with correct extension
+	fileName := uniqueCode + "." + extension
 	filePath := filepath.Join("internal/database/images", fileName)
 
 	// Ensure the directory exists
@@ -94,4 +102,26 @@ func getUniqueNumber() (string, error) {
 
 	// Return the serial number as a zero-padded string
 	return fmt.Sprintf("%06d", serial), nil
+}
+
+// getImageFormat returns the format of the image data
+func getImageFormat(imageData []byte) string {
+	switch {
+	case bytes.HasPrefix(imageData, []byte{0xff, 0xd8, 0xff}):
+		return "jpg" // or jpeg
+	case bytes.HasPrefix(imageData, []byte{0x89, 'P', 'N', 'G', 0x0d, 0x0a, 0x1a, 0x0a}):
+		return "png"
+	case bytes.HasPrefix(imageData, []byte{'G', 'I', 'F', '8', '7', 'a'}) || bytes.HasPrefix(imageData, []byte{'G', 'I', 'F', '8', '9', 'a'}):
+		return "gif"
+	case bytes.HasPrefix(imageData, []byte{'B', 'M'}):
+		return "bmp"
+	case bytes.HasPrefix(imageData, []byte{'I', 'I', '*', 0x00}) || bytes.HasPrefix(imageData, []byte{'M', 'M', 0x00, '*'}):
+		return "tiff"
+	case bytes.HasPrefix(imageData, []byte{'<', '?', 'x', 'm', 'l'}) || bytes.HasPrefix(imageData, []byte{'<', 's', 'v', 'g'}):
+		return "svg"
+	case bytes.HasPrefix(imageData, []byte{'R', 'I', 'F', 'F'}) && bytes.HasPrefix(imageData[8:], []byte{'W', 'E', 'B', 'P'}):
+		return "webp"
+	default:
+		return "unknown format"
+	}
 }

@@ -29,7 +29,7 @@ type Create_Post struct {
 type Create_Comment struct {
 	ParentID int    `json:"parent_id"`
 	Content  string `json:"body"`
-	Image    string `json:"image_id"`
+	Image    string `json:"image"`
 }
 
 type Comment struct {

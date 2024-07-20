@@ -90,7 +90,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		Gender:         data.Gender,
 		DateOfBirth:    data.DateOfBirth,
 		ProfilePrivacy: data.ProfilePrivacy,
-		Image:          data.Image,
+		Avatar:         data.Image,
 		About:          data.About,
 	}
 

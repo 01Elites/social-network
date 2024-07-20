@@ -1,6 +1,6 @@
 import { JSXElement } from 'solid-js';
 import { AspectRatio } from "~/components/ui/aspect-ratio";
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button } from "~/components/ui/button";
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
@@ -22,8 +22,8 @@ export default function ProfileDetails(props: { targetUser: () => User }): JSXEl
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}
           <p class='text-2xl font-bold m-2'>{props.targetUser().first_name} {props.targetUser().last_name}</p>
           <div class='grid w-full grid-cols-2 text-sm m-2'>
-            <p class='flex justify-center'>Followers -2</p>
-            <p class='flex justify-center'>Following 9999999</p>
+            <p class='flex justify-center'>Followers {props.targetUser().follower_count}</p>
+            <p class='flex justify-center'>Followring {props.targetUser().following_count}</p>
           </div>
         </div> {/* Username, followers, following */}
         <div class='m-4'> {/* Bio */}

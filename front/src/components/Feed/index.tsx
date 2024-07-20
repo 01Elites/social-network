@@ -17,7 +17,7 @@ export default function Feed(props: FeedProps): JSXElement {
       <h1 class='text-xl font-bold'>Feed</h1>
       {userDetails() && <NewPostCell />}
       <section class='h-full overflow-y-scroll'>
-        <FeedPosts />
+        <FeedPosts path="/posts" />
       </section>
     </section>
   );

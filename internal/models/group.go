@@ -3,13 +3,14 @@ package models
 import "time"
 
 type GroupFeed struct {
-	Title       string   `json:"title,omitempty"`
-	Description string   `json:"description,omitempty"`
-	ID          int      `json:"id,omitempty"`
-	Members     []string `json:"members,omitempty"`
-	Events      []Event  `json:"events,omitempty"`
-	IsMember    bool     `json:"ismember,omitempty"`
-	RequestMade bool     `json:"request_made,omitempty"`
+	Title       string          `json:"title,omitempty"`
+	Description string          `json:"description,omitempty"`
+	ID          int             `json:"id,omitempty"`
+	Members     []string        `json:"members,omitempty"`
+	Events      []Event         `json:"events,omitempty"`
+	IsMember    bool            `json:"ismember"`
+	RequestMade bool            `json:"request_made"`
+	Creator     PostFeedProfile `json:"creator,omitempty"`
 }
 
 type CreateGroup struct {

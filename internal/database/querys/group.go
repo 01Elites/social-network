@@ -130,6 +130,17 @@ func GetGroupCreatorID(groupID int) (string, error) {
 	return creatorID, nil
 }
 
+func GetCreatorProfile(groupID int) (models.PostFeedProfile, error) {
+	var creator models.PostFeedProfile
+	query := `SELECT user_name, first_name, last_name, image FROM profile INNER JOIN "user" USING (user_id) WHERE user_id = (SELECT creator_id FROM "group" WHERE group_id = $1)`
+	err := DB.QueryRow(context.Background(), query, groupID).Scan(&creator.UserName, &creator.FirstName, &creator.LastName, &creator.Avatar)
+	if err != nil {
+		log.Printf("database failed to get creator profile: %v\n", err)
+		return models.PostFeedProfile{}, err
+	}
+	return creator, nil
+}
+
 func LeaveGroup(userID string, groupID int) error {
 	query := `DELETE FROM group_member WHERE group_id = $1 AND user_id = $2`
 	_, err := DB.Exec(context.Background(), query, groupID, userID)

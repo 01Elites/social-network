@@ -76,12 +76,24 @@ Example:
 	GET api/group/123
 
 Response:
-{"id":1,
-"title": string,
-"description": string,
-"members":[]string,
-"ismember":true,
-"events":[]Events
+       {"id":1,
+				"title":"testing",
+				"description":"desc test",
+				"members":[]string //usernames,
+				"ismember":true,
+				"request_made":true
+      	"events":[{"id":1,
+      	    "title":"testing",
+            "description":"desc test",
+            "options":["Going","Notgoing"],
+            "event_time":"2024-07-10T14:00:00Z",
+        "responded_users":["AHeidenreich5716","Going"]
+        "creator":{
+				"user_name": string,
+				"first_name": string,
+				"last_name": string,
+				"avatar": string // optional
+		},
 }
 */
 func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -110,6 +122,13 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
 		return
 	}
+	
+	group.Creator, err = database.GetCreatorProfile(group.ID)
+	if err != nil {
+		http.Error(w, "Failed to get creator profile", http.StatusInternalServerError)
+		return
+	}
+
 	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
 		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
 		return

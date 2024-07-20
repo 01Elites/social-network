@@ -4,7 +4,16 @@ type Group = {
   description: string;
   members: string[];
   ismember: boolean;
+  request_made: boolean;
   events: groupEvent[];
+  creator: creator;
+};
+
+type creator = {
+  user_name: string;
+  first_name: string;
+  last_name: string;
+  avatar?: string;
 };
 
 type groupEvent = {

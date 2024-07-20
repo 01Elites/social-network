@@ -6,7 +6,6 @@ import { Button } from "~/components/ui/button";
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
-import { Switch, Match } from "solid-js"
 
 
 export default function GroupDetails(props: { targetGroup: () => Group}): JSXElement {
@@ -17,7 +16,7 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
         <AspectRatio ratio={16 / 9}> {/* Profile picture */}
           <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-end rounded-lg'>
             <Avatar class='w-[5rem] h-[5rem] mb-2'>
-              <AvatarFallback>{props.targetGroup().first_name[0]}</AvatarFallback>
+              <AvatarFallback>{props.targetGroup().creator.avatar}</AvatarFallback>
             </Avatar>
           </div>
         </AspectRatio>
@@ -32,17 +31,15 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
         <div class='m-4'> {/* Bio */}
           <p>{props.targetGroup().description}</p>
         </div> {/* Bio */}
-        <Switch>
-  <Match when={condition1}>
-    <p>Outcome 1</p>
-  </Match>
-  <Match when={condition2}>
-    <p>Outcome 2</p>
-  </Match>
-</Switch>
-          <Button class="flex grow" variant="default">
-            <Follow_Icon /> {props.targetGroup().follow_status === 'following' ? 'Unfollow' : 'Follow'}
-          </Button>
+        <Show when={!props.targetGroup().ismember}
+         fallback={<div><p>You are a member</p></div>}> 
+  <Show when={!props.targetGroup().request_made}>
+    <Button class="flex grow" variant="default">
+      <Follow_Icon /> Request to join
+    </Button>
+</Show>
+<p>request to join already made</p>
+</Show>
         <div class='flex flex-row w-full justify-between gap-2 m-4'>
           <div class='flex gap-2'> {/* Follow button */}
             <Button variant="default">
@@ -57,4 +54,3 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
     </div>
   )
 }
-/// create function for pending request 

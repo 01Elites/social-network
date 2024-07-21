@@ -7,6 +7,27 @@ import (
 	"social-network/internal/models"
 )
 
+func GetFollowingCount(userID string) (int, error) {
+	var count int
+	query := `SELECT COUNT(*) FROM follower WHERE follower_id = $1`
+	err := DB.QueryRow(context.Background(),query, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func GetFollowerCount(userID string) (int, error) {
+	var count int
+	query := `SELECT COUNT(*) FROM follower WHERE followed_id = $1`
+	err := DB.QueryRow(context.Background(),query, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+
 func GetUsersFollowingByID(userID string) (map[string]bool, error) {
 	Following := make(map[string]bool)
 	query := `SELECT followed_id FROM follower WHERE follower_id = $1`

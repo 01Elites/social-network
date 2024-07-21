@@ -20,6 +20,7 @@ import { PostCommentsDialog } from './PostCommentsDialog';
 
 interface FeedPostsProps {
   class?: string;
+  path: string;
 }
 
 export default function FeedPosts(props: FeedPostsProps): JSXElement {
@@ -32,10 +33,9 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
     );
     setPosts(updatedPosts);
   }
-
   createEffect(() => {
     if (!userDetails()) return;
-    fetchWithAuth(config.API_URL + '/posts')
+    fetchWithAuth(config.API_URL + props.path)
       .then(async (res) => {
         const body = await res.json();
         if (res.status === 404) {

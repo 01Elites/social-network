@@ -52,7 +52,7 @@ type UserProfile struct {
 	Gender         string    `db:"gender" json:"gender,omitempty"`
 	DateOfBirth    time.Time `db:"date_of_birth" json:"date_of_birth,omitempty"`
 	ProfilePrivacy string    `db:"privacy" json:"post_privacy,omitempty"`
-	Image          string    `db:"image" json:"image_id,omitempty"`
+	Avatar         string    `db:"image" json:"avatar,omitempty"`
 	About          string    `db:"about" json:"about,omitempty"`
 }
 

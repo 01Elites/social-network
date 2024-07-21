@@ -111,7 +111,7 @@ Response:
 				"user_name": string,
 				"first_name": string,
 				"last_name": string,
-				"image": string // optional
+				"avatar": string // optional
 		},
 		"title": string,
 		"content": string,

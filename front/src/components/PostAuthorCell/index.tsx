@@ -1,3 +1,4 @@
+import { A } from '@solidjs/router';
 import moment from 'moment';
 import { JSXElement } from 'solid-js';
 import User from '~/types/User';
@@ -18,7 +19,10 @@ export default function PostAuthorCell(props: PostAuthorCellProps): JSXElement {
         </AvatarFallback>
       </Avatar>
       <div>
-        <h3 class='text-sm font-bold'>{`${props.author.first_name} ${props.author.last_name}`}</h3>
+        <A
+          href={`/profile/${props.author.user_name}`}
+          class='block text-sm font-bold hover:underline'
+        >{`${props.author.first_name} ${props.author.last_name}`}</A>
         <time
           class='text-xs font-light text-muted-foreground'
           dateTime={moment(props.date).calendar()}

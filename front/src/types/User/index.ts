@@ -10,6 +10,8 @@ type User = {
   about?: string;
   profile_privacy: 'public' | 'private';
   follow_status: string;
+  follower_count: number;
+  following_count: number;
 };
 
 interface UserDetailsHook {

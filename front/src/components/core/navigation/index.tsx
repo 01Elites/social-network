@@ -1,4 +1,4 @@
-import { A, useNavigate } from '@solidjs/router';
+import { A, useLocation, useNavigate } from '@solidjs/router';
 import { createSignal, For, JSXElement, Show, useContext } from 'solid-js';
 import { showLogin } from '~/components/LoginDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -43,14 +43,15 @@ export default function Navigation(props: NavigationProps): JSXElement {
     UserDetailsContext,
   ) as UserDetailsHook;
 
-  const currentPath = window.location.pathname; // Get the current path
+  const location = useLocation();
+
   // eh writing the same line every where? sucks
   function cpFill(path: string) {
-    return currentPath === path ? 'white' : undefined;
+    return location.pathname === path ? 'white' : undefined;
   }
 
   function itemVariant(path: string) {
-    return currentPath === path ? 'default' : 'ghost';
+    return location.pathname === path ? 'default' : 'ghost';
   }
 
   // Define the navItems array with default item based on currentPath match
@@ -118,8 +119,12 @@ export default function Navigation(props: NavigationProps): JSXElement {
         <Show
           when={userDetails()}
           fallback={
-            <Button variant='secondary' class='w-full' onClick={showLogin}>
-              <IconLogin class='size-4 justify-start gap-2' />
+            <Button
+              variant='secondary'
+              class='w-full gap-2'
+              onClick={showLogin}
+            >
+              <IconLogin class='size-4' />
               <span class='hidden md:block'>Login</span>
             </Button>
           }

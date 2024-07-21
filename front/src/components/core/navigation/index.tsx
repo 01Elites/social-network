@@ -49,31 +49,35 @@ export default function Navigation(props: NavigationProps): JSXElement {
     return currentPath === path ? 'white' : undefined;
   }
 
+  function itemVariant(path: string) {
+    return currentPath === path ? 'default' : 'ghost';
+  }
+
   // Define the navItems array with default item based on currentPath match
   const [navItems] = createSignal<NavItem[]>([
     {
       label: 'Home',
       href: '/',
       icon: <IconHome class='size-4' fill={cpFill('/')} />,
-      variant: currentPath === '/' ? 'default' : 'ghost',
+      variant: itemVariant('/'),
     },
     {
       label: 'Friends',
       href: '/friends',
       icon: <IconTwoPerson class='size-4' fill={cpFill('/friends')} />,
-      variant: currentPath === '/friends' ? 'default' : 'ghost',
+      variant: itemVariant('/friends'),
     },
     {
       label: 'Groups',
       href: '/groups',
       icon: <IconGroup class='size-4' fill={cpFill('/groups')} />,
-      variant: currentPath === '/groups' ? 'default' : 'ghost',
+      variant: itemVariant('/groups'),
     },
     {
       label: 'Events',
       href: '/events',
       icon: <IconFlag class='size-4' fill={cpFill('/events')} />,
-      variant: currentPath === '/events' ? 'default' : 'ghost',
+      variant: itemVariant('/events'),
     },
   ]);
 

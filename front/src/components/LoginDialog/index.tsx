@@ -1,4 +1,4 @@
-import { JSXElement, createSignal, useContext } from 'solid-js';
+import { JSXElement, Show, createSignal, useContext } from 'solid-js';
 import {
   Dialog,
   DialogContent,
@@ -13,15 +13,6 @@ import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import moment from 'moment';
 import { Button } from '~/components/ui/button';
-import { Checkbox } from '~/components/ui/checkbox';
-import { Label } from '~/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import {
   TextField,
   TextFieldInput,
@@ -32,6 +23,15 @@ import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/types/User';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
 const loginMessages = [
   'Waste your time here ✨',
@@ -53,6 +53,8 @@ function LoginDialog(): JSXElement {
   const { fetchUserDetails } = useContext(
     UserDetailsContext,
   ) as UserDetailsHook;
+
+  const [loginFormOpen, setLoginFormOpen] = createSignal(true);
 
   const [formProcessing, setFormProcessing] = createSignal(false);
 
@@ -158,13 +160,14 @@ function LoginDialog(): JSXElement {
       open={loginOpen()}
       onOpenChange={(isOpen) => {
         setLoginOpen(isOpen);
+        setLoginFormOpen(true);
       }}
     >
       <DialogContent>
         <DialogHeader>
           <div
             class={
-              loginOpen()
+              loginFormOpen()
                 ? 'flex justify-center'
                 : 'flex justify-center xs:justify-start'
             }
@@ -173,21 +176,156 @@ function LoginDialog(): JSXElement {
           </div>
           <DialogTitle
             class={
-              loginOpen()
+              loginFormOpen()
                 ? 'text-center text-3xl'
                 : 'text-center text-3xl xs:text-left'
             }
           >
-            {loginOpen() ? 'Oh, no life?' : 'Sign Up'}
+            {loginFormOpen() ? 'Oh, no life?' : 'Sign Up'}
           </DialogTitle>
           <DialogDescription
-            class={loginOpen() ? 'text-center' : 'text-center xs:text-left'}
+            class={loginFormOpen() ? 'text-center' : 'text-center xs:text-left'}
           >
-            {loginOpen() ? loginMessages.random() : signUpMessages.random()}
+            {loginFormOpen() ? loginMessages.random() : signUpMessages.random()}
           </DialogDescription>
         </DialogHeader>
 
-        {loginOpen() && (
+        <Show
+          when={loginFormOpen()}
+          fallback={
+            <form
+              class='grid w-full grid-cols-1 gap-4 xs:grid-cols-2'
+              onSubmit={handleSignupForm}
+            >
+              <TextField
+                class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
+                onChange={setSignupFirstName}
+                value={signupFirstName()}
+                required
+              >
+                <TextFieldLabel for='fname'>First Name</TextFieldLabel>
+                <TextFieldInput type='text' id='fname' placeholder='Yaman' />
+              </TextField>
+              <TextField
+                class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
+                onChange={setSignupLastName}
+                value={signupLastName()}
+                required
+              >
+                <TextFieldLabel for='lname'>Last Name</TextFieldLabel>
+                <TextFieldInput type='text' id='lname' placeholder='Almasri' />
+              </TextField>
+              <TextField
+                class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
+                onChange={setSignupEmail}
+                value={signupEmail()}
+                required
+              >
+                <TextFieldLabel for='email'>Email</TextFieldLabel>
+                <TextFieldInput
+                  type='email'
+                  id='email'
+                  placeholder='yaman@reboot01.com'
+                />
+              </TextField>
+              <TextField
+                class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
+                onChange={setSignupDOB}
+                value={signupDOB()}
+                required
+              >
+                <TextFieldLabel for='dob'>Date of Birth</TextFieldLabel>
+                <TextFieldInput
+                  class='block' // without it calendar icon gets ruined
+                  type='date'
+                  max={moment().subtract(18, 'years').format('YYYY-MM-DD')}
+                  id='dob'
+                />
+              </TextField>
+
+              <TextField
+                class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
+                onChange={setSignupGender}
+              >
+                <TextFieldLabel>Gender</TextFieldLabel>
+
+                <Select
+                  class='col-span-2 w-full xs:col-span-1'
+                  placeholder='Select your Gender'
+                  itemComponent={(props) => (
+                    <SelectItem item={props.item}>
+                      {props.item.rawValue}
+                    </SelectItem>
+                  )}
+                  options={['male', 'female']}
+                  defaultValue='male'
+                >
+                  <SelectTrigger aria-label='profile privacy' class='w-full'>
+                    <SelectValue<string>>
+                      {(state) => {
+                        setSignupGender(state.selectedOption() as any);
+                        return state.selectedOption();
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent />
+                </Select>
+              </TextField>
+
+              <TextField
+                class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
+                onChange={setSignupPassword}
+                required
+              >
+                <TextFieldLabel for='password'>Password</TextFieldLabel>
+                <TextFieldInput
+                  type='password'
+                  id='password'
+                  placeholder='your password'
+                />
+              </TextField>
+
+              <div class='items-top col-span-2 flex space-x-2'>
+                <Checkbox
+                  id='terms1'
+                  checked={signupPrivate()}
+                  onChange={setSignupPrivate}
+                />
+                <div class='grid gap-1.5 leading-none'>
+                  <Label for='terms1-input'>Make my profile private</Label>
+                  <p class='text-sm text-muted-foreground'>
+                    I am a big looser and I don't want anyone to know about me
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                type='submit'
+                class='col-span-2 gap-4'
+                disabled={
+                  !signupFirstName() ||
+                  !signupLastName() ||
+                  !signupEmail() ||
+                  !signupDOB() ||
+                  !signupGender() ||
+                  !signupPassword() ||
+                  formProcessing()
+                }
+              >
+                {formProcessing() && <img src={tailspin} class='h-full' />}
+                Become a Looser
+              </Button>
+              <Button
+                variant='link'
+                class='justify-start p-0 text-base underline'
+                onClick={() => setLoginFormOpen(true)}
+                disabled={formProcessing()}
+              >
+                I am already a looser
+              </Button>
+            </form>
+          }
+        >
           <form class='flex flex-col gap-4' onSubmit={handleLoginForm}>
             <Button
               variant='outline'
@@ -237,149 +375,16 @@ function LoginDialog(): JSXElement {
               <Button
                 variant='link'
                 class='p-0 text-base underline'
-                onClick={() => setLoginOpen(false)}
+                onClick={() => setLoginFormOpen(false)}
                 disabled={formProcessing()}
               >
                 Sign up for Free
               </Button>
             </p>
           </form>
-        )}
+        </Show>
 
         {/* Sign up form */}
-        {!loginOpen() && (
-          <form
-            class='grid w-full grid-cols-1 gap-4 xs:grid-cols-2'
-            onSubmit={handleSignupForm}
-          >
-            <TextField
-              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
-              onChange={setSignupFirstName}
-              value={signupFirstName()}
-              required
-            >
-              <TextFieldLabel for='fname'>First Name</TextFieldLabel>
-              <TextFieldInput type='text' id='fname' placeholder='Yaman' />
-            </TextField>
-            <TextField
-              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
-              onChange={setSignupLastName}
-              value={signupLastName()}
-              required
-            >
-              <TextFieldLabel for='lname'>Last Name</TextFieldLabel>
-              <TextFieldInput type='text' id='lname' placeholder='Almasri' />
-            </TextField>
-            <TextField
-              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
-              onChange={setSignupEmail}
-              value={signupEmail()}
-              required
-            >
-              <TextFieldLabel for='email'>Email</TextFieldLabel>
-              <TextFieldInput
-                type='email'
-                id='email'
-                placeholder='yaman@reboot01.com'
-              />
-            </TextField>
-            <TextField
-              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
-              onChange={setSignupDOB}
-              value={signupDOB()}
-              required
-            >
-              <TextFieldLabel for='dob'>Date of Birth</TextFieldLabel>
-              <TextFieldInput
-                class='block' // without it calendar icon gets ruined
-                type='date'
-                max={moment().subtract(18, 'years').format('YYYY-MM-DD')}
-                id='dob'
-              />
-            </TextField>
-
-            <TextField
-              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
-              onChange={setSignupGender}
-            >
-              <TextFieldLabel>Gender</TextFieldLabel>
-
-              <Select
-                class='col-span-2 w-full xs:col-span-1'
-                placeholder='Select your Gender'
-                itemComponent={(props) => (
-                  <SelectItem item={props.item}>
-                    {props.item.rawValue}
-                  </SelectItem>
-                )}
-                options={['male', 'female']}
-                defaultValue='male'
-              >
-                <SelectTrigger aria-label='profile privacy' class='w-full'>
-                  <SelectValue<string>>
-                    {(state) => {
-                      setSignupGender(state.selectedOption() as any);
-                      return state.selectedOption();
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent />
-              </Select>
-            </TextField>
-
-            <TextField
-              class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
-              onChange={setSignupPassword}
-              required
-            >
-              <TextFieldLabel for='password'>Password</TextFieldLabel>
-              <TextFieldInput
-                type='password'
-                id='password'
-                placeholder='your password'
-              />
-            </TextField>
-
-            <div class='items-top col-span-2 flex space-x-2'>
-              <Checkbox
-                id='terms1'
-                checked={signupPrivate()}
-                onChange={setSignupPrivate}
-              />
-              <div class='grid gap-1.5 leading-none'>
-                <Label for='terms1-input'>Make my profile private</Label>
-                <p class='text-sm text-muted-foreground'>
-                  I am a big looser and I don't want anyone to know about me
-                </p>
-              </div>
-            </div>
-
-            <Button
-              type='submit'
-              class='col-span-2 gap-4'
-              disabled={
-                !signupFirstName() ||
-                !signupLastName() ||
-                !signupEmail() ||
-                !signupDOB() ||
-                !signupGender() ||
-                !signupPassword() ||
-                formProcessing()
-              }
-            >
-              {formProcessing() && <img src={tailspin} class='h-full' />}
-              Become a Looser
-            </Button>
-            <Button
-              variant='link'
-              class='justify-start p-0 text-base underline'
-              onClick={() => setLoginOpen(true)}
-              disabled={formProcessing()}
-            >
-              I am already a looser
-            </Button>
-          </form>
-        )}
       </DialogContent>
     </Dialog>
   );

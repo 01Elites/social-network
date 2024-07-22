@@ -1,4 +1,4 @@
-import { A, useNavigate } from '@solidjs/router';
+import { A, useLocation, useNavigate } from '@solidjs/router';
 import { createSignal, For, JSXElement, Show, useContext } from 'solid-js';
 import { showLogin } from '~/components/LoginDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -43,10 +43,15 @@ export default function Navigation(props: NavigationProps): JSXElement {
     UserDetailsContext,
   ) as UserDetailsHook;
 
-  const currentPath = window.location.pathname; // Get the current path
+  const location = useLocation();
+
   // eh writing the same line every where? sucks
   function cpFill(path: string) {
-    return currentPath === path ? 'white' : undefined;
+    return location.pathname === path ? 'white' : undefined;
+  }
+
+  function itemVariant(path: string) {
+    return location.pathname === path ? 'default' : 'ghost';
   }
 
   // Define the navItems array with default item based on currentPath match
@@ -55,25 +60,25 @@ export default function Navigation(props: NavigationProps): JSXElement {
       label: 'Home',
       href: '/',
       icon: <IconHome class='size-4' fill={cpFill('/')} />,
-      variant: currentPath === '/' ? 'default' : 'ghost',
+      variant: itemVariant('/'),
     },
     {
       label: 'Friends',
       href: '/friends',
       icon: <IconTwoPerson class='size-4' fill={cpFill('/friends')} />,
-      variant: currentPath === '/friends' ? 'default' : 'ghost',
+      variant: itemVariant('/friends'),
     },
     {
       label: 'Groups',
       href: '/groups',
       icon: <IconGroup class='size-4' fill={cpFill('/groups')} />,
-      variant: currentPath === '/groups' ? 'default' : 'ghost',
+      variant: itemVariant('/groups'),
     },
     {
       label: 'Events',
       href: '/events',
       icon: <IconFlag class='size-4' fill={cpFill('/events')} />,
-      variant: currentPath === '/events' ? 'default' : 'ghost',
+      variant: itemVariant('/events'),
     },
   ]);
 
@@ -114,8 +119,12 @@ export default function Navigation(props: NavigationProps): JSXElement {
         <Show
           when={userDetails()}
           fallback={
-            <Button variant='secondary' class='w-full' onClick={showLogin}>
-              <IconLogin class='size-4 justify-start gap-2' />
+            <Button
+              variant='secondary'
+              class='w-full gap-2'
+              onClick={showLogin}
+            >
+              <IconLogin class='size-4' />
               <span class='hidden md:block'>Login</span>
             </Button>
           }

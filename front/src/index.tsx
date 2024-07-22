@@ -9,6 +9,9 @@ import { render } from 'solid-js/web';
 import '~/extensions';
 
 import './index.css';
+import EventsPage from './pages/events';
+import FriendsPage from './pages/friends';
+import GroupsPage from './pages/groups';
 import HomePage from './pages/home';
 import Profile from './pages/profile';
 import Group from './pages/group';
@@ -33,13 +36,14 @@ function App() {
         </>
       )}
     >
-      {/* <AuthGuard> */}
       <Route path='/' component={HomePage} />
       {/* </AuthGuard> */}
        <Route path='/group/:id' component={Group} /> 
       {/* <AuthGuard> */}
+      <Route path='/friends' component={FriendsPage} />
+      <Route path='/events' component={EventsPage} />
+
       <Route path='/profile/:username' component={Profile} />
-      {/* </AuthGuard> */}
     </Router>
   );
 }

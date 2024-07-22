@@ -321,6 +321,9 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			post.image,
 			user_id, 
 			user_name,
+			created_at,
+      first_name,
+			last_name,
 			profile.image
 	FROM 
 			post 
@@ -346,6 +349,9 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 			&p.Image,
 			&p.User.UserID,
 			&p.User.UserName,
+			&p.CreationDate,
+			&p.User.FirstName,
+			&p.User.LastName,
 			&p.User.Avatar,
 		); err != nil {
 			log.Printf("database failed to scan post: %v\n", err)

@@ -20,23 +20,27 @@ export default function Group(): JSXElement {
   
   createEffect(() => {
   fetchWithAuth(config.API_URL + '/group/' + groupID).then(async (res) => {
+    console.log(config.API_URL + '/group/' + groupID)
     const body = await res.json();
-    if (res.status === 404) {
-      console.log('User not found');
-      return;
-    }
-    if (res.ok) {
+    if (res.status === 200) {
+      console.log('User fetched');
+      console.log(body)
       setTargetGroup(body);
       return;
+    } else {
+      console.log('Error fetching group');
+      return
     }
   })
 })
 
   return (<><Layout>
     <div class='grid grid-cols-1 md:grid-cols-6 m-4 '> {/* Main grid */}
+      <Show when={targetGroup()}>  
       <div class='col-span-2'>
           <GroupDetails targetGroup={() => targetGroup() as Group} />
       </div>
+      </Show>
       <Show when={targetGroup()?.ismember}>
       <div class='col-span-4 overflow-y-auto'>
         <GroupPostFeed groupID={groupID as string} />

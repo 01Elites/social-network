@@ -15,7 +15,7 @@ export default function ProfileDetails(props: { targetUser: () => User }): JSXEl
         <AspectRatio ratio={16 / 9}> {/* Profile picture */}
           <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-end rounded-lg'>
             <Avatar class='w-[5rem] h-[5rem] mb-2'>
-              <AvatarFallback>{props.targetUser().first_name[0]}</AvatarFallback>
+              <AvatarFallback>{props.targetUser().avatar}</AvatarFallback>
             </Avatar>
           </div>
         </AspectRatio> {/* Profile picture */}

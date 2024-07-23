@@ -5,7 +5,7 @@ import config from '~/config';
 import type {Group} from '~/types/group';
 import Layout from '~/Layout';
 import GroupDetails from './details';
-import GroupPostFeed from './groupfeed';
+import GroupFeed from './groupfeed';
 
   export type GroupParams = {
     id: string;
@@ -43,7 +43,7 @@ export default function Group(): JSXElement {
       </Show>
       <Show when={targetGroup()?.ismember}>
       <div class='col-span-4 overflow-y-auto'>
-        <GroupPostFeed groupID={groupID as string} />
+        <GroupFeed groupID={groupID as string} />
       </div>
         </Show>
     </div> {/* Main grid */}

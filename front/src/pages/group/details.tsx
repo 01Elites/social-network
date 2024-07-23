@@ -7,9 +7,12 @@ import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
 import config from '~/config';
+import RequestToJoin from "./request";
+
 
 export default function GroupDetails(props: { targetGroup: () => Group}): JSXElement {
   const numberOfMembers = props.targetGroup().members.length;
+  const groupID = String(props.targetGroup().id)
   return (
     <div class='flex flex-col'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
@@ -40,9 +43,7 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
   <Show when={!props.targetGroup().request_made}
     fallback={<p>request to join already made</p>
     }>
-    <Button class="flex grow" variant="default">
-      <Follow_Icon /> Request to join
-    </Button>
+    <RequestToJoin targetGroup={() => props.targetGroup() as Group}/>
 </Show>
 </Show>
         <div class='flex flex-row w-full justify-between gap-2 m-4'>

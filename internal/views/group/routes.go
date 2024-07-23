@@ -15,7 +15,7 @@ func SetupGroupRoutes() {
 	http.HandleFunc("PATCH /api/invitation_response", middleware.AllowCORS(middleware.CheckAuth(InvitationResponseHandler)))
 
 	http.HandleFunc("POST /api/join_group_req", middleware.AllowCORS(middleware.CheckAuth(CreateRequestHandler)))
-	http.HandleFunc("PATCH /api/cancel_join_req", middleware.AllowCORS(middleware.CheckAuth(CancelRequestHandler)))
+	http.HandleFunc("POST /api/cancel_join_req", middleware.AllowCORS(middleware.CheckAuth(CancelRequestHandler)))
 	http.HandleFunc("PATCH /api/join_group_res", middleware.AllowCORS(middleware.CheckAuth(RequestResponseHandler)))
 
 	http.HandleFunc("POST /api/exit_group", middleware.AllowCORS(middleware.CheckAuth(ExitGroupHandler)))

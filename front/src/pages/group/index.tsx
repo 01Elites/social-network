@@ -11,7 +11,7 @@ import GroupFeed from './groupfeed';
     id: string;
   };
 
-export default function Group(): JSXElement {
+export default function GroupPage(): JSXElement {
 
   const [targetGroup, setTargetGroup] = createSignal<Group | undefined>();
   

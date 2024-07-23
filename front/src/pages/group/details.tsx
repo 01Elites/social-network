@@ -37,25 +37,8 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
         </div> {/* Username, followers, following */}
         <div class='m-4'> {/* Bio */}
           <p>{props.targetGroup().description}</p>
-        </div> {/* Bio */}
-        <Show when={!props.targetGroup().ismember}
-         fallback={<div><p>You are a member</p></div>}> 
-  <Show when={!props.targetGroup().request_made}
-    fallback={<p>request to join already made</p>
-    }>
-    <RequestToJoin targetGroup={() => props.targetGroup() as Group}/>
-</Show>
-</Show>
-        <div class='flex flex-row w-full justify-between gap-2 m-4'>
-          <div class='flex gap-2'> {/* Follow button */}
-            <Button variant="default">
-              <Globe_Icon class='w-5 justify-center' />
-            </Button>
-            <Button variant="default">
-              <Message_Icon class='w-5 justify-center' />
-            </Button>
-          </div> {/* Follow button */}
         </div>
+       <RequestToJoin targetGroup={() => props.targetGroup() as Group}/>
       </div>
     </div>
   )

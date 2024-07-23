@@ -2,7 +2,6 @@ package group
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -190,7 +189,6 @@ func CancelRequestHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "failed to cancel request", http.StatusNotFound)
 		return
 	}
-	fmt.Println(requestID)
 	creatorID, err := database.GetGroupCreatorID(request.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "error getting creator ID", http.StatusNotFound)

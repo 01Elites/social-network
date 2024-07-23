@@ -1,13 +1,21 @@
-import { JSXElement } from 'solid-js';
-import { AspectRatio } from "~/components/ui/aspect-ratio";
+import { JSXElement, Show, useContext } from 'solid-js';
+import {
+  ProfileEditDialog,
+  showEditProfile,
+} from '~/components/EditProfileDialog';
+import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
-import { Button } from "~/components/ui/button";
+import { Button } from '~/components/ui/button';
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
-import User from '~/types/User';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
+import User, { UserDetailsHook } from '~/types/User';
 
-export default function ProfileDetails(props: { targetUser: () => User }): JSXElement {
+export default function ProfileDetails(props: {
+  targetUser: () => User;
+}): JSXElement {
+  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   return (
     <div class='flex flex-col'> {/* Left div */}
@@ -29,20 +37,39 @@ export default function ProfileDetails(props: { targetUser: () => User }): JSXEl
         <div class='m-4'> {/* Bio */}
           <p>{props.targetUser().about}</p>
         </div> {/* Bio */}
-        <div class='flex flex-row w-full justify-between gap-2 m-4'>
-          <Button class="flex grow" variant="default">
-            <Follow_Icon /> {props.targetUser().follow_status === 'following' ? 'Unfollow' : 'Follow'}
+        <Show
+          when={userDetails()?.user_name === props.targetUser().user_name}
+          fallback={
+            <div class='m-4 flex w-full flex-row justify-between gap-2'>
+              <Button class='flex grow' variant='default'>
+                <Follow_Icon />
+                {props.targetUser().follow_status === 'following'
+                  ? 'Unfollow'
+                  : 'Follow'}
+              </Button>
+              <div class='flex gap-2'>
+                {/* Follow button */}
+                <Button variant='default'>
+                  <Globe_Icon class='w-5 justify-center' />
+                </Button>
+                <Button variant='default'>
+                  <Message_Icon class='w-5 justify-center' />
+                </Button>
+              </div>
+              {/* Follow button */}
+            </div>
+          }
+        >
+          <Button
+            class='m-4 w-full'
+            variant='default'
+            onClick={showEditProfile}
+          >
+            Edit Profile
           </Button>
-          <div class='flex gap-2'> {/* Follow button */}
-            <Button variant="default">
-              <Globe_Icon class='w-5 justify-center' />
-            </Button>
-            <Button variant="default">
-              <Message_Icon class='w-5 justify-center' />
-            </Button>
-          </div> {/* Follow button */}
-        </div>
+          <ProfileEditDialog />
+        </Show>
       </div>
     </div>
-  )
+  );
 }

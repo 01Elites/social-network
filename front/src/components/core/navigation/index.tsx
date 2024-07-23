@@ -144,7 +144,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  navigate('/profile');
+                  navigate(`/profile/${userDetails()?.user_name}`);
                 }}
               >
                 Profile

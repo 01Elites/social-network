@@ -3,8 +3,9 @@ import { Button } from "~/components/ui/button";
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
-import { JSXElement } from 'solid-js';
+import { createEffect, JSXElement } from 'solid-js';
 import { Show } from 'solid-js';
+import { createSignal } from 'solid-js';
 
 
 type GroupRequestParams= {
@@ -12,44 +13,51 @@ type GroupRequestParams= {
 }
 
 export default function RequestToJoin(props: { targetGroup: () => Group}):JSXElement{
-  function fetchRequest(data: string){
-  fetchWithAuth(config.API_URL + data,{
+  var [buttonData, setButtonData] = createSignal(["", ""]);
+  if (props.targetGroup().ismember){
+    setButtonData(["Exit Group", "/exit_group"])
+  } else if (props.targetGroup().request_made){
+  setButtonData(["Cancel Request", "/cancel_join_req"])
+} else {
+    setButtonData(["Request to Join", "/join_group_req"])
+  }
+  function sendRequestApi(){
+    console.log(buttonData())
+    if (buttonData()[1] === ""){
+      return
+    }
+  fetchWithAuth(config.API_URL + buttonData()[1],{
     method:'POST',
     body:JSON.stringify({
         group_id:props.targetGroup().id
     })
   }).then(async (res) => {
     if (res.status === 200) {
-      if (data === '/join_group_req'){
+      if (buttonData()[1] === "/join_group_req"){
+        setButtonData(["Cancel Request", "/cancel_join_req"])
         props.targetGroup().request_made = true
         console.log('RequestMade');
-      } else {
+      } else if (buttonData()[1] === "/cancel_join_req"){
+        setButtonData(["Request to Join", "/join_group_req"])      
         props.targetGroup().request_made = false
+        console.log('RequestCancelled');
+      } else if (buttonData()[1] === "/exit_group"){
+        setButtonData(["Request to Join", "/join_group_req"])
+        props.targetGroup().ismember = false
+        props.targetGroup().request_made = false
+        console.log('GroupExited');
       }
       return;
     } else {
+      console.log(res.body);
       console.log('Error making request');
       return
     }
   })
 }
-  return (<><Show when={!props.targetGroup().ismember}
-  fallback={<Button class="flex grow" variant="default" onclick={[fetchRequest,"/exit_group"]} name="request">
-  <Follow_Icon /> exit group
-</Button>}> 
-<Show when={!props.targetGroup().request_made}
-fallback={<Button class="flex grow" variant="default" onclick={[fetchRequest,"/cancel_join_req"]} name="request">
-<Follow_Icon /> Cancel Request
+  return (<>
+<Button class="flex grow" variant="default" onClick={sendRequestApi}>
+<Follow_Icon />{buttonData()[0]}
 </Button>
-}>
-<Button class="flex grow" variant="default" onclick={[fetchRequest,"/join_group_req"]} name="request">
-    <Follow_Icon /> Request to join
-  </Button>
-</Show>
-</Show>
- <div class='flex flex-row w-full justify-between gap-2 m-4'>
-   <div class='flex gap-2'> {/* Follow button */}
-   </div> {/* Follow button */}
- </div>
      </>)
 }

@@ -33,9 +33,9 @@ func CreateGroup(userID string, group models.CreateGroup) (int, error) {
 	return group_id, nil
 }
 
-func CreatGroupChat(groupID int)error{
-		query := `INSERT INTO "chat" (group_id, chat_type) VALUES ($1, $2)`
-		_, err := DB.Exec(context.Background(), query, groupID, "group")
+func CreatGroupChat(groupID int) error {
+	query := `INSERT INTO "chat" (group_id, chat_type) VALUES ($1, $2)`
+	_, err := DB.Exec(context.Background(), query, groupID, "group")
 	if err != nil {
 		log.Printf("database: Failed to insert group into database: %v", err)
 		return err // Return error if failed to insert group member
@@ -189,7 +189,7 @@ func getGroupFromInvitation(invitationID int) (string, int, string, error) {
 						WHERE
 						invitation_id = $1
 						`
-	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser,&groupID, &groupTitle)
+	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser, &groupID, &groupTitle)
 	if err != nil {
 		log.Printf("database failed to scan group user: %v\n", err)
 		return "", 0, "", err
@@ -197,6 +197,37 @@ func getGroupFromInvitation(invitationID int) (string, int, string, error) {
 	return invitedUser, groupID, groupTitle, nil
 }
 
-func GetAllGroups(){
+func GetGroupRequests(groupID int) ([]models.Requester, error) {
+	var requesters []models.Requester
+	query := `SELECT user_name,
+									 requested_at,
+									 first_name,
+									 last_name,
+									 image
+									  FROM group_requests
+										INNER JOIN profile ON public.profile.user_id = public.group_requests.requester_id
+										INNER JOIN "user" USING (user_id)
+										WHERE group_id = $1 AND status = 'pending'`
+	rows, err := DB.Query(context.Background(), query, groupID)
+	if err != nil {
+		log.Printf("database failed to scan group user: %v\n", err)
+		return nil, err
+	}
+	for rows.Next() {
+		var requester models.Requester
+		if err = rows.Scan(&requester.User.UserName,
+			&requester.CreationDate,
+			&requester.User.FirstName,
+			&requester.User.LastName,
+			&requester.User.Avatar); err != nil {
+			log.Printf("database failed to scan group user: %v\n", err)
+			return nil, err
+		}
+		requesters = append(requesters, requester)
+	}
+	return requesters, nil
+}
+
+func GetAllGroups() {
 
 }

@@ -2,10 +2,6 @@ import { JSXElement, Show } from "solid-js";
 import type {Group} from "~/types/group";
 import { A } from '@solidjs/router';
 import { AspectRatio } from "~/components/ui/aspect-ratio";
-import { Button } from "~/components/ui/button";
-import Follow_Icon from '~/components/ui/icons/follow_icon';
-import Globe_Icon from '~/components/ui/icons/globe_icon';
-import Message_Icon from '~/components/ui/icons/message_icon';
 import config from '~/config';
 import RequestToJoin from "./request";
 

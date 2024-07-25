@@ -1,12 +1,16 @@
+import { requester } from "~/pages/group/groupfeed";
+
 type Group = {
   id: number,
   title: string;
   description: string;
   members: string[];
   ismember: boolean;
+  iscreator: boolean;
   request_made: boolean;
   events: groupEvent[];
   creator: creator;
+  requesters: requester[];
 };
 
 type creator = {

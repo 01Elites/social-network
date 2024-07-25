@@ -76,25 +76,26 @@ Example:
 	GET api/group/123
 
 Response:
-       {"id":1,
-				"title":"testing",
-				"description":"desc test",
-				"members":[]string //usernames,
-				"ismember":true,
-				"request_made":true
-      	"events":[{"id":1,
-      	    "title":"testing",
-            "description":"desc test",
-            "options":["Going","Notgoing"],
-            "event_time":"2024-07-10T14:00:00Z",
-        "responded_users":["AHeidenreich5716","Going"]
-        "creator":{
-				"user_name": string,
-				"first_name": string,
-				"last_name": string,
-				"avatar": string // optional
-		},
-}
+
+	       {"id":1,
+					"title":"testing",
+					"description":"desc test",
+					"members":[]string //usernames,
+					"ismember":true,
+					"request_made":true
+	      	"events":[{"id":1,
+	      	    "title":"testing",
+	            "description":"desc test",
+	            "options":["Going","Notgoing"],
+	            "event_time":"2024-07-10T14:00:00Z",
+	        "responded_users":["AHeidenreich5716","Going"]
+	        "creator":{
+					"user_name": string,
+					"first_name": string,
+					"last_name": string,
+					"avatar": string // optional
+			},
+	}
 */
 func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	var group models.GroupFeed
@@ -111,22 +112,36 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID not found", http.StatusInternalServerError)
 		return
 	}
+	username, err := database.GetUserNameByID(userID)
+	if err != nil {
+		http.Error(w, "Failed to get username", http.StatusInternalServerError)
+		return
+	}
+
 	group.Title, group.Description, err = database.GetGroupInfo(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group info", http.StatusInternalServerError)
 		return
 	}
 
-	group.Members,_, err = database.GetGroupMembers(group.ID)
+	group.Members, _, err = database.GetGroupMembers(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
 		return
 	}
-	
+
 	group.Creator, err = database.GetCreatorProfile(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get creator profile", http.StatusInternalServerError)
 		return
+	}
+	if group.Creator.UserName == username {
+		group.IsCreator = true
+		group.Requesters, err = database.GetGroupRequests(group.ID)
+		if err != nil {
+			http.Error(w, "Failed to get group requests", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
@@ -135,10 +150,10 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if !group.IsMember { // to view group page for a non-member
 		group.RequestMade, err = database.CheckForGroupRequest(group.ID, userID)
-	if err != nil {
-		helpers.HTTPError(w, "failed to check for request", http.StatusNotFound)
-		return
-	}
+		if err != nil {
+			helpers.HTTPError(w, "failed to check for request", http.StatusNotFound)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(group)
 		return

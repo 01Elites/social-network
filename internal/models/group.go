@@ -9,13 +9,20 @@ type GroupFeed struct {
 	Members     []string        `json:"members,omitempty"`
 	Events      []Event         `json:"events,omitempty"`
 	IsMember    bool            `json:"ismember"`
+	IsCreator   bool            `json:"iscreator"`
 	RequestMade bool            `json:"request_made"`
 	Creator     PostFeedProfile `json:"creator,omitempty"`
+	Requesters  []Requester     `json:"requesters,omitempty"`
 }
 
 type CreateGroup struct {
 	Title       string `json:"title,omitempty"`
 	Description string `json:"description,omitempty"`
+}
+
+type Requester struct {
+	User         PostFeedProfile `json:"user,omitempty"`
+	CreationDate time.Time       `json:"creation_date"`
 }
 
 type GroupAction struct {
@@ -26,7 +33,8 @@ type GroupAction struct {
 }
 type GroupResponse struct {
 	ID          int    `json:"invite_id,omitempty"`
-	GroupID     int    `json:"group_id,omitempty"`
+	GroupIdstr  string `json:"group_id,omitempty"`
+	GroupID     int    
 	Requester   string `json:"requester,omitempty"`
 	RequesterID string
 	Status      string `json:"response,omitempty"`

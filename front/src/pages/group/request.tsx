@@ -4,7 +4,6 @@ import Follow_Icon from '~/components/ui/icons/follow_icon';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
 import { createEffect, JSXElement } from 'solid-js';
-import { Show } from 'solid-js';
 import { createSignal } from 'solid-js';
 
 

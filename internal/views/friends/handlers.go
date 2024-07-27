@@ -11,6 +11,55 @@ import (
 	"strings"
 )
 
+// GetMyFriendsHandler returns the friends of the user
+func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
+	// Retrieve the userID from context using the same key defined globally
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		log.Printf("User ID not found")
+		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
+
+	var friendsList models.Friends
+
+	followers, err := database.GetUserFollowerUserNames(userID)
+	if err != nil {
+		log.Printf("Failed to get followers: %v\n", err)
+		helpers.HTTPError(w, "Failed to get followers", http.StatusInternalServerError)
+		return
+	}
+	friendsList.Followers = followers
+
+	following, err := database.GetUserFollowingUserNames(userID)
+	if err != nil {
+		log.Printf("Failed to get following: %v\n", err)
+		helpers.HTTPError(w, "Failed to get following", http.StatusInternalServerError)
+		return
+	}
+	friendsList.Following = following
+
+	// If the user is the same as the user page, return the friend requests and explore
+	friend_requests, err := database.GetFollowRequests(userID)
+	if err != nil {
+		log.Printf("Failed to get friend requests: %v\n", err)
+		helpers.HTTPError(w, "Failed to get friend requests", http.StatusInternalServerError)
+		return
+	}
+	friendsList.Friend_requests = friend_requests
+
+	explore, err := database.GetExplore(userID)
+	if err != nil {
+		log.Printf("Failed to get explore: %v\n", err)
+		helpers.HTTPError(w, "Failed to get explore", http.StatusInternalServerError)
+		return
+	}
+	friendsList.Explore = explore
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(friendsList)
+}
+
 // GetFriendsHandler returns the friends of the user
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally

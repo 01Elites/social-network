@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Friends struct {
-	UserName        string          `json:"user_name"`
+	UserName        string          `json:"user_name,omitempty"`
 	Followers       []string        `json:"followers"`
 	Following       []string        `json:"following"`
 	Friend_requests []FriendRequest `json:"friend_requests"`

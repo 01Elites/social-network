@@ -2,8 +2,8 @@ type Friends = {
   user_name: string;
   followers: string[];
   following: string[];
-  friend_requests: FriendRequest[] | undefined;
-  explore: string[] | undefined;
+  friend_requests: FriendRequest[];
+  explore: string[];
 };
 
 type FriendRequest = {

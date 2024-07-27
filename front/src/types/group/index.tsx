@@ -1,4 +1,6 @@
 import { requester } from "~/pages/group/groupfeed";
+import { User } from "~/types/User";
+
 
 type Group = {
   id: number,
@@ -10,6 +12,7 @@ type Group = {
   request_made: boolean;
   events: groupEvent[];
   creator: creator;
+  invited_by: requester;
   requesters: requester[];
 };
 

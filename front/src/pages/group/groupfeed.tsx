@@ -29,7 +29,6 @@ export type requester = {
 }
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
   console.log(props)
-  const [requester, removeRequester] = createSignal<requester[]>();
   const [groupPosts, setGroupPosts] = createSignal<Post[]>();
   createEffect(() => {
     fetchWithAuth(config.API_URL + '/group/' + props.groupID + '/posts').then(async (res) => {
@@ -72,8 +71,8 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         </div>
         </div>
       </Tabs.Content>
-      <Tabs.Content class="tabs__content" value="nill">NOTHING!!!</Tabs.Content>
-      <Tabs.Content class="tabs__content" value="nill2">still NOTHING!!!</Tabs.Content>
+      <Tabs.Content class="tabs__content" value="chat">NOTHING!!!</Tabs.Content>
+      <Tabs.Content class="tabs__content" value="events">still NOTHING!!!</Tabs.Content>
       <Show when={props.creator}>
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="requests">
         <Show when={props.requesters?.length === 0}>

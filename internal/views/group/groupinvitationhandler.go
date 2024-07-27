@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
+	"fmt"
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
@@ -116,10 +116,12 @@ func InvitationResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	fmt.Println(response)
 	if response.Status != "accepted" && response.Status != "rejected" {
 		helpers.HTTPError(w, "response can only be rejected or accepted", http.StatusBadRequest)
 		return
 	}
+	
 	groupExists := database.CheckGroupID(response.GroupID)
 	if !groupExists {
 		helpers.HTTPError(w, "group ID does not exist", http.StatusBadRequest)
@@ -146,5 +148,4 @@ func InvitationResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	// database.UpdateNotificationTable()
 }

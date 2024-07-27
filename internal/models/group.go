@@ -11,7 +11,7 @@ type GroupFeed struct {
 	IsMember    bool            `json:"ismember"`
 	IsCreator   bool            `json:"iscreator"`
 	RequestMade bool            `json:"request_made"`
-	InvitedBy		string					`json:"invited_by,omitempty"`
+	InvitedBy   Requester       `json:"invited_by,omitempty"`
 	Creator     PostFeedProfile `json:"creator,omitempty"`
 	Requesters  []Requester     `json:"requesters,omitempty"`
 }
@@ -35,7 +35,7 @@ type GroupAction struct {
 type GroupResponse struct {
 	ID          int    `json:"invite_id,omitempty"`
 	GroupIdstr  string `json:"group_id,omitempty"`
-	GroupID     int    
+	GroupID     int			`json:"group_id_int,omitempty"`
 	Requester   string `json:"requester,omitempty"`
 	RequesterID string
 	Status      string `json:"response,omitempty"`

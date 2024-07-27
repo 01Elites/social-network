@@ -66,30 +66,28 @@ func RespondToInvite(response models.GroupResponse, userID string) (int, error) 
 	return inviteID, nil
 }
 
-func CheckForGroupInvitation(groupID int, userID string) (string, error) {
-	var senderID string
+func CheckForGroupInvitation(groupID int, userID string) (models.Requester, error) {
+	var invitation models.Requester
 	query := `
 	SELECT
-		 sender_id
+		 sent_at, first_name, last_name, user_name
 		FROM
 			group_invitations
+		INNER JOIN profile ON public.profile.user_id = public.group_invitations.sender_id
+		INNER JOIN "user" USING (user_id)
 		WHERE
-		 receiver_id = $1 AND status = $2
+		 group_id = $1 AND receiver_id = $2 AND status = $3
 `
-	err := DB.QueryRow(context.Background(), query, userID, "pending").Scan(&senderID)
+	err := DB.QueryRow(context.Background(), query, groupID, userID, "pending").Scan(&invitation.CreationDate,
+		&invitation.User.FirstName, &invitation.User.LastName, &invitation.User.UserName)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for invitation: %v", err)
-		return "", err
+		return models.Requester{}, err
 	}
-	if senderID == "" {
-		return "", nil
+	if invitation.User.FirstName == "" {
+		return models.Requester{}, nil
 	}
-	sender, err := GetUserNameByID(senderID)
-	if err != nil {
-		log.Printf("database: Failed check for invitation: %v", err)
-		return "", err // Return error if failed to insert post
-	}
-	return sender, nil
+	return invitation, nil
 }
 
 func CheckForGroupRequest(groupID int, senderID string) (bool, error) {

@@ -11,6 +11,7 @@ type GroupFeed struct {
 	IsMember    bool            `json:"ismember"`
 	IsCreator   bool            `json:"iscreator"`
 	RequestMade bool            `json:"request_made"`
+	InvitedBy		string					`json:"invited_by,omitempty"`
 	Creator     PostFeedProfile `json:"creator,omitempty"`
 	Requesters  []Requester     `json:"requesters,omitempty"`
 }

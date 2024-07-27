@@ -44,7 +44,7 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 }
 
 // RespondToInvite responds to an invitation that already exists in the group_invitations table
-func RespondToInvite(response models.GroupResponse, userID string) (int,error) {
+func RespondToInvite(response models.GroupResponse, userID string) (int, error) {
 	var inviteID int
 	query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending' RETURNING invitation_id`
 	err := DB.QueryRow(context.Background(), query, response.Status, response.GroupID, userID).Scan(&inviteID)
@@ -64,6 +64,32 @@ func RespondToInvite(response models.GroupResponse, userID string) (int,error) {
 		}
 	}
 	return inviteID, nil
+}
+
+func CheckForGroupInvitation(groupID int, userID string) (string, error) {
+	var senderID string
+	query := `
+	SELECT
+		 sender_id
+		FROM
+			group_invitations
+		WHERE
+		 receiver_id = $1 AND status = $2
+`
+	err := DB.QueryRow(context.Background(), query, userID, "pending").Scan(&senderID)
+	if err != nil && err.Error() != "no rows in result set" {
+		log.Printf("database: Failed check for invitation: %v", err)
+		return "", err
+	}
+	if senderID == "" {
+		return "", nil
+	}
+	sender, err := GetUserNameByID(senderID)
+	if err != nil {
+		log.Printf("database: Failed check for invitation: %v", err)
+		return "", err // Return error if failed to insert post
+	}
+	return sender, nil
 }
 
 func CheckForGroupRequest(groupID int, senderID string) (bool, error) {
@@ -143,7 +169,7 @@ func RespondToRequest(response models.GroupResponse) (int, error) {
 		_, err = DB.Exec(context.Background(), query, response.RequesterID, response.GroupID)
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
-			return 0,err // Return error if failed to insert post
+			return 0, err // Return error if failed to insert post
 		}
 	}
 	return requestID, nil
@@ -157,6 +183,6 @@ func CancelRequest(GroupID int, userID string) (int, error) {
 		log.Printf("database: Failed to update response in database: %v", err)
 		return requestID, err // Return error if failed to insert post
 	}
-	
+
 	return requestID, nil
 }

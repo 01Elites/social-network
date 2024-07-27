@@ -154,6 +154,11 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "failed to check for request", http.StatusNotFound)
 			return
 		}
+		group.InvitedBy,err = database.CheckForGroupInvitation(group.ID, userID)
+		if err != nil {
+			helpers.HTTPError(w, "failed to check for invitation", http.StatusNotFound)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(group)
 		return

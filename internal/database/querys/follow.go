@@ -10,7 +10,7 @@ import (
 func GetFollowingCount(userID string) (int, error) {
 	var count int
 	query := `SELECT COUNT(*) FROM follower WHERE follower_id = $1`
-	err := DB.QueryRow(context.Background(),query, userID).Scan(&count)
+	err := DB.QueryRow(context.Background(), query, userID).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -20,13 +20,12 @@ func GetFollowingCount(userID string) (int, error) {
 func GetFollowerCount(userID string) (int, error) {
 	var count int
 	query := `SELECT COUNT(*) FROM follower WHERE followed_id = $1`
-	err := DB.QueryRow(context.Background(),query, userID).Scan(&count)
+	err := DB.QueryRow(context.Background(), query, userID).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
 	return count, nil
 }
-
 
 func GetUsersFollowingByID(userID string) (map[string]bool, error) {
 	Following := make(map[string]bool)
@@ -203,4 +202,93 @@ func RespondToFollow(response models.Response) error {
 		}
 	}
 	return nil
+}
+
+// GetFollowRequests returns all the follow requests for a user
+func GetFollowRequests(userID string) ([]models.FriendRequest, error) {
+	var requests []models.FriendRequest
+	query := `
+	SELECT
+			"user".user_name,
+			follow_requests.created_at
+	FROM
+			follow_requests
+	INNER JOIN
+			public."user" ON follow_requests.sender_id = public."user".user_id
+	WHERE
+      follow_requests.receiver_id = $1 AND follow_requests.status = 'pending'
+	`
+
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("Database query error: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var request models.FriendRequest
+		if err := rows.Scan(&request.UserName, &request.Creation_date); err != nil {
+			log.Printf("Row scan error: %v\n", err)
+			return nil, err
+		}
+		requests = append(requests, request)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("Rows iteration error: %v\n", err)
+		return nil, err
+	}
+	return requests, nil
+}
+
+// GetExplore returns all the users that are not friends or requested to be friends
+func GetExplore(userID string) ([]string, error) {
+	var explore []string
+	query := `
+	SELECT
+		"user".user_name
+	FROM
+		public."user"
+	WHERE
+		"user".user_id NOT IN (
+			SELECT
+				follower.followed_id
+			FROM
+				follower
+			WHERE
+				follower.follower_id = $1
+		)
+		AND "user".user_id NOT IN (
+			SELECT
+				follow_requests.sender_id
+			FROM
+				follow_requests
+			WHERE
+				follow_requests.receiver_id = $1
+		)
+		AND "user".user_id != $1
+	`
+	rows, err := DB.Query(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("Database query error: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var username string
+		if err = rows.Scan(&username); err != nil {
+			log.Printf("database failed to scan explore user: %v\n", err)
+			return nil, err
+		}
+		explore = append(explore, username)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("rows iteration error: %v\n", err)
+		return nil, err
+	}
+
+	return explore, nil
 }

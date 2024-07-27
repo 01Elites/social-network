@@ -5,6 +5,7 @@ import (
 
 	"social-network/internal/views/auth"
 	"social-network/internal/views/follow"
+	"social-network/internal/views/friends"
 	"social-network/internal/views/group"
 	"social-network/internal/views/middleware"
 	"social-network/internal/views/pic"
@@ -47,4 +48,6 @@ func SetupRoutes() {
 	/*********************** Websocket ***************************/
 	websocket.SetupWebSocketRoutes()
 
+	/************************ Friends ****************************/
+	friends.SetupFriendsRoutes()
 }

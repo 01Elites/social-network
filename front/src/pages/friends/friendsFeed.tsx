@@ -2,9 +2,9 @@ import { Tabs } from '@kobalte/core/tabs';
 import 'solid-devtools';
 import { For, JSXElement } from 'solid-js';
 import { Button } from '~/components/ui/button';
+import { Card } from '~/components/ui/card';
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Friends from '~/types/friends';
-import { Card } from '~/components/ui/card';
 
 export default function FriendsFeed(props: {
   targetFriends: () => Friends | undefined;
@@ -29,10 +29,13 @@ export default function FriendsFeed(props: {
         </Tabs.Trigger>
         <Tabs.Indicator class='tabs__indicator' />
       </Tabs.List>
-      <Tabs.Content class='tabs__content h-[80vh]' value='followers'>
+      <Tabs.Content
+        class='m-8 flex flex-wrap space-x-4 space-y-4'
+        value='followers'
+      >
         <For each={friends?.followers ?? []}>
           {(follower) => (
-            <Card>
+            <Card class='flex flex-col items-center space-y-4 p-3'>
               <a href={`/profile/${follower}`} class='text-blue-500 underline'>
                 {follower}
               </a>
@@ -41,10 +44,13 @@ export default function FriendsFeed(props: {
         </For>
       </Tabs.Content>
 
-      <Tabs.Content class='tabs__content h-[80vh]' value='following'>
+      <Tabs.Content
+        class='m-8 flex flex-wrap space-x-4 space-y-4'
+        value='following'
+      >
         <For each={friends?.following ?? []}>
           {(following) => (
-            <Card>
+            <Card class='flex flex-col items-center space-y-4 p-3'>
               <a href={`/profile/${following}`} class='text-blue-500 underline'>
                 {following}
               </a>
@@ -52,34 +58,43 @@ export default function FriendsFeed(props: {
           )}
         </For>
       </Tabs.Content>
-      <Tabs.Content class='tabs__content h-[80vh]' value='friend_requests'>
+      <Tabs.Content
+        class='m-8 flex flex-wrap space-x-4 space-y-4'
+        value='friend_requests'
+      >
         <For each={friends?.friend_requests ?? []}>
           {(request) => (
-            <Card>
+            <Card class='flex flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${request.requester}`}
-                class='text-blue-500 underline'
+                class='items-center text-blue-500 underline'
               >
                 {request.requester}
               </a>
-              <Button class='flex grow' variant='default'>
-                Accept
-              </Button>
-              <Button class='flex grow' variant='default'>
-                Reject
-              </Button>
+              <div class='flex space-x-4'>
+                <Button class='w-1/2 grow' variant='default'>
+                  Accept
+                </Button>
+                <Button class='w-1/2 grow' variant='default'>
+                  Reject
+                </Button>
+              </div>
             </Card>
           )}
         </For>
       </Tabs.Content>
-      <Tabs.Content class='tabs__content h-[80vh]' value='explore'>
+
+      <Tabs.Content
+        class='m-8 flex flex-wrap space-x-4 space-y-4'
+        value='explore'
+      >
         <For each={friends?.explore ?? []}>
           {(explore) => (
-            <Card>
+            <Card class='flex flex-col items-center space-y-4 p-3'>
               <a href={`/profile/${explore}`} class='text-blue-500 underline'>
                 {explore}
               </a>
-              <Button class='flex grow' variant='default'>
+              <Button class='grow' variant='default'>
                 <Follow_Icon />
                 Follow
               </Button>

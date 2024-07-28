@@ -29,18 +29,15 @@ export default function FriendsFeed(props: {
         </Tabs.Trigger>
         <Tabs.Indicator class='tabs__indicator' />
       </Tabs.List>
-      <Tabs.Content
-        class='m-8 flex flex-wrap space-x-4 space-y-4'
-        value='followers'
-      >
+      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='followers'>
         <For each={friends?.followers ?? []}>
           {(follower) => (
-            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
+            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${follower.user_name}`}
-                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold text-blue-500'
               >
-                <Avatar class='size-20 p-3'>
+                <Avatar class='mb-3 h-20 w-20'>
                   <AvatarImage src={follower.avatar} />
                   <AvatarFallback>
                     {follower.first_name.charAt(0).toUpperCase()}
@@ -53,18 +50,15 @@ export default function FriendsFeed(props: {
         </For>
       </Tabs.Content>
 
-      <Tabs.Content
-        class='m-8 flex flex-wrap space-x-4 space-y-4'
-        value='following'
-      >
+      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='following'>
         <For each={friends?.following ?? []}>
           {(following) => (
-            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
+            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${following.user_name}`}
-                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold text-blue-500'
               >
-                <Avatar class='size-20 p-3'>
+                <Avatar class='mb-3 h-20 w-20'>
                   <AvatarImage src={following.avatar} />
                   <AvatarFallback>
                     {following.first_name.charAt(0).toUpperCase()}
@@ -77,15 +71,15 @@ export default function FriendsFeed(props: {
         </For>
       </Tabs.Content>
 
-      <Tabs.Content class='m-8 flex flex-wrap' value='friend_requests'>
+      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='friend_requests'>
         <For each={friends?.friend_requests ?? []}>
           {(request) => (
-            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
+            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${request.requester}`}
-                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold text-blue-500'
               >
-                <Avatar class='size-20 p-3'>
+                <Avatar class='mb-3 h-20 w-20'>
                   <AvatarImage src={request.user_info.avatar} />
                   <AvatarFallback>
                     {request.user_info.first_name.charAt(0).toUpperCase()}
@@ -93,11 +87,11 @@ export default function FriendsFeed(props: {
                 </Avatar>
                 {request.user_info.first_name} {request.user_info.last_name}
               </a>
-              <div class='flex space-x-4'>
-                <Button class='w-1/2' variant='default'>
+              <div class='flex w-full space-x-1'>
+                <Button class='flex-1' variant='default'>
                   Accept
                 </Button>
-                <Button class='w-1/2' variant='default'>
+                <Button class='flex-1' variant='default'>
                   Reject
                 </Button>
               </div>
@@ -106,23 +100,22 @@ export default function FriendsFeed(props: {
         </For>
       </Tabs.Content>
 
-      <Tabs.Content class='m-8 flex flex-wrap' value='explore'>
+      <Tabs.Content class='m-6 flex flex-wrap' value='explore'>
         <For each={friends?.explore ?? []}>
           {(explore) => (
-            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
+            <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${explore.user_name}`}
-                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold text-blue-500'
               >
-                <Avatar class='size-20 p-3'>
+                <Avatar class='mb-3 h-20 w-20'>
                   <AvatarImage src={explore.avatar} />
                   <AvatarFallback>
                     {explore.first_name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div class='flex flex-wrap items-center justify-around'>
+                <div class='flex flex-wrap items-center justify-center space-x-1'>
                   <div>{explore.first_name}</div>
-                  <div>&nbsp;</div>
                   <div>{explore.last_name}</div>
                 </div>
               </a>

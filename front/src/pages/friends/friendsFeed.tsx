@@ -1,6 +1,7 @@
 import { Tabs } from '@kobalte/core/tabs';
 import 'solid-devtools';
 import { For, JSXElement } from 'solid-js';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
 import Follow_Icon from '~/components/ui/icons/follow_icon';
@@ -36,8 +37,17 @@ export default function FriendsFeed(props: {
         <For each={friends?.followers ?? []}>
           {(follower) => (
             <Card class='flex flex-col items-center space-y-4 p-3'>
-              <a href={`/profile/${follower}`} class='font-bold text-blue-500'>
-                {follower}
+              <a
+                href={`/profile/${follower.user_name}`}
+                class='font-bold text-blue-500'
+              >
+                <Avatar>
+                  <AvatarImage src={follower.avatar} />
+                  <AvatarFallback>
+                    {follower.first_name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {follower.first_name} {follower.last_name}
               </a>
             </Card>
           )}
@@ -51,8 +61,17 @@ export default function FriendsFeed(props: {
         <For each={friends?.following ?? []}>
           {(following) => (
             <Card class='flex flex-col items-center space-y-4 p-3'>
-              <a href={`/profile/${following}`} class='font-bold text-blue-500'>
-                {following}
+              <a
+                href={`/profile/${following.user_name}`}
+                class='font-bold text-blue-500'
+              >
+                <Avatar>
+                  <AvatarImage src={following.avatar} />
+                  <AvatarFallback>
+                    {following.first_name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {following.first_name} {following.last_name}
               </a>
             </Card>
           )}
@@ -67,7 +86,13 @@ export default function FriendsFeed(props: {
                 href={`/profile/${request.requester}`}
                 class='font-bold text-blue-500'
               >
-                {request.requester}
+                <Avatar>
+                  <AvatarImage src={request.user_info.avatar} />
+                  <AvatarFallback>
+                    {request.user_info.first_name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {request.user_info.first_name} {request.user_info.last_name}
               </a>
               <div class='flex space-x-4'>
                 <Button class='w-1/2' variant='default'>
@@ -86,8 +111,19 @@ export default function FriendsFeed(props: {
         <For each={friends?.explore ?? []}>
           {(explore) => (
             <Card class='m-2 flex flex-col items-center p-3'>
-              <a href={`/profile/${explore}`} class='font-bold text-blue-500'>
-                <div>{explore}</div>
+              <a
+                href={`/profile/${explore.user_name}`}
+                class='font-bold text-blue-500'
+              >
+                <Avatar>
+                  <AvatarImage src={explore.avatar} />
+                  <AvatarFallback>
+                    {explore.first_name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  {explore.first_name} {explore.last_name}
+                </div>
               </a>
               <Button variant='default'>
                 <Follow_Icon />

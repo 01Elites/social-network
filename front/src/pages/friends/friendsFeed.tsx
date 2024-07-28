@@ -36,7 +36,7 @@ export default function FriendsFeed(props: {
         <For each={friends?.followers ?? []}>
           {(follower) => (
             <Card class='flex flex-col items-center space-y-4 p-3'>
-              <a href={`/profile/${follower}`} class='text-blue-500 underline'>
+              <a href={`/profile/${follower}`} class='font-bold text-blue-500'>
                 {follower}
               </a>
             </Card>
@@ -51,31 +51,29 @@ export default function FriendsFeed(props: {
         <For each={friends?.following ?? []}>
           {(following) => (
             <Card class='flex flex-col items-center space-y-4 p-3'>
-              <a href={`/profile/${following}`} class='text-blue-500 underline'>
+              <a href={`/profile/${following}`} class='font-bold text-blue-500'>
                 {following}
               </a>
             </Card>
           )}
         </For>
       </Tabs.Content>
-      <Tabs.Content
-        class='m-8 flex flex-wrap space-x-4 space-y-4'
-        value='friend_requests'
-      >
+
+      <Tabs.Content class='m-8 flex flex-wrap' value='friend_requests'>
         <For each={friends?.friend_requests ?? []}>
           {(request) => (
-            <Card class='flex flex-col items-center space-y-4 p-3'>
+            <Card class='m-2 flex flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${request.requester}`}
-                class='items-center text-blue-500 underline'
+                class='font-bold text-blue-500'
               >
                 {request.requester}
               </a>
               <div class='flex space-x-4'>
-                <Button class='w-1/2 grow' variant='default'>
+                <Button class='w-1/2' variant='default'>
                   Accept
                 </Button>
-                <Button class='w-1/2 grow' variant='default'>
+                <Button class='w-1/2' variant='default'>
                   Reject
                 </Button>
               </div>
@@ -84,17 +82,14 @@ export default function FriendsFeed(props: {
         </For>
       </Tabs.Content>
 
-      <Tabs.Content
-        class='m-8 flex flex-wrap space-x-4 space-y-4'
-        value='explore'
-      >
+      <Tabs.Content class='m-8 flex flex-wrap' value='explore'>
         <For each={friends?.explore ?? []}>
           {(explore) => (
-            <Card class='flex flex-col items-center space-y-4 p-3'>
-              <a href={`/profile/${explore}`} class='text-blue-500 underline'>
-                {explore}
+            <Card class='m-2 flex flex-col items-center p-3'>
+              <a href={`/profile/${explore}`} class='font-bold text-blue-500'>
+                <div>{explore}</div>
               </a>
-              <Button class='grow' variant='default'>
+              <Button variant='default'>
                 <Follow_Icon />
                 Follow
               </Button>

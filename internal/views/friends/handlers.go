@@ -11,6 +11,25 @@ import (
 	"strings"
 )
 
+// GetUsersLiteInfo returns the lite info of the users
+func GetUsersLiteInfo(users []string) []models.UserLiteInfo {
+	var usersLite []models.UserLiteInfo
+	var userLiteInfo models.UserLiteInfo
+	for _, user := range users {
+		userLite, err := database.GetUserProfileByUserName(user)
+		if err != nil {
+			log.Printf("Failed to get user lite info: %v\n", err)
+			continue
+		}
+		userLiteInfo.UserName = userLite.Username
+		userLiteInfo.FirstName = userLite.FirstName
+		userLiteInfo.LastName = userLite.LastName
+		userLiteInfo.Avatar = userLite.Avatar
+		usersLite = append(usersLite, userLiteInfo)
+	}
+	return usersLite
+}
+
 // GetMyFriendsHandler returns the friends of the user
 func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
@@ -29,7 +48,10 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get followers", http.StatusInternalServerError)
 		return
 	}
-	friendsList.Followers = followers
+
+	if len(followers) != 0 {
+		friendsList.Followers = GetUsersLiteInfo(followers)
+	}
 
 	following, err := database.GetUserFollowingUserNames(userID)
 	if err != nil {
@@ -37,7 +59,9 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get following", http.StatusInternalServerError)
 		return
 	}
-	friendsList.Following = following
+	if len(following) != 0 {
+		friendsList.Following = GetUsersLiteInfo(following)
+	}
 
 	// If the user is the same as the user page, return the friend requests and explore
 	friend_requests, err := database.GetFollowRequests(userID)
@@ -46,7 +70,22 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get friend requests", http.StatusInternalServerError)
 		return
 	}
-	friendsList.Friend_requests = friend_requests
+
+	// friendsList.Friend_requests = friend_requests
+	if len(friend_requests) != 0 {
+		for i, request := range friend_requests {
+			userLite, err := database.GetUserProfileByUserName(request.UserName)
+			if err != nil {
+				log.Printf("Failed to get user lite info: %v\n", err)
+				continue
+			}
+			friend_requests[i].UserInfo.UserName = userLite.Username
+			friend_requests[i].UserInfo.FirstName = userLite.FirstName
+			friend_requests[i].UserInfo.LastName = userLite.LastName
+			friend_requests[i].UserInfo.Avatar = userLite.Avatar
+		}
+		friendsList.Friend_requests = friend_requests
+	}
 
 	explore, err := database.GetExplore(userID)
 	if err != nil {
@@ -54,7 +93,9 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get explore", http.StatusInternalServerError)
 		return
 	}
-	friendsList.Explore = explore
+	if len(explore) != 0 {
+		friendsList.Explore = GetUsersLiteInfo(explore)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(friendsList)
@@ -93,7 +134,10 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get followers", http.StatusInternalServerError)
 		return
 	}
-	friendsList.Followers = followers
+
+	if len(followers) != 0 {
+		friendsList.Followers = GetUsersLiteInfo(followers)
+	}
 
 	following, err := database.GetUserFollowingUserNames(UserPageID)
 	if err != nil {
@@ -101,7 +145,10 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get following", http.StatusInternalServerError)
 		return
 	}
-	friendsList.Following = following
+
+	if len(following) != 0 {
+		friendsList.Following = GetUsersLiteInfo(following)
+	}
 
 	// If the user is the same as the user page, return the friend requests and explore
 	if userID == UserPageID {
@@ -111,7 +158,22 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "Failed to get friend requests", http.StatusInternalServerError)
 			return
 		}
-		friendsList.Friend_requests = friend_requests
+
+		// friendsList.Friend_requests = friend_requests
+		if len(friend_requests) != 0 {
+			for i, request := range friend_requests {
+				userLite, err := database.GetUserProfileByUserName(request.UserName)
+				if err != nil {
+					log.Printf("Failed to get user lite info: %v\n", err)
+					continue
+				}
+				friend_requests[i].UserInfo.UserName = userLite.Username
+				friend_requests[i].UserInfo.FirstName = userLite.FirstName
+				friend_requests[i].UserInfo.LastName = userLite.LastName
+				friend_requests[i].UserInfo.Avatar = userLite.Avatar
+			}
+			friendsList.Friend_requests = friend_requests
+		}
 
 		explore, err := database.GetExplore(UserPageID)
 		if err != nil {
@@ -119,7 +181,9 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "Failed to get explore", http.StatusInternalServerError)
 			return
 		}
-		friendsList.Explore = explore
+		if len(explore) != 0 {
+			friendsList.Explore = GetUsersLiteInfo(explore)
+		}
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(friendsList)

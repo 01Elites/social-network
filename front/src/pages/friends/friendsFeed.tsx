@@ -4,7 +4,6 @@ import { For, JSXElement } from 'solid-js';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
-import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Friends from '~/types/friends';
 
 export default function FriendsFeed(props: {
@@ -36,12 +35,12 @@ export default function FriendsFeed(props: {
       >
         <For each={friends?.followers ?? []}>
           {(follower) => (
-            <Card class='flex flex-col items-center space-y-4 p-3'>
+            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
               <a
                 href={`/profile/${follower.user_name}`}
-                class='font-bold text-blue-500'
+                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
               >
-                <Avatar>
+                <Avatar class='size-20 p-3'>
                   <AvatarImage src={follower.avatar} />
                   <AvatarFallback>
                     {follower.first_name.charAt(0).toUpperCase()}
@@ -60,12 +59,12 @@ export default function FriendsFeed(props: {
       >
         <For each={friends?.following ?? []}>
           {(following) => (
-            <Card class='flex flex-col items-center space-y-4 p-3'>
+            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
               <a
                 href={`/profile/${following.user_name}`}
-                class='font-bold text-blue-500'
+                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
               >
-                <Avatar>
+                <Avatar class='size-20 p-3'>
                   <AvatarImage src={following.avatar} />
                   <AvatarFallback>
                     {following.first_name.charAt(0).toUpperCase()}
@@ -81,12 +80,12 @@ export default function FriendsFeed(props: {
       <Tabs.Content class='m-8 flex flex-wrap' value='friend_requests'>
         <For each={friends?.friend_requests ?? []}>
           {(request) => (
-            <Card class='m-2 flex flex-col items-center space-y-4 p-3'>
+            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
               <a
                 href={`/profile/${request.requester}`}
-                class='font-bold text-blue-500'
+                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
               >
-                <Avatar>
+                <Avatar class='size-20 p-3'>
                   <AvatarImage src={request.user_info.avatar} />
                   <AvatarFallback>
                     {request.user_info.first_name.charAt(0).toUpperCase()}
@@ -110,25 +109,23 @@ export default function FriendsFeed(props: {
       <Tabs.Content class='m-8 flex flex-wrap' value='explore'>
         <For each={friends?.explore ?? []}>
           {(explore) => (
-            <Card class='m-2 flex flex-col items-center p-3'>
+            <Card class='m-2 flex size-40 flex-col items-center space-y-4 justify-around p-3'>
               <a
                 href={`/profile/${explore.user_name}`}
-                class='font-bold text-blue-500'
+                class='flex flex-col items-center justify-around text-base font-bold text-blue-500'
               >
-                <Avatar>
+                <Avatar class='size-20 p-3'>
                   <AvatarImage src={explore.avatar} />
                   <AvatarFallback>
                     {explore.first_name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  {explore.first_name} {explore.last_name}
+                <div class='flex flex-wrap items-center justify-around'>
+                  <div>{explore.first_name}</div>
+                  <div>&nbsp;</div>
+                  <div>{explore.last_name}</div>
                 </div>
               </a>
-              <Button variant='default'>
-                <Follow_Icon />
-                Follow
-              </Button>
             </Card>
           )}
         </For>

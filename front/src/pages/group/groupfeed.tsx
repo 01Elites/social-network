@@ -10,9 +10,13 @@ import { Button } from '~/components/ui/button';
 import { showToast } from '~/components/ui/toast';
 import config from '~/config';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { cn } from '~/lib/utils';
-import type { Post } from '~/types/Post';
-import User from '~/types/User';
+import config from '~/config';
+import { Tabs } from "@kobalte/core/tabs";
+import { cn } from "~/lib/utils";
+import FeedPosts from '~/components/Feed/FeedPosts';
+import { Show } from "solid-js";
+import User  from "~/types/User";
+import { GroupRequests } from "~/pages/group/creatorsrequest";
 
 type GroupPostFeedProps = {
   groupID: string;
@@ -25,8 +29,7 @@ export type requester = {
   creation_date: string;
 };
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
-  console.log(props);
-  const [requester, removeRequester] = createSignal<requester[]>();
+  console.log(props)
   const [groupPosts, setGroupPosts] = createSignal<Post[]>();
   createEffect(() => {
     fetchWithAuth(config.API_URL + '/group/' + props.groupID + '/posts')
@@ -81,116 +84,18 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
           </div>
         </div>
       </Tabs.Content>
-      <Tabs.Content class='tabs__content' value='nill'>
-        NOTHING!!!
-      </Tabs.Content>
-      <Tabs.Content class='tabs__content' value='nill2'>
-        still NOTHING!!!
-      </Tabs.Content>
+      <Tabs.Content class="tabs__content" value="chat">NOTHING!!!</Tabs.Content>
+      <Tabs.Content class="tabs__content" value="events">still NOTHING!!!</Tabs.Content>
       <Show when={props.creator}>
-        <Tabs.Content
-          class='tabs__content h-[80vh] overflow-scroll'
-          value='requests'
-        >
-          <Show when={props.requesters?.length === 0}>
-            <h1 class='text-center font-bold text-muted-foreground'>
-              Hmmm, we don't seem to have any requests
-            </h1>
-          </Show>
-          <Index each={props.requesters}>
-            {(requester, i) => (
-              <>
-                {' '}
-                <div class='flex gap-2 xs:block'>
-                  <div id={requester().user.user_name}>
-                    <p class='flex-1 gap-2'>
-                      <Avatar>
-                        <AvatarImage src={requester().user.avatar} />
-                        <AvatarFallback>
-                          {requester().user.first_name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <A
-                        href={'/profile/' + requester().user.user_name}
-                        class='block text-sm font-bold hover:underline'
-                      >
-                        {requester().user.first_name}{' '}
-                        {requester().user.last_name}
-                      </A>
-                      <time
-                        class='text-xs font-light text-muted-foreground'
-                        dateTime={moment(requester().creation_date).calendar()}
-                        title={moment(requester().creation_date).calendar()}
-                      >
-                        {moment(requester().creation_date).fromNow()}
-                      </time>
-                    </p>
-                    <Button
-                      variant='ghost'
-                      class='flex-1 gap-2'
-                      onClick={() => {
-                        handleRequest(
-                          'accepted',
-                          props.groupID,
-                          requester().user.user_name,
-                        );
-                        props.requesters?.splice(i, i + 1);
-                      }}
-                    >
-                      <FaSolidCheck class='size-4' color='green' />
-                    </Button>
-                    <Button
-                      variant='ghost'
-                      class='flex-1 gap-2'
-                      color='red'
-                      onClick={() => {
-                        handleRequest(
-                          'rejected',
-                          props.groupID,
-                          requester().user.user_name,
-                        );
-                        props.requesters?.splice(i, i + 1);
-                      }}
-                    >
-                      <IoClose class='size-4' color='red' />
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
-          </Index>
-        </Tabs.Content>
+      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="requests">
+        <Show when={props.requesters?.length === 0}>
+          <h1 class='text-center font-bold text-muted-foreground'>
+            Hmmm, we don't seem to have any requests
+          </h1>
+        </Show>
+        <GroupRequests requesters={props.requesters} groupID={props.groupID}/>
+      </Tabs.Content>
       </Show>
     </Tabs>
   );
-}
-
-export function handleRequest(
-  response: string,
-  groupID: string,
-  requester: string,
-) {
-  fetchWithAuth(`${config.API_URL}/join_group_res`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      requester: requester,
-      group_id: groupID,
-      response: response,
-    }),
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        throw new Error();
-        // reason ?? 'An error occurred while responding to request',
-      }
-    })
-    .catch((err) => {
-      showToast({
-        title: 'Error responding to request',
-        description: err.message,
-        variant: 'error',
-      });
-    });
-  const elem = document.getElementById(requester);
-  elem?.remove();
 }

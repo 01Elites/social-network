@@ -154,6 +154,11 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "failed to check for request", http.StatusNotFound)
 			return
 		}
+		group.InvitedBy, err = database.CheckForGroupInvitation(group.ID, userID)
+		if err != nil {
+			helpers.HTTPError(w, "failed to check for invitation", http.StatusNotFound)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(group)
 		return
@@ -199,8 +204,17 @@ func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
 		return
 	}
+	creatorID, err := database.GetGroupCreatorID(group.ID)
+	if err != nil {
+		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
+		return
+	}
 	if !isMember { // to view group page for a non-member
 		helpers.HTTPError(w, "user not part of group", http.StatusBadRequest)
+		return
+	}
+	if creatorID == userID {
+		helpers.HTTPError(w, "creator cannot leave group", http.StatusBadRequest)
 		return
 	}
 	if err := database.LeaveGroup(userID, group.ID); err != nil {

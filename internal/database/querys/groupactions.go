@@ -44,7 +44,7 @@ func CreateInvite(groupID int, senderID string, receiverID string) (int, error) 
 }
 
 // RespondToInvite responds to an invitation that already exists in the group_invitations table
-func RespondToInvite(response models.GroupResponse, userID string) (int,error) {
+func RespondToInvite(response models.GroupResponse, userID string) (int, error) {
 	var inviteID int
 	query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending' RETURNING invitation_id`
 	err := DB.QueryRow(context.Background(), query, response.Status, response.GroupID, userID).Scan(&inviteID)
@@ -64,6 +64,30 @@ func RespondToInvite(response models.GroupResponse, userID string) (int,error) {
 		}
 	}
 	return inviteID, nil
+}
+
+func CheckForGroupInvitation(groupID int, userID string) (models.Requester, error) {
+	var invitation models.Requester
+	query := `
+	SELECT
+		 sent_at, first_name, last_name, user_name
+		FROM
+			group_invitations
+		INNER JOIN profile ON public.profile.user_id = public.group_invitations.sender_id
+		INNER JOIN "user" USING (user_id)
+		WHERE
+		 group_id = $1 AND receiver_id = $2 AND status = $3
+`
+	err := DB.QueryRow(context.Background(), query, groupID, userID, "pending").Scan(&invitation.CreationDate,
+		&invitation.User.FirstName, &invitation.User.LastName, &invitation.User.UserName)
+	if err != nil && err.Error() != "no rows in result set" {
+		log.Printf("database: Failed check for invitation: %v", err)
+		return models.Requester{}, err
+	}
+	if invitation.User.FirstName == "" {
+		return models.Requester{}, nil
+	}
+	return invitation, nil
 }
 
 func CheckForGroupRequest(groupID int, senderID string) (bool, error) {
@@ -143,7 +167,7 @@ func RespondToRequest(response models.GroupResponse) (int, error) {
 		_, err = DB.Exec(context.Background(), query, response.RequesterID, response.GroupID)
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
-			return 0,err // Return error if failed to insert post
+			return 0, err // Return error if failed to insert post
 		}
 	}
 	return requestID, nil
@@ -157,6 +181,6 @@ func CancelRequest(GroupID int, userID string) (int, error) {
 		log.Printf("database: Failed to update response in database: %v", err)
 		return requestID, err // Return error if failed to insert post
 	}
-	
+
 	return requestID, nil
 }

@@ -5,6 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
 import Friends from '~/types/friends';
+import moment from 'moment';
+import { FaSolidCheck } from 'solid-icons/fa';
+import { IoClose } from 'solid-icons/io';
+import { fetchWithAuth } from '~/extensions/fetch';
+import config from '~/config';
+import { handleRequest } from '../group/creatorsrequest';
 
 export default function FriendsFeed(props: {
   targetFriends: () => Friends | undefined;
@@ -74,6 +80,7 @@ export default function FriendsFeed(props: {
       <Tabs.Content class='m-6 flex flex-wrap gap-4' value='friend_requests'>
         <For each={friends?.friend_requests ?? []}>
           {(request) => (
+              <div id={request.requester} class='flex w-full space-x-1'>
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${request.requester}`}
@@ -87,15 +94,32 @@ export default function FriendsFeed(props: {
                 </Avatar>
                 {request.user_info.first_name} {request.user_info.last_name}
               </a>
-              <div class='flex w-full space-x-1'>
-                <Button class='flex-1' variant='default'>
-                  Accept
+                <time
+                  class='text-xs font-light text-muted-foreground'
+                  dateTime={moment(request.creation_date).calendar()}
+                  title={moment(request.creation_date).calendar()}
+                >
+                  {moment(request.creation_date).fromNow()}</time>
+                <Button
+                  variant='ghost'
+                  class='flex-1 gap-2'
+                  onClick={() => { handleFollowRequest("accepted", request.user_info.user_name); }}
+                >
+                  <FaSolidCheck
+                    class='size-4'
+                    color='green'
+                  />
                 </Button>
-                <Button class='flex-1' variant='default'>
-                  Reject
+                <Button
+                  variant='ghost'
+                  class='flex-1 gap-2'
+                  color="red"
+                  onClick={() => { handleFollowRequest("rejected", request.user_info.user_name) }}
+                >
+                  <IoClose class='size-4' color='red' />
                 </Button>
-              </div>
             </Card>
+              </div>
           )}
         </For>
       </Tabs.Content>
@@ -125,4 +149,26 @@ export default function FriendsFeed(props: {
       </Tabs.Content>
     </Tabs>
   );
+}
+
+function handleFollowRequest(response: string, follower: string) {
+  fetchWithAuth(`${config.API_URL}/follow_response`, {
+    method: 'POST',
+    body: JSON.stringify({
+      follower: follower,
+      status: response,
+    })
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        throw new Error(
+          // reason ?? 'An error occurred while responding to request',
+        );
+      }
+    })
+    .catch((err) => {
+      console.log('Error responding to request');
+    });
+  const elem = document.getElementById(follower);
+  elem?.remove();
 }

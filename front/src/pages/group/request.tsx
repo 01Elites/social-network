@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
-import { createEffect, JSXElement, Show } from 'solid-js';
+import { JSXElement, Show } from 'solid-js';
 import { createSignal } from 'solid-js'
 import moment from 'moment';
 import { IoClose } from 'solid-icons/io';

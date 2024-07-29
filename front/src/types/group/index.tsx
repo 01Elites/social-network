@@ -1,6 +1,4 @@
 import { requester } from "~/pages/group/groupfeed";
-import { User } from "~/types/User";
-
 
 type Group = {
   id: number,
@@ -32,4 +30,4 @@ type groupEvent = {
   responded_users: string[];
 };
 
-export type {Group}
+export type { Group }

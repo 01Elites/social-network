@@ -112,6 +112,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		notification.ID = notificationID
 		websocket.SendNotificationToChannel(*notification, websocket.FollowRequestChan)
 	}
+	
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -146,7 +147,7 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	// Decode the request body into the response struct
 	err = json.NewDecoder(r.Body).Decode(&response)
 	if err != nil {
-		log.Printf("Error decoding follow Respons: %v\n", err)
+		log.Printf("Error decoding follow Response: %v\n", err)
 		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}

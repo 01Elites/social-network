@@ -11,12 +11,13 @@ import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import User, { UserDetailsHook } from '~/types/User';
+import FollowRequest from './followRequest';
 
 export default function ProfileDetails(props: {
   targetUser: () => User;
 }): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-
+  console.log(props.targetUser());
   return (
     <div class='flex flex-col'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
@@ -41,14 +42,15 @@ export default function ProfileDetails(props: {
           when={userDetails()?.user_name === props.targetUser().user_name}
           fallback={
             <div class='m-4 flex w-full flex-row justify-between gap-2'>
-              <Button class='flex grow' variant='default'>
+              {/* <Button class='flex grow' variant='default'>
                 <Follow_Icon />
                 {props.targetUser().follow_status === 'following'
                   ? 'Unfollow'
                   : 'Follow'}
-              </Button>
+              </Button> */}
               <div class='flex gap-2'>
                 {/* Follow button */}
+                <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status}/>
                 <Button variant='default'>
                   <Globe_Icon class='w-5 justify-center' />
                 </Button>

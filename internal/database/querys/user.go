@@ -301,7 +301,7 @@ func IsFollowing(userID string, followedID string) bool {
 
 func GetRequestStatus(userID string, followedID string) (string, error) {
 	var status string
-	query := `SELECT status FROM follow_requests WHERE sender_id = $1 AND receiver_id = $2`
+	query := `SELECT status FROM follow_requests WHERE sender_id = $1 AND receiver_id = $2 AND status = 'pending'`
 	err := DB.QueryRow(context.Background(), query, userID, followedID).Scan(&status)
 	if err != nil {
 		if err.Error() == "no rows in result set" {

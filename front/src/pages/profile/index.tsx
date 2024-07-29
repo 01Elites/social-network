@@ -45,7 +45,9 @@ export default function Profile(): JSXElement {
           </Show>
         </div>
         <div class='col-span-4 overflow-y-auto'>
+          <Show when={targetUser()?.follow_status === "following"}>
           <ProfileFeed />
+          </Show>
         </div>
       </div> {/* Main grid */}
     </Layout>

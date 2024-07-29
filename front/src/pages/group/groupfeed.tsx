@@ -1,20 +1,11 @@
 import { Tabs } from '@kobalte/core/tabs';
-import { A } from '@solidjs/router';
-import moment from 'moment';
-import { FaSolidCheck } from 'solid-icons/fa';
-import { IoClose } from 'solid-icons/io';
 import { createEffect, createSignal, Index, JSXElement, Show } from 'solid-js';
-import FeedPosts from '~/components/Feed/FeedPosts';
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { Button } from '~/components/ui/button';
 import { showToast } from '~/components/ui/toast';
-import config from '~/config';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
-import { Tabs } from "@kobalte/core/tabs";
 import { cn } from "~/lib/utils";
+import { Post } from "~/types/Post";
 import FeedPosts from '~/components/Feed/FeedPosts';
-import { Show } from "solid-js";
 import User  from "~/types/User";
 import { GroupRequests } from "~/pages/group/creatorsrequest";
 

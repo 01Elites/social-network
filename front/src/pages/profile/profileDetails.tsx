@@ -29,7 +29,7 @@ export default function ProfileDetails(props: {
           </div>
         </AspectRatio> {/* Profile picture */}
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}
-          <p class='text-2xl font-bold m-2'>{props.targetUser().first_name} {props.targetUser().last_name}</p>
+          <p class='text-2xl font-bold m-2'>{props.targetUser().first_name} {props.targetUser().last_name} </p>
           <div class='grid w-full grid-cols-2 text-sm m-2'>
             <p class='flex justify-center'>Followers {props.targetUser().follower_count}</p>
             <p class='flex justify-center'>Followring {props.targetUser().following_count}</p>
@@ -50,7 +50,7 @@ export default function ProfileDetails(props: {
               </Button> */}
               <div class='flex gap-2'>
                 {/* Follow button */}
-                <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status}/>
+                <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status} privacy={props.targetUser().profile_privacy}/>
                 <Button variant='default'>
                   <Globe_Icon class='w-5 justify-center' />
                 </Button>

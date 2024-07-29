@@ -8,6 +8,7 @@ import { createSignal } from 'solid-js'
 type FollowRequestParams = {
   username: string | undefined;
   status: string;
+  privacy: string;
 }
 export default function FollowRequest(props: FollowRequestParams): JSXElement {
   console.log(props.username, props.status)
@@ -32,7 +33,11 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
     }).then(async (res) => {
       if (res.status === 200) {
         if (buttonData() === "Follow") {
-          setButtonData("Cancel Follow Request")
+          if (props.privacy === "private") {
+            setButtonData("Cancel Follow Request")
+          } else {
+            setButtonData("Unfollow")
+          }
         } else if (buttonData() === "Unfollow") {
           setButtonData("Follow")
         } else if (buttonData() === "Cancel Follow Request") {

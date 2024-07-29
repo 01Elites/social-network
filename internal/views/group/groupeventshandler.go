@@ -271,3 +271,42 @@ func GetEventResponsesByOptionAndUserHandler(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(options)
 }
 */
+
+func GetMyGroupsHandler(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		http.Error(w, "User ID not found", http.StatusInternalServerError)
+		return
+	}
+	var groups models.Groups
+
+	// get the id of all the groups in database
+	groupIDs, err := database.GetAllGroupIDs()
+	if err != nil {
+		helpers.HTTPError(w, "failed to get group ids", http.StatusNotFound)
+		return
+	}
+
+	if len(groupIDs) != 0 {
+		for _, groupID := range groupIDs {
+			group, err := database.GetGroupFeedInfo(groupID, userID)
+			if err != nil {
+				helpers.HTTPError(w, "failed to get group info", http.StatusNotFound)
+				return
+			}
+			if group.ID != 0 {
+				if group.IsCreator {
+					groups.Owned = append(groups.Owned, group)
+				} else if group.IsMember {
+					groups.Joined = append(groups.Joined, group)
+				} else {
+					groups.Explore = append(groups.Explore, group)
+				}
+			}
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(groups)
+
+}

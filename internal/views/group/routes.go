@@ -25,4 +25,6 @@ func SetupGroupRoutes() {
 	http.HandleFunc("POST /api/event_response", middleware.AllowCORS(middleware.CheckAuth(EventResponseHandler)))
 	http.HandleFunc("DELETE /api/cancel_event", middleware.AllowCORS(middleware.CheckAuth(CancelEventHandler)))
 
+	http.HandleFunc("GET /api/mygroups", middleware.AllowCORS(middleware.CheckAuth(GetMyGroupsHandler)))
+
 }

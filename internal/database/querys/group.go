@@ -231,3 +231,60 @@ func GetGroupRequests(groupID int) ([]models.Requester, error) {
 func GetAllGroups() {
 
 }
+
+// get the id of all the groups in database
+func GetAllGroupIDs() ([]int, error) {
+	var groupIDs []int
+	query := `SELECT group_id FROM "group"`
+	rows, err := DB.Query(context.Background(), query)
+	if err != nil {
+		log.Printf("database failed to scan group user: %v\n", err)
+		return nil, err
+	}
+	for rows.Next() {
+		var groupID int
+		if err = rows.Scan(&groupID); err != nil {
+			log.Printf("database failed to scan group user: %v\n", err)
+			return nil, err
+		}
+		groupIDs = append(groupIDs, groupID)
+	}
+	return groupIDs, nil
+}
+
+func GetGroupFeedInfo(groupID int, userID string) (models.GroupFeed, error) {
+	var group models.GroupFeed
+	group.ID = groupID
+	// group.Title, group.Description, group.Creator, group.Requesters, group.Events, group.IsCreator, group.RequestMade = database.GetGroupInfo(groupID)
+
+	username, err := GetUserNameByID(userID)
+	if err != nil {
+		return models.GroupFeed{}, err
+	}
+
+	group.Title, group.Description, err = GetGroupInfo(group.ID)
+	if err != nil {
+		return models.GroupFeed{}, err
+	}
+
+	group.Members, _, err = GetGroupMembers(group.ID)
+	if err != nil {
+		return models.GroupFeed{}, err
+	}
+
+	group.Creator, err = GetCreatorProfile(group.ID)
+	if err != nil {
+		return models.GroupFeed{}, err
+
+	}
+
+	if group.Creator.UserName == username {
+		group.IsCreator = true
+	}
+
+	if group.IsMember, err = GroupMember(userID, group.ID); err != nil {
+		return models.GroupFeed{}, err
+	}
+
+	return group, nil
+}

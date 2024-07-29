@@ -35,7 +35,7 @@ type GroupAction struct {
 type GroupResponse struct {
 	ID          int    `json:"invite_id,omitempty"`
 	GroupIdstr  string `json:"group_id,omitempty"`
-	GroupID     int			`json:"group_id_int,omitempty"`
+	GroupID     int    `json:"group_id_int,omitempty"`
 	Requester   string `json:"requester,omitempty"`
 	RequesterID string
 	Status      string `json:"response,omitempty"`
@@ -65,4 +65,10 @@ type Event struct {
 
 type CancelEvent struct {
 	EventID int `json:"event_id,omitempty"`
+}
+
+type Groups struct {
+	Owned   []GroupFeed `json:"owned,omitempty"`
+	Joined  []GroupFeed `json:"joined,omitempty"`
+	Explore []GroupFeed `json:"explore,omitempty"`
 }

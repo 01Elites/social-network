@@ -100,6 +100,7 @@ export default function FriendsFeed(props: {
                   title={moment(request.creation_date).calendar()}
                 >
                   {moment(request.creation_date).fromNow()}</time>
+                  <div class='flex flex-row gap-2'>
                 <Button
                   variant='ghost'
                   class='flex-1 gap-2'
@@ -118,6 +119,7 @@ export default function FriendsFeed(props: {
                 >
                   <IoClose class='size-4' color='red' />
                 </Button>
+                </div>
             </Card>
               </div>
           )}

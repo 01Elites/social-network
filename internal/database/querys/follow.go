@@ -292,3 +292,49 @@ func GetExplore(userID string) ([]string, error) {
 
 	return explore, nil
 }
+
+func GetExploreGroup(groupID int)([]models.PostFeedProfile, error){
+	var explore []models.PostFeedProfile
+	query := `
+	SELECT
+		"user".user_name
+		profile.avatar
+		profile.first_name
+		profile.last_name
+	FROM
+		public."user"
+	INNER JOIN
+		profile ON "user".user_id = profile.user_id
+	WHERE
+		"user".user_id NOT IN (
+			SELECT
+				user_id
+			FROM
+				group_member
+			WHERE
+				group_id = $1
+		)
+	`
+	rows, err := DB.Query(context.Background(), query, groupID)
+	if err != nil {
+		log.Printf("Database query error: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.PostFeedProfile
+		if err = rows.Scan(&user.UserName,&user.Avatar,&user.FirstName, &user.LastName); err != nil {
+			log.Printf("database failed to scan explore user: %v\n", err)
+			return nil, err
+		}
+		explore = append(explore, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("rows iteration error: %v\n", err)
+		return nil, err
+	}
+
+	return explore, nil
+}

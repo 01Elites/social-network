@@ -1,20 +1,13 @@
+import { createSignal, For } from 'solid-js';
+import { JSXElement } from 'solid-js';
 import { Tabs } from '@kobalte/core/tabs';
-import 'solid-devtools';
-import { For, JSXElement } from 'solid-js';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
-import Groups from '~/types/groups';
-import moment from 'moment';
-import { FaSolidCheck } from 'solid-icons/fa';
-import { IoClose } from 'solid-icons/io';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
-import { createSignal } from 'solid-js';
+import Groups from '~/types/groups';
 
-export default function GroupsFeed(props: {
-  targetGroups: () => Groups | undefined;
-}): JSXElement {
+export default function GroupsFeed(props: { targetGroups: () => Groups | undefined }): JSXElement {
   const groups = props.targetGroups();
   console.log("groups", groups);
   const [title, setTitle] = createSignal('');
@@ -29,7 +22,7 @@ export default function GroupsFeed(props: {
       description: description(),
     };
 
-    fetchWithAuth(config.API_URL + '/create_group', {
+    fetchWithAuth(`${config.API_URL}/create_group`, {
       method: 'POST',
       body: JSON.stringify(groupData),
     })
@@ -54,46 +47,40 @@ export default function GroupsFeed(props: {
       });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: Event) => {
     event.preventDefault();
     submitGroupData();
   };
 
-
   return (
-    <Tabs aria-label='Main navigation' class='tabs'>
-
-      <Tabs.List class='tabs__list'>
-        <Tabs.Trigger class='tabs__trigger' value='owned'>
+    <Tabs aria-label="Main navigation" class="tabs">
+      <Tabs.List class="tabs__list">
+        <Tabs.Trigger class="tabs__trigger" value="owned">
           Owned ({groups?.owned?.length || 0})
         </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='joined'>
+        <Tabs.Trigger class="tabs__trigger" value="joined">
           Joined ({groups?.joined?.length || 0})
         </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='explore'>
+        <Tabs.Trigger class="tabs__trigger" value="explore">
           Explore ({groups?.explore?.length || 0})
         </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='create'>
+        <Tabs.Trigger class="tabs__trigger" value="create">
           Create
         </Tabs.Trigger>
-
-        <Tabs.Indicator class='tabs__indicator' />
+        <Tabs.Indicator class="tabs__indicator" />
       </Tabs.List>
 
-
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='owned'>
+      <Tabs.Content class="m-6 flex flex-wrap gap-4" value="owned">
         <For each={groups?.owned ?? []}>
           {(group) => (
-            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
+            <Card class="flex w-44 flex-col items-center space-y-4 p-3">
               <a
                 href={`/group/${group.id}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
+                class="flex flex-col items-center text-base font-bold text-blue-500"
               >
-                <Avatar class='mb-3 h-20 w-20'>
+                <Avatar class="mb-3 h-20 w-20">
                   <AvatarImage />
-                  <AvatarFallback>
-                    {group.title.charAt(0).toUpperCase()}
-                  </AvatarFallback>
+                  <AvatarFallback>{group.title.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 {group.title}
               </a>
@@ -102,19 +89,17 @@ export default function GroupsFeed(props: {
         </For>
       </Tabs.Content>
 
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='joined'>
+      <Tabs.Content class="m-6 flex flex-wrap gap-4" value="joined">
         <For each={groups?.joined ?? []}>
           {(group) => (
-            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
+            <Card class="flex w-44 flex-col items-center space-y-4 p-3">
               <a
                 href={`/group/${group.id}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
+                class="flex flex-col items-center text-base font-bold text-blue-500"
               >
-                <Avatar class='mb-3 h-20 w-20'>
+                <Avatar class="mb-3 h-20 w-20">
                   <AvatarImage />
-                  <AvatarFallback>
-                    {group.title.charAt(0).toUpperCase()}
-                  </AvatarFallback>
+                  <AvatarFallback>{group.title.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 {group.title}
               </a>
@@ -123,19 +108,17 @@ export default function GroupsFeed(props: {
         </For>
       </Tabs.Content>
 
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='explore'>
+      <Tabs.Content class="m-6 flex flex-wrap gap-4" value="explore">
         <For each={groups?.explore ?? []}>
           {(group) => (
-            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
+            <Card class="flex w-44 flex-col items-center space-y-4 p-3">
               <a
                 href={`/group/${group.id}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
+                class="flex flex-col items-center text-base font-bold text-blue-500"
               >
-                <Avatar class='mb-3 h-20 w-20'>
+                <Avatar class="mb-3 h-20 w-20">
                   <AvatarImage />
-                  <AvatarFallback>
-                    {group.title.charAt(0).toUpperCase()}
-                  </AvatarFallback>
+                  <AvatarFallback>{group.title.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 {group.title}
               </a>
@@ -151,7 +134,7 @@ export default function GroupsFeed(props: {
             <input
               type="text"
               value={title()}
-              onInput={(e) => setTitle(e.target.value)}
+              onInput={(e) => setTitle(e.currentTarget.value)}
               class="p-2 border rounded"
               required
             />
@@ -160,7 +143,7 @@ export default function GroupsFeed(props: {
             <span class="text-sm font-medium">Description</span>
             <textarea
               value={description()}
-              onInput={(e) => setDescription(e.target.value)}
+              onInput={(e) => setDescription(e.currentTarget.value)}
               class="p-2 border rounded"
               rows="4"
               required
@@ -171,9 +154,6 @@ export default function GroupsFeed(props: {
           </button>
         </form>
       </Tabs.Content>
-
-
-
     </Tabs>
   );
 }

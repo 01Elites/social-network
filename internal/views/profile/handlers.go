@@ -55,7 +55,7 @@ Response:
 
 If any error occurs during the process, it returns the corresponding HTTP error status code.
 */
-func getProfile(w http.ResponseWriter, r *http.Request) {
+func getMyProfile(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
 	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
@@ -210,6 +210,11 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Failed to get userID: %v\n", err)
 		helpers.HTTPError(w, "Failed to get userID", http.StatusInternalServerError)
+		return
+	}
+	
+	if UserPageID == userID {
+		getMyProfile(w, r)
 		return
 	}
 

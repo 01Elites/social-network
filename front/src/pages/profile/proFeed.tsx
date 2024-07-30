@@ -6,6 +6,7 @@ import config from "~/config";
 import FeedPosts from "~/components/Feed/FeedPosts";
 import { useParams } from "@solidjs/router";
 import User from "~/types/User";
+import NewPostCell from "~/components/Feed/NewPostCell";
 
 type ProfileParams = {
   username: string;
@@ -27,7 +28,7 @@ export default function ProfileFeed(props: {
       </Tabs.List>
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="posts">
         <div class={cn('flex flex-col gap-4 p-2')}>
-          <Show when={props.targetUser()?.follow_status === "following" || props.targetUser()?.profile_privacy === "public"}
+          <Show when={props.targetUser()?.follow_status === "following" || props.targetUser()?.profile_privacy === "public" || props.targetUser()?.email !== undefined}
             fallback={
               <div class="flex flex-col items-center justify-center h-full">
                 <p class="text-2xl font-bold">This user's profile is private</p>
@@ -35,6 +36,9 @@ export default function ProfileFeed(props: {
               </div>
             }
           >
+            <Show when={props.targetUser().email != undefined}>
+            <NewPostCell />
+            </Show>
             <FeedPosts path={`/profile/${params.username}/posts`} />
           </Show>
         </div>

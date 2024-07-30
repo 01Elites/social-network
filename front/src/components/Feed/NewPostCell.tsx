@@ -16,7 +16,7 @@ export default function NewPostCell(): JSXElement {
       <NewPostPreview setOpen={setPostPreviewOpen} open={postPreviewOpen()} />
 
       <Avatar>
-        <AvatarImage src={userDetails()?.avatar_url} />
+        <AvatarImage src={userDetails()?.avatar} />
         <AvatarFallback>
           {userDetails()?.first_name.charAt(0).toUpperCase()}
         </AvatarFallback>
@@ -26,7 +26,7 @@ export default function NewPostCell(): JSXElement {
         class='w-full justify-start text-muted-foreground'
         onClick={() => setPostPreviewOpen(true)}
       >
-        Your father disappointed? Click to Cry 😢
+        What's on your mind, {userDetails()?.first_name}?
       </Button>
       {/* <Button
         variant='ghost'

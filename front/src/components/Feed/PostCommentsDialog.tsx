@@ -177,7 +177,7 @@ export function PostCommentsDialog(): JSXElement {
                 >
                   <TextFieldTextArea
                     class='resize-none'
-                    placeholder="That's so boring"
+                    placeholder="What's on your mind?"
                   ></TextFieldTextArea>
                 </TextField>
 

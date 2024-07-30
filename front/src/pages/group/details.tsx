@@ -14,7 +14,7 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
       <div class='flex flex-col justify-center items-center'>
         <Show when={props.targetGroup().creator.avatar}>
         <AspectRatio ratio={16 / 9}>
-          <img
+          <img alt='Group Avatar'
             class='size-full rounded-md rounded-b-none object-cover'
             loading='lazy'
             src={`${config.API_URL}/image/${props.targetGroup().creator.avatar}`}

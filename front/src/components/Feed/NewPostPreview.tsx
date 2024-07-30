@@ -119,10 +119,10 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
       />
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Apparently he is Disappointed</DialogTitle>
+          <DialogTitle>Create New Post</DialogTitle>
           <DialogDescription>
-            It's okay <b>clown</b> 🤡 don't cry yet. Wait till you read the
-            comments
+            Share your thoughts with the world. Make sure you are respectful
+            and kind to others.
           </DialogDescription>
         </DialogHeader>
 

@@ -175,7 +175,7 @@ func RespondToRequest(response models.GroupResponse) (int, error) {
 
 func CancelRequest(GroupID int, userID string) (int, error) {
 	var requestID int
-	query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1 and group_id = $2 RETURNING request_id`
+	query := `UPDATE group_requests SET status = 'canceled' WHERE requester_id = $1 AND group_id = $2 AND status= 'pending' RETURNING request_id`
 	err := DB.QueryRow(context.Background(), query, userID, GroupID).Scan(&requestID)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)

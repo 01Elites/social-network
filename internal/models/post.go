@@ -45,5 +45,5 @@ type Error struct {
 }
 
 type ID struct {
-	ID int `json:"group_id"`
+	ID int `json:"group_id_int"`
 }

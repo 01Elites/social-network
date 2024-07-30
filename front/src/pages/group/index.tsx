@@ -45,7 +45,8 @@ export default function GroupPage(): JSXElement {
       <div class='col-span-4 overflow-y-auto'>
         <GroupFeed groupID={groupID as string}
          creator={targetGroup()?.iscreator as boolean}
-         requesters={targetGroup()?.requesters} />
+         requesters={targetGroup()?.requesters}
+         explore={targetGroup()?.explore} />
       </div>
         </Show>
     </div> {/* Main grid */}

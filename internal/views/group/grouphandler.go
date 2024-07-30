@@ -163,6 +163,12 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(group)
 		return
 	}
+	group.Explore, err = database.GetExploreGroup(group.ID)
+	if err != nil {
+		http.Error(w, "Failed to get group explore", http.StatusInternalServerError)
+		return
+	}
+
 	group.Events, err = database.GetGroupEvents(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group events", http.StatusInternalServerError)

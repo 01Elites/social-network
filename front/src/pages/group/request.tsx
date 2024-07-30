@@ -92,11 +92,14 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
     </p>
   </Card></div>      
 </Show>
+<Show when={buttonData()[0] == "Exit Group" || props.targetGroup().invited_by.user.first_name == ""}>
 <Button class="flex grow" variant="default" onClick={sendRequestApi}>
 <Show when={buttonData()[0] == "Request To Join"}>
   <Follow_Icon />
-</Show>{buttonData()[0]}
+{buttonData()[0]}
+</Show>
 </Button>
+</Show>
      </>)
 }
 

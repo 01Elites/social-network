@@ -347,6 +347,6 @@ func GetExploreGroup(groupID int)([]models.PostFeedProfile, error){
 		log.Printf("rows iteration error: %v\n", err)
 		return nil, err
 	}
-	log.Print(explore)
+	// log.Print(explore)
 	return explore, nil
 }

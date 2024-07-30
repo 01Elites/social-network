@@ -41,7 +41,7 @@ export default function FriendsFeed(props: {
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${follower.user_name}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
                 <Avatar class='mb-3 h-20 w-20'>
                   <AvatarImage src={follower.avatar} />
@@ -62,7 +62,7 @@ export default function FriendsFeed(props: {
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${following.user_name}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
                 <Avatar class='mb-3 h-20 w-20'>
                   <AvatarImage src={following.avatar} />
@@ -80,48 +80,48 @@ export default function FriendsFeed(props: {
       <Tabs.Content class='m-6 flex flex-wrap gap-4' value='friend_requests'>
         <For each={friends?.friend_requests ?? []}>
           {(request) => (
-              <div id={request.requester} class='flex w-full space-x-1'>
-            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
-              <a
-                href={`/profile/${request.requester}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
-              >
-                <Avatar class='mb-3 h-20 w-20'>
-                  <AvatarImage src={request.user_info.avatar} />
-                  <AvatarFallback>
-                    {request.user_info.first_name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {request.user_info.first_name} {request.user_info.last_name}
-              </a>
+            <div id={request.requester} class='flex w-full space-x-1'>
+              <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
+                <a
+                  href={`/profile/${request.requester}`}
+                  class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
+                >
+                  <Avatar class='mb-3 h-20 w-20'>
+                    <AvatarImage src={request.user_info.avatar} />
+                    <AvatarFallback>
+                      {request.user_info.first_name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {request.user_info.first_name} {request.user_info.last_name}
+                </a>
                 <time
                   class='text-xs font-light text-muted-foreground'
                   dateTime={moment(request.creation_date).calendar()}
                   title={moment(request.creation_date).calendar()}
                 >
                   {moment(request.creation_date).fromNow()}</time>
-                  <div class='flex flex-row gap-2'>
-                <Button
-                  variant='ghost'
-                  class='flex-1 gap-2'
-                  onClick={() => { handleFollowRequest("accepted", request.user_info.user_name); }}
-                >
-                  <FaSolidCheck
-                    class='size-4'
-                    color='green'
-                  />
-                </Button>
-                <Button
-                  variant='ghost'
-                  class='flex-1 gap-2'
-                  color="red"
-                  onClick={() => { handleFollowRequest("rejected", request.user_info.user_name) }}
-                >
-                  <IoClose class='size-4' color='red' />
-                </Button>
+                <div class='flex flex-row gap-2'>
+                  <Button
+                    variant='ghost'
+                    class='flex-1 gap-2'
+                    onClick={() => { handleFollowRequest("accepted", request.user_info.user_name); }}
+                  >
+                    <FaSolidCheck
+                      class='size-4'
+                      color='green'
+                    />
+                  </Button>
+                  <Button
+                    variant='ghost'
+                    class='flex-1 gap-2'
+                    color="red"
+                    onClick={() => { handleFollowRequest("rejected", request.user_info.user_name) }}
+                  >
+                    <IoClose class='size-4' color='red' />
+                  </Button>
                 </div>
-            </Card>
-              </div>
+              </Card>
+            </div>
           )}
         </For>
       </Tabs.Content>
@@ -132,7 +132,7 @@ export default function FriendsFeed(props: {
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${explore.user_name}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
                 <Avatar class='mb-3 h-20 w-20'>
                   <AvatarImage src={explore.avatar} />

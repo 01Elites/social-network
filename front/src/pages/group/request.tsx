@@ -71,6 +71,8 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
     title={moment(props.targetGroup().invited_by.creation_date).calendar()}
   >
     {moment(props.targetGroup().invited_by.creation_date).fromNow()}</time>
+    </p>
+    <div class='flex flex-row gap-2'>
       <Button
       variant='ghost'
       class='flex-1 gap-2'
@@ -89,7 +91,7 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
     >
     <IoClose class='size-4' color='red'/>
     </Button>
-    </p>
+    </div>
   </Card></div>      
 </Show>
 <Show when={buttonData()[0] == "Exit Group" || props.targetGroup().invited_by.user.first_name == ""}>

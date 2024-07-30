@@ -81,7 +81,7 @@ function sendRequestApi(username: string) {
       </Tabs.Content>
       <Tabs.Content class="tabs__content" value="chat">NOTHING!!!</Tabs.Content>
       <Tabs.Content class="tabs__content" value="events">still NOTHING!!!</Tabs.Content>
-      <Tabs.Content class="tabs__content" value="invite">
+      <Tabs.Content class="tabs__content m-6 flex flex-wrap gap-4 " value="invite">
         <For each={props?.explore ?? []}>
           {(explore) => (
             setButtonData([explore.user_name, "Invite"]),

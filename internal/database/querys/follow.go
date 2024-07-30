@@ -293,7 +293,7 @@ func GetExplore(userID string) ([]string, error) {
 	return explore, nil
 }
 
-func GetExploreGroup(groupID int)([]models.PostFeedProfile, error){
+func GetExploreGroup(groupID int) ([]models.PostFeedProfile, error) {
 	var explore []models.PostFeedProfile
 	query := `
 		SELECT
@@ -325,21 +325,21 @@ func GetExploreGroup(groupID int)([]models.PostFeedProfile, error){
 
 	for rows.Next() {
 		var user models.PostFeedProfile
-		if err = rows.Scan(&user.UserID, &user.UserName,&user.Avatar,&user.FirstName, &user.LastName); err != nil {
+		if err = rows.Scan(&user.UserID, &user.UserName, &user.Avatar, &user.FirstName, &user.LastName); err != nil {
 			log.Printf("database failed to scan explore user: %v\n", err)
 			return nil, err
 		}
 		var invitationCount int
-		query = `SELECT COUNT(*) FROM group_invitations WHERE receiver_id = $1 AND status = 'pending'`
-		err = DB.QueryRow(context.Background(), query, user.UserID).Scan(&invitationCount)
-		
+		query = `SELECT COUNT(*) FROM group_invitations WHERE receiver_id = $1 AND group_id = $2 AND status = 'pending'`
+		err = DB.QueryRow(context.Background(), query, user.UserID, groupID).Scan(&invitationCount)
+
 		if err != nil {
 			log.Printf("database failed to scan explore user: %v\n", err)
 			return nil, err
 		}
-		if invitationCount == 0{
+		if invitationCount == 0 {
 			user.UserID = ""
-		explore = append(explore, user)
+			explore = append(explore, user)
 		}
 	}
 

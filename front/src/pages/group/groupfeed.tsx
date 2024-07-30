@@ -26,27 +26,28 @@ export type requester = {
 };
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
   var [buttonData, setButtonData] = createSignal(["", ""]);
-function sendRequestApi(username: string) {
-  if (buttonData() === null) {
-    return
-  }
-  fetchWithAuth(config.API_URL + "/invitation", {
-    method: 'POST',
-    body: JSON.stringify({
-      receiver: username,
-      group_id: props.groupID
-    })
-  }).then(async (res) => {
-    if (res.status === 200) {
-      setButtonData([username, "Invite Pending"])
-      return;
-    } else {
-      console.log(res.body);
-      console.log('Error making request');
+  function sendRequestApi(username: string) {
+    if (buttonData() === null) {
       return
     }
-  })
-}
+    fetchWithAuth(config.API_URL + "/invitation", {
+      method: 'POST',
+      body: JSON.stringify({
+        receiver: username,
+        group_id: props.groupID
+      })
+    }).then(async (res) => {
+      if (res.status === 200) {
+        // setButtonData([username, "Invite Pending"])
+        setButtonData((prev) => ({ ...prev, [username]: "Invite Pending" }));
+        return;
+      } else {
+        console.log(res.body);
+        console.log('Error making request');
+        return
+      }
+    })
+  }
   return (
     <Tabs aria-label='Main navigation' class='tabs'>
       <Tabs.List class='tabs__list'>
@@ -82,34 +83,39 @@ function sendRequestApi(username: string) {
       <Tabs.Content class="tabs__content" value="chat">NOTHING!!!</Tabs.Content>
       <Tabs.Content class="tabs__content" value="events">still NOTHING!!!</Tabs.Content>
       <Tabs.Content class="tabs__content m-6 flex flex-wrap gap-4 " value="invite">
-        <For each={props?.explore ?? []}>
-          {(explore) => (
-            setButtonData([explore.user_name, "Invite"]),
+        <Index each={props?.explore ?? []}>
+          {(explore, i) => <>
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
               <a
-                href={`/profile/${explore.user_name}`}
+                href={`/profile/${explore().user_name}`}
                 class='flex flex-col items-center text-base font-bold text-blue-500'
               >
                 <Avatar class='mb-3 h-20 w-20'>
-                  <AvatarImage src={explore.avatar} />
+                  <AvatarImage src={explore().avatar} />
                   <AvatarFallback>
-                    {explore.first_name.charAt(0).toUpperCase()}
+                    {explore().first_name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
-                  <div>{explore.first_name}</div>
-                  <div>{explore.last_name}</div>
+                  <div>{explore().first_name}</div>
+                  <div>{explore().last_name}</div>
                 </div>
               </a>
-              <Show when={buttonData()[1] === "Invite"}
-                fallback={buttonData()[1]}>
-                <Button class="flex grow" variant="default" onClick={() => sendRequestApi(explore.user_name)}>
-                  {buttonData()[1]}
-                </Button>
-              </Show>
+              <div class="flex flex-row gap-2">
+                <Show when={buttonData()[explore().user_name] !== "Invite Pending"}
+                  fallback={buttonData()[explore().user_name]}>
+                  <Button
+                    class="flex grow"
+                    variant="default"
+                    onClick={() => sendRequestApi(explore().user_name)}
+                  >
+                    {buttonData()[explore().user_name] || "Invite"}
+                  </Button>
+                </Show>
+              </div>
             </Card>
-          )}
-        </For>
+          </>}
+        </Index>
       </Tabs.Content>
       <Show when={props.creator}>
         <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="requests">

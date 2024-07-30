@@ -265,7 +265,7 @@ func GetExplore(userID string) ([]string, error) {
 			FROM
 				follow_requests
 			WHERE
-				follow_requests.receiver_id = $1
+				follow_requests.receiver_id = $1 AND follow_requests.status = 'pending'
 		)
 		AND "user".user_id != $1
 	`

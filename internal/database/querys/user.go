@@ -314,7 +314,7 @@ func GetRequestStatus(userID string, followedID string) (string, error) {
 }
 
 func GetFollowStatus(userID string, followedID string) string {
-	if IsFollowing(userID, followedID) {
+	if IsFollowing(userID, followedID) || userID == followedID {
 		return "following"
 	}
 	status, err := GetRequestStatus(userID, followedID)

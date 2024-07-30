@@ -297,16 +297,16 @@ func GetExploreGroup(groupID int)([]models.PostFeedProfile, error){
 	var explore []models.PostFeedProfile
 	query := `
 	SELECT
-		"user".user_name
-		profile.avatar
-		profile.first_name
-		profile.last_name
+		user_name,
+		image,
+		first_name,
+		last_name
 	FROM
-		public."user"
+		"user"
 	INNER JOIN
-		profile ON "user".user_id = profile.user_id
+		profile USING (user_id)
 	WHERE
-		"user".user_id NOT IN (
+		user_id NOT IN (
 			SELECT
 				user_id
 			FROM
@@ -335,6 +335,6 @@ func GetExploreGroup(groupID int)([]models.PostFeedProfile, error){
 		log.Printf("rows iteration error: %v\n", err)
 		return nil, err
 	}
-
+	log.Print(explore)
 	return explore, nil
 }

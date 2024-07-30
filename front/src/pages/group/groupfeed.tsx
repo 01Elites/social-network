@@ -25,35 +25,8 @@ export type requester = {
   creation_date: string;
 };
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
-  console.log(props)
-  const [groupPosts, setGroupPosts] = createSignal<Post[]>();
   var [buttonData, setButtonData] = createSignal("");
   setButtonData("Invite")
-  createEffect(() => {
-    fetchWithAuth(config.API_URL + '/group/' + props.groupID + '/posts')
-      .then(async (res) => {
-        const body = await res.json();
-        if (res.status === 404) {
-          console.log('User not found');
-          return;
-        }
-        if (res.ok) {
-          setGroupPosts(body);
-          return;
-        }
-        throw new Error(
-          body.reason ? body.reason : 'An error occurred while fetching posts',
-        );
-      })
-      .catch((err) => {
-        showToast({
-          title: 'Error fetching posts',
-          description: err.message,
-          variant: 'error',
-        });
-      });
-  });
-
 function sendRequestApi(username: string) {
   console.log(buttonData())
   if (buttonData() === "") {

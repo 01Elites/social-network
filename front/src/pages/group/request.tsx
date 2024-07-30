@@ -30,7 +30,7 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
   fetchWithAuth(config.API_URL + buttonData()[1],{
     method:'POST',
     body:JSON.stringify({
-        group_id:props.targetGroup().id
+        group_id_int:props.targetGroup().id
     })
   }).then(async (res) => {
     if (res.status === 200) {
@@ -96,8 +96,8 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
 <Button class="flex grow" variant="default" onClick={sendRequestApi}>
 <Show when={buttonData()[0] == "Request To Join"}>
   <Follow_Icon />
-{buttonData()[0]}
 </Show>
+{buttonData()[0]}
 </Button>
 </Show>
      </>)

@@ -25,11 +25,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 interface NewPostPreviewProps {
   open: boolean;
   setOpen: (open: boolean) => void;
+  groupID: int ;
 }
 
 type NewPostPrivacyOptions = 'public' | 'private' | 'almost_private';
 
-export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
+export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const [uploadedImage, setUploadedImage] = createSignal<File | null>(null);
   const [postText, setPostText] = createSignal<string>('');
@@ -50,6 +51,7 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
       image: '',
       privacy: postPrivacy(),
       usernames: selectedUsers(),
+      group_id: props.groupID,
     };
 
     if (uploadedImage()) {

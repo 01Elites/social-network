@@ -47,7 +47,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "invalid post", http.StatusBadRequest)
 		return
 	}
-
+	fmt.Println("post", post)
 	// validate the post content
 	post.Content = strings.TrimSpace(post.Content)
 	if post.Content == "" {

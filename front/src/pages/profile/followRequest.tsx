@@ -16,7 +16,7 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
   if (props.status == "following") {
     setButtonData("Unfollow")
   } else if (props.status == "pending") {
-    setButtonData("Cancel Follow Request")
+    setButtonData("Requested")
   } else if (props.status == "not_following") {
     setButtonData("Follow")
   } 
@@ -34,13 +34,13 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
       if (res.status === 200) {
         if (buttonData() === "Follow") {
           if (props.privacy === "private") {
-            setButtonData("Cancel Follow Request")
+            setButtonData("Requested")
           } else {
             setButtonData("Unfollow")
           }
         } else if (buttonData() === "Unfollow") {
           setButtonData("Follow")
-        } else if (buttonData() === "Cancel Follow Request") {
+        } else if (buttonData() === "Requested") {
           setButtonData("Follow")
         } 
         return;

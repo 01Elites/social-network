@@ -37,7 +37,7 @@ export default function GroupPage(): JSXElement {
   })
   return (<><Layout>
     <section class='flex h-full gap-4'>
-    <div class='grid grid-cols-1 md:grid-cols-6 m-4 '>
+    <div class='grid grid-cols-1 md:grid-cols-6 m-4'>
       <Show when={targetGroup()}>
         <div class='col-span-2'>
           <GroupDetails targetGroup={() => targetGroup() as Group} />

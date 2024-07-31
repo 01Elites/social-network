@@ -5,7 +5,7 @@ type Group = {
   id: number,
   title: string;
   description: string;
-  members: string[];
+  members: User[];
   ismember: boolean;
   iscreator: boolean;
   request_made: boolean;

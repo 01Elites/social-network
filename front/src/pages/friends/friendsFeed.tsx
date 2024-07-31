@@ -37,6 +37,7 @@ export default function FriendsFeed(props: {
         </Tabs.Trigger>
         <Tabs.Indicator class='tabs__indicator' />
       </Tabs.List>
+      
       <Tabs.Content class='m-6 flex flex-wrap gap-4' value='followers'>
         <For each={friends?.followers ?? []}>
           {(follower) => (

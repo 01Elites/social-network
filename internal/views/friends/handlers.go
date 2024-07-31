@@ -104,7 +104,7 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 // GetFriendsHandler returns the friends of the user
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
-	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
+	_, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		log.Printf("User ID not found")
 		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
@@ -150,41 +150,6 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		friendsList.Following = GetUsersLiteInfo(following)
 	}
 
-	// If the user is the same as the user page, return the friend requests and explore
-	if userID == UserPageID {
-		friend_requests, err := database.GetFollowRequests(UserPageID)
-		if err != nil {
-			log.Printf("Failed to get friend requests: %v\n", err)
-			helpers.HTTPError(w, "Failed to get friend requests", http.StatusInternalServerError)
-			return
-		}
-
-		// friendsList.Friend_requests = friend_requests
-		if len(friend_requests) != 0 {
-			for i, request := range friend_requests {
-				userLite, err := database.GetUserProfileByUserName(request.UserName)
-				if err != nil {
-					log.Printf("Failed to get user lite info: %v\n", err)
-					continue
-				}
-				friend_requests[i].UserInfo.UserName = userLite.Username
-				friend_requests[i].UserInfo.FirstName = userLite.FirstName
-				friend_requests[i].UserInfo.LastName = userLite.LastName
-				friend_requests[i].UserInfo.Avatar = userLite.Avatar
-			}
-			friendsList.Friend_requests = friend_requests
-		}
-
-		explore, err := database.GetExplore(UserPageID)
-		if err != nil {
-			log.Printf("Failed to get explore: %v\n", err)
-			helpers.HTTPError(w, "Failed to get explore", http.StatusInternalServerError)
-			return
-		}
-		if len(explore) != 0 {
-			friendsList.Explore = GetUsersLiteInfo(explore)
-		}
-	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(friendsList)
 }

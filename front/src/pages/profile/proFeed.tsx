@@ -14,6 +14,7 @@ import { For } from 'solid-js';
 import { Card } from '~/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 
+
 type ProfileParams = {
   username: string;
 };
@@ -37,10 +38,7 @@ export default function ProfileFeed(props: {
         return;
       }
     });
-  });
-
-
-  return (
+  });  return (
     <Tabs aria-label="Main navigation" class="tabs">
       <Tabs.List class="tabs__list">
         <Tabs.Trigger class="tabs__trigger" value="posts">Posts</Tabs.Trigger>
@@ -59,6 +57,7 @@ export default function ProfileFeed(props: {
             }
           >
             <Show when={props.targetUser().email != undefined}>
+              <NewPostCell />
               <NewPostCell />
             </Show>
             <FeedPosts path={`/profile/${params.username}/posts`} />
@@ -98,33 +97,24 @@ export default function ProfileFeed(props: {
 
       </Tabs.Content>
       <Tabs.Content class="tabs__content flex flex-wrap gap-4" value="following">
-        <Show when={props.targetUser()?.follow_status === "following" || props.targetUser()?.profile_privacy === "public" || props.targetUser()?.email !== undefined}
-          fallback={
-            <div class="flex flex-col items-center justify-center h-full">
-              <p class="text-2xl font-bold">This user's profile is private</p>
-              <p class="text-lg">Follow this user to see their following</p>
-            </div>
-          }
-        >
-          <For each={targetFriends()?.following ?? []}>
-            {(following) => (
-              <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
-                <a
-                  href={`/profile/${following.user_name}`}
-                  class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
-                >
-                  <Avatar class='mb-3 h-20 w-20'>
-                    <AvatarImage src={following.avatar} />
-                    <AvatarFallback>
-                      {following.first_name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  {following.first_name} {following.last_name}
-                </a>
-              </Card>
-            )}
-          </For>
-        </Show>
+        <For each={targetFriends()?.following ?? []}>
+          {(following) => (
+            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
+              <a
+                href={`/profile/${following.user_name}`}
+                class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
+              >
+                <Avatar class='mb-3 h-20 w-20'>
+                  <AvatarImage src={following.avatar} />
+                  <AvatarFallback>
+                    {following.first_name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {following.first_name} {following.last_name}
+              </a>
+            </Card>
+          )}
+        </For>
       </Tabs.Content>
     </Tabs>
   )

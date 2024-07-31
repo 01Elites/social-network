@@ -4,6 +4,7 @@ import { A } from '@solidjs/router';
 import { AspectRatio } from "~/components/ui/aspect-ratio";
 import config from '~/config';
 import RequestToJoin from "./request";
+import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 
 
 export default function GroupDetails(props: { targetGroup: () => Group}): JSXElement {
@@ -14,11 +15,13 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
       <div class='flex flex-col justify-center items-center'>
         <Show when={props.targetGroup().creator.avatar}>
         <AspectRatio ratio={16 / 9}>
-          <img alt='Group Avatar'
-            class='size-full rounded-md rounded-b-none object-cover'
-            loading='lazy'
-            src={`${config.API_URL}/image/${props.targetGroup().creator.avatar}`}
-          />
+          <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-end rounded-lg'>
+            <Avatar class='w-[5rem] h-[5rem] mb-2'>
+              <AvatarFallback>
+                  {props.targetGroup().title.charAt(0).toUpperCase()}
+</AvatarFallback>
+            </Avatar>
+          </div>
         </AspectRatio>
       </Show>
          {/* Profile picture */}

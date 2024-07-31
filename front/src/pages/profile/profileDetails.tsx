@@ -6,6 +6,7 @@ import {
 import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
+import config from '~/config';
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
@@ -21,13 +22,20 @@ export default function ProfileDetails(props: {
   return (
     <div class='flex flex-col'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
-        <AspectRatio ratio={16 / 9}> {/* Profile picture */}
+        <AspectRatio ratio={16 / 9}>
           <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-end rounded-lg'>
             <Avatar class='w-[5rem] h-[5rem] mb-2'>
-              <AvatarFallback>{props.targetUser().avatar}</AvatarFallback>
+              <AvatarFallback>
+                <Show when={props.targetUser().avatar} fallback={
+                  props.targetUser().first_name.charAt(0).toUpperCase()
+                }><img
+                    class='size-full rounded-md rounded-b-none object-cover'
+                    loading='lazy'
+                    src={`${config.API_URL}/image/${props.targetUser().avatar}`}
+                  /></Show></AvatarFallback>
             </Avatar>
           </div>
-        </AspectRatio> {/* Profile picture */}
+        </AspectRatio> 
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}
           <p class='text-2xl font-bold m-2'>{props.targetUser().first_name} {props.targetUser().last_name} </p>
           <div class='grid w-full grid-cols-2 text-sm m-2'>
@@ -50,7 +58,7 @@ export default function ProfileDetails(props: {
               </Button> */}
               <div class='flex gap-2'>
                 {/* Follow button */}
-                <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status} privacy={props.targetUser().profile_privacy}/>
+                <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status} privacy={props.targetUser().profile_privacy} />
                 <Button variant='default'>
                   <Globe_Icon class='w-5 justify-center' />
                 </Button>

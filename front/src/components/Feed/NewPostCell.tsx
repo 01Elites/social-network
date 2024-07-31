@@ -14,7 +14,6 @@ export default function NewPostCell(): JSXElement {
   return (
     <div class='flex gap-2 rounded border-[1px] p-2'>
       <NewPostPreview setOpen={setPostPreviewOpen} open={postPreviewOpen()} />
-
       <Avatar>
         <AvatarImage src={userDetails()?.avatar} />
         <AvatarFallback>

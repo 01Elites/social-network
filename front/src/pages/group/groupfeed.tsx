@@ -25,7 +25,7 @@ export type requester = {
   creation_date: string;
 };
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
-  var [buttonData, setButtonData] = createSignal(["", ""]);
+  var [buttonData, setButtonData] = createSignal<{ [key: string]: string }>({});
   function sendRequestApi(username: string) {
     if (buttonData() === null) {
       return
@@ -90,12 +90,16 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
                 href={`/profile/${explore().user_name}`}
                 class='flex flex-col items-center text-base font-bold text-blue-500'
               >
-                <Avatar class='mb-3 h-20 w-20'>
-                  <AvatarImage src={explore().avatar} />
-                  <AvatarFallback>
-                    {explore().first_name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <Avatar class='w-[5rem] h-[5rem] mb-2'>
+        <AvatarFallback>
+          <Show when={explore().avatar} fallback={
+            explore().first_name.charAt(0).toUpperCase()
+          }><img
+              class='size-full rounded-md rounded-b-none object-cover'
+              loading='lazy'
+              src={`${config.API_URL}/image/${explore().avatar}`}
+            /></Show></AvatarFallback>
+      </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
                   <div>{explore().first_name}</div>
                   <div>{explore().last_name}</div>

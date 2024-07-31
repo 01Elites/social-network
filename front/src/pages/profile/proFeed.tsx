@@ -98,24 +98,33 @@ export default function ProfileFeed(props: {
 
       </Tabs.Content>
       <Tabs.Content class="tabs__content flex flex-wrap gap-4" value="following">
-        <For each={targetFriends()?.following ?? []}>
-          {(following) => (
-            <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
-              <a
-                href={`/profile/${following.user_name}`}
-                class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
-              >
-                <Avatar class='mb-3 h-20 w-20'>
-                  <AvatarImage src={following.avatar} />
-                  <AvatarFallback>
-                    {following.first_name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {following.first_name} {following.last_name}
-              </a>
-            </Card>
-          )}
-        </For>
+        <Show when={props.targetUser()?.follow_status === "following" || props.targetUser()?.profile_privacy === "public" || props.targetUser()?.email !== undefined}
+          fallback={
+            <div class="flex flex-col items-center justify-center h-full">
+              <p class="text-2xl font-bold">This user's profile is private</p>
+              <p class="text-lg">Follow this user to see their following</p>
+            </div>
+          }
+        >
+          <For each={targetFriends()?.following ?? []}>
+            {(following) => (
+              <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
+                <a
+                  href={`/profile/${following.user_name}`}
+                  class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
+                >
+                  <Avatar class='mb-3 h-20 w-20'>
+                    <AvatarImage src={following.avatar} />
+                    <AvatarFallback>
+                      {following.first_name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {following.first_name} {following.last_name}
+                </a>
+              </Card>
+            )}
+          </For>
+        </Show>
       </Tabs.Content>
     </Tabs>
   )

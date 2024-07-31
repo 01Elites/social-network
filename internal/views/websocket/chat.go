@@ -179,7 +179,7 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 
 	for _, member := range members {
 		// Get the recipient's client from the Clients map
-		recipient, online := GetClient(member)
+		recipient, online := GetClient(member.UserName)
 		if online && recipient.Conn != nil {
 			// Write JSON data to the WebSocket connection of the recipient
 			sendMessageToWebSocket(recipient, event.GET_MESSAGES, jsonData)
@@ -265,7 +265,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 
 		for _, member := range members {
 			// Get the recipient's client from the Clients map
-			recipient, online := GetClient(member)
+			recipient, online := GetClient(member.UserName)
 			if online && recipient.Conn != nil {
 				// Write JSON data to the WebSocket connection of the recipient
 				sendMessageToWebSocket(recipient, event.TYPING, jsonData)

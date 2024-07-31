@@ -80,9 +80,9 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
           </div>
         </div>
       </Tabs.Content>
-      <Tabs.Content class="tabs__content" value="chat">NOTHING!!!</Tabs.Content>
-      <Tabs.Content class="tabs__content" value="events">still NOTHING!!!</Tabs.Content>
-      <Tabs.Content class="tabs__content m-6 flex flex-wrap gap-4 " value="invite">
+      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="chat">NOTHING!!!</Tabs.Content>
+      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="events">still NOTHING!!!</Tabs.Content>
+      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="invite">
         <Index each={props?.explore ?? []}>
           {(explore, i) => <>
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>

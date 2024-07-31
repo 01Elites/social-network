@@ -77,7 +77,6 @@ func getMyProfile(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
-	prof.Avatar = helpers.GetImage(prof.Avatar)
 	profile = profileData{
 		UserName:       user.UserName,
 		Email:          user.Email,

@@ -142,7 +142,7 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to get group requests", http.StatusInternalServerError)
 			return
 		}
-	} else {
+	}
 	if group.IsMember, err = database.GroupMember(userID, group.ID); err != nil {
 		helpers.HTTPError(w, "Error when checking if user is a member", http.StatusBadRequest)
 		return
@@ -158,11 +158,11 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "failed to check for invitation", http.StatusNotFound)
 			return
 		}
-	}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(group)
 		return
 	}
+	
 	group.Explore, err = database.GetExploreGroup(group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group explore", http.StatusInternalServerError)

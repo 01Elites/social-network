@@ -43,7 +43,7 @@ export default function GroupPage(): JSXElement {
           <GroupDetails targetGroup={() => targetGroup() as Group} />
         </div>
       </Show>
-      <Show when={targetGroup()?.ismember || targetGroup()?.creator}>
+      <Show when={targetGroup()?.ismember}>
         <div class='col-span-4 overflow-y-auto'>
           <NewGroupPostCell targetGroup={() => targetGroup() as Group} />
             <GroupFeed groupID={groupID as string}

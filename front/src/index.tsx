@@ -38,7 +38,7 @@ function App() {
     >
       <Route path='/' component={HomePage} />
       {/* </AuthGuard> */}
-       <Route path='/group/:id' component={Group} /> 
+      <Route path='/group/:id' component={Group} />
       {/* <AuthGuard> */}
       <Route path='/groups' component={GroupsPage} />
       <Route path='/friends' component={FriendsPage} />

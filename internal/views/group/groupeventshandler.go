@@ -26,7 +26,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("failed to decode request: %v", err)
 		return
 	}
-
+	log.Print(event)
 	if event.GroupID == 0 || event.Title == "" || event.EventTime.IsZero() {
 		http.Error(w, "missing required fields", http.StatusBadRequest)
 		return

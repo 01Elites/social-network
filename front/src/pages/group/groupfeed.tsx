@@ -12,9 +12,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { For } from 'solid-js';
 import { User } from '~/types/User';
 import { Button } from '~/components/ui/button';
+import CreateEvent from './createevent';
+import NewEventCell from './neweventcell';
 
 type GroupPostFeedProps = {
   groupID: string;
+  groupTitle: string | undefined;
   creator: boolean;
   requesters: requester[] | undefined;
   explore: User[] | undefined;
@@ -81,7 +84,9 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         </div>
       </Tabs.Content>
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="chat">NOTHING!!!</Tabs.Content>
-      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="events">still NOTHING!!!</Tabs.Content>
+      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="events">
+        <NewEventCell groupTitle={props.groupTitle} groupID={props.groupID}/>
+      </Tabs.Content>
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="invite">
         <Index each={props?.explore ?? []}>
           {(explore, i) => <>

@@ -46,7 +46,8 @@ export default function GroupPage(): JSXElement {
       <Show when={targetGroup()?.ismember}>
         <div class='col-span-4 overflow-y-auto'>
           <NewGroupPostCell targetGroup={() => targetGroup() as Group} />
-            <GroupFeed groupID={groupID as string}
+            <GroupFeed groupTitle={targetGroup()?.title}
+            groupID={groupID as string}
               creator={targetGroup()?.iscreator as boolean}
               requesters={targetGroup()?.requesters}
               explore={targetGroup()?.explore} />

@@ -7,5 +7,5 @@ import (
 )
 
 func SetupWebSocketRoutes() {
-	http.HandleFunc("/api/ws", middleware.AllowCORS(middleware.CheckAuth(HandleWebSocket)))
+	http.HandleFunc("/api/ws", middleware.AllowCORS((HandleWebSocket)))
 }

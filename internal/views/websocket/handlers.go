@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"social-network/internal/helpers"
-	"social-network/internal/views/middleware"
 	"social-network/internal/views/websocket/types"
 
 	database "social-network/internal/database/querys"
@@ -27,23 +26,28 @@ var (
 )
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
-	if !ok {
-		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
+	// get the token from the header wedsocket protocol
+	protocols := websocket.Subprotocols(r)
+	if len(protocols) == 0 {
+		helpers.HTTPError(w, "Authorization token required", http.StatusUnauthorized)
 		return
 	}
-	fmt.Printf("User %s connected to WebSocket\n", userID)
-	// Upgrade HTTP connection to WebSocket
+	token := protocols[0]
+	userID, err := database.ValidateSessionToken(token)
+	if err != nil {
+		helpers.HTTPError(w, "Invalid session token", http.StatusUnauthorized)
+		return
+	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Error upgrading to WebSocket:", err)
-		http.Error(w, "Could not open WebSocket connection", http.StatusBadRequest)
+		helpers.HTTPError(w, "Could not upgrade to WebSocket", http.StatusInternalServerError)
 		return
 	}
 	username, err := database.GetUserNameByID(userID)
 	if err != nil {
 		log.Println("Error getting user name:", err)
-		http.Error(w, "Could not get user name", http.StatusInternalServerError)
+		helpers.HTTPError(w, "Could not get user name", http.StatusInternalServerError)
 		return
 	}
 	user := types.User{

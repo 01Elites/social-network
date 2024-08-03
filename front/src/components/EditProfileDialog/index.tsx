@@ -203,7 +203,7 @@ function ProfileEditDialog(): JSXElement {
               formProcessing()
             }
           >
-            {formProcessing() && <img src={tailspin} class='h-full' />}
+            {formProcessing() && <img alt='' src={tailspin} class='h-full' />}
             {'Save Changes'}
           </Button>
         </form>

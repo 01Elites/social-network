@@ -20,6 +20,7 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
                 <Show when={props.targetGroup().creator.avatar} fallback={
                   props.targetGroup().title.charAt(0).toUpperCase()
                 }><img
+                    alt='avatar'
                     class='size-full rounded-md rounded-b-none object-cover'
                     loading='lazy'
                     src={`${config.API_URL}/image/${props.targetGroup().creator.avatar}`}

@@ -29,6 +29,7 @@ export default function ProfileDetails(props: {
                 <Show when={props.targetUser().avatar} fallback={
                   props.targetUser().first_name.charAt(0).toUpperCase()
                 }><img
+                    alt='avatar'
                     class='size-full rounded-md rounded-b-none object-cover'
                     loading='lazy'
                     src={`${config.API_URL}/image/${props.targetUser().avatar}`}

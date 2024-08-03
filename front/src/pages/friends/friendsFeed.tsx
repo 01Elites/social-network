@@ -37,7 +37,7 @@ export default function FriendsFeed(props: {
         </Tabs.Trigger>
         <Tabs.Indicator class='tabs__indicator' />
       </Tabs.List>
-      
+
       <Tabs.Content class='m-6 flex flex-wrap gap-4' value='followers'>
         <For each={friends?.followers ?? []}>
           {(follower) => (
@@ -46,16 +46,17 @@ export default function FriendsFeed(props: {
                 href={`/profile/${follower.user_name}`}
                 class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
-             <Avatar class='w-[5rem] h-[5rem] mb-2'>
-              <AvatarFallback>
-                <Show when={follower.avatar} fallback={
-                  follower.first_name.charAt(0).toUpperCase()
-                }><img
-                    class='size-full rounded-md rounded-b-none object-cover'
-                    loading='lazy'
-                    src={`${config.API_URL}/image/${follower.avatar}`}
-                  /></Show></AvatarFallback>
-            </Avatar>
+                <Avatar class='w-[5rem] h-[5rem] mb-2'>
+                  <AvatarFallback>
+                    <Show when={follower.avatar} fallback={
+                      follower.first_name.charAt(0).toUpperCase()
+                    }><img
+                        alt='avatar'
+                        class='size-full rounded-md rounded-b-none object-cover'
+                        loading='lazy'
+                        src={`${config.API_URL}/image/${follower.avatar}`}
+                      /></Show></AvatarFallback>
+                </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
                   <div>{follower.first_name}</div>
                   <div>{follower.last_name}</div>
@@ -74,16 +75,17 @@ export default function FriendsFeed(props: {
                 href={`/profile/${following.user_name}`}
                 class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
-             <Avatar class='w-[5rem] h-[5rem] mb-2'>
-              <AvatarFallback>
-                <Show when={following.avatar} fallback={
-                  following.first_name.charAt(0).toUpperCase()
-                }><img
-                    class='size-full rounded-md rounded-b-none object-cover'
-                    loading='lazy'
-                    src={`${config.API_URL}/image/${following.avatar}`}
-                  /></Show></AvatarFallback>
-            </Avatar>
+                <Avatar class='w-[5rem] h-[5rem] mb-2'>
+                  <AvatarFallback>
+                    <Show when={following.avatar} fallback={
+                      following.first_name.charAt(0).toUpperCase()
+                    }><img
+                        alt='avatar'
+                        class='size-full rounded-md rounded-b-none object-cover'
+                        loading='lazy'
+                        src={`${config.API_URL}/image/${following.avatar}`}
+                      /></Show></AvatarFallback>
+                </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
                   <div>{following.first_name}</div>
                   <div>{following.last_name}</div>
@@ -99,25 +101,26 @@ export default function FriendsFeed(props: {
           {(request) => (
             <div id={request.requester} class='flex w-full space-x-1'>
               <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
-              <a
-                href={`/profile/${request.user_info.user_name}`}
-                class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
-              >
-             <Avatar class='w-[5rem] h-[5rem] mb-2'>
-              <AvatarFallback>
-                <Show when={request.user_info.avatar} fallback={
-                  request.user_info.first_name.charAt(0).toUpperCase()
-                }><img
-                    class='size-full rounded-md rounded-b-none object-cover'
-                    loading='lazy'
-                    src={`${config.API_URL}/image/${request.user_info.avatar}`}
-                  /></Show></AvatarFallback>
-            </Avatar>
-                <div class='flex flex-wrap items-center justify-center space-x-1'>
-                  <div>{request.user_info.first_name}</div>
-                  <div>{request.user_info.last_name}</div>
-                </div>
-              </a>
+                <a
+                  href={`/profile/${request.user_info.user_name}`}
+                  class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
+                >
+                  <Avatar class='w-[5rem] h-[5rem] mb-2'>
+                    <AvatarFallback>
+                      <Show when={request.user_info.avatar} fallback={
+                        request.user_info.first_name.charAt(0).toUpperCase()
+                      }><img
+                          alt='avatar'
+                          class='size-full rounded-md rounded-b-none object-cover'
+                          loading='lazy'
+                          src={`${config.API_URL}/image/${request.user_info.avatar}`}
+                        /></Show></AvatarFallback>
+                  </Avatar>
+                  <div class='flex flex-wrap items-center justify-center space-x-1'>
+                    <div>{request.user_info.first_name}</div>
+                    <div>{request.user_info.last_name}</div>
+                  </div>
+                </a>
                 <time
                   class='text-xs font-light text-muted-foreground'
                   dateTime={moment(request.creation_date).calendar()}
@@ -158,16 +161,17 @@ export default function FriendsFeed(props: {
                 href={`/profile/${explore.user_name}`}
                 class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
-             <Avatar class='w-[5rem] h-[5rem] mb-2'>
-              <AvatarFallback>
-                <Show when={explore.avatar} fallback={
-                  explore.first_name.charAt(0).toUpperCase()
-                }><img
-                    class='size-full rounded-md rounded-b-none object-cover'
-                    loading='lazy'
-                    src={`${config.API_URL}/image/${explore.avatar}`}
-                  /></Show></AvatarFallback>
-            </Avatar>
+                <Avatar class='w-[5rem] h-[5rem] mb-2'>
+                  <AvatarFallback>
+                    <Show when={explore.avatar} fallback={
+                      explore.first_name.charAt(0).toUpperCase()
+                    }><img
+                        alt='avatar'
+                        class='size-full rounded-md rounded-b-none object-cover'
+                        loading='lazy'
+                        src={`${config.API_URL}/image/${explore.avatar}`}
+                      /></Show></AvatarFallback>
+                </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
                   <div>{explore.first_name}</div>
                   <div>{explore.last_name}</div>

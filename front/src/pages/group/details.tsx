@@ -11,7 +11,7 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
   const numberOfMembers = props.targetGroup().members.length;
   const groupID = String(props.targetGroup().id)
   return (
-    <div class='flex flex-col w-[30rem]'> {/* Left div */}
+    <div class='flex flex-col min-w-24'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
         <AspectRatio ratio={16 / 9}>
           <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-end rounded-lg'>

@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./front/src/logo.svg" alt="logo" />
+    <img src="./front/src/assets/logo.svg" alt="logo" />
     <h1 align="center">Elite-network</h1>
 </p>
 

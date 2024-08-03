@@ -87,6 +87,7 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
       <Show when={props.post.image}>
         <AspectRatio ratio={16 / 9}>
           <img
+            alt='post image'
             class='size-full rounded-md rounded-b-none object-cover'
             loading='lazy'
             src={`${config.API_URL}/image/${props.post.image}`}

@@ -98,7 +98,7 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
                       <Avatar>
                         <AvatarImage
                           loading='lazy'
-                          src='https://thispersondoesnotexist.com'
+                          src={user.avatar}
                         />
                         <AvatarFallback>{user.user_name[0].toUpperCase()}</AvatarFallback>
                       </Avatar>

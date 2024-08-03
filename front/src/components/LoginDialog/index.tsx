@@ -341,7 +341,7 @@ function LoginDialog(): JSXElement {
                   formProcessing()
                 }
               >
-                {formProcessing() && <img src={tailspin} class='h-full' />}
+                {formProcessing() && <img alt='' src={tailspin} class='h-full' />}
                 Become a Looser
               </Button>
               <Button
@@ -363,7 +363,7 @@ function LoginDialog(): JSXElement {
               // disabled={formProcessing()}
               disabled={true}
             >
-              <img src={rebootLogo} class='h-5'></img>
+              <img alt='' src={rebootLogo} class='h-5'></img>
               Login with Reboot01
             </Button>
             <TextField
@@ -395,7 +395,7 @@ function LoginDialog(): JSXElement {
               type='submit'
               class='gap-4'
             >
-              {formProcessing() && <img src={tailspin} class='h-full' />}
+              {formProcessing() && <img alt='' src={tailspin} class='h-full' />}
               {formProcessing() ? 'Logging in...' : 'Login'}
             </Button>
             <p class='text-center'>

@@ -58,7 +58,6 @@ export default function ProfileFeed(props: {
           >
             <Show when={props.targetUser().email != undefined}>
               <NewPostCell />
-              <NewPostCell />
             </Show>
             <FeedPosts path={`/profile/${params.username}/posts`} />
           </Show>

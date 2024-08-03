@@ -1,4 +1,4 @@
-import { createSignal, For, JSXElement } from 'solid-js';
+import { createEffect, createSignal, For, JSXElement } from 'solid-js';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
@@ -12,6 +12,9 @@ import {
 } from '../ui/dialog';
 import { Separator } from '../ui/separator';
 import { Table, TableBody, TableCell, TableRow } from '../ui/table';
+import Friends from '~/types/friends';
+import { fetchWithAuth } from '~/extensions/fetch';
+import config from '~/config';
 
 interface NewPostPrivacyProps {
   open: boolean;
@@ -45,6 +48,21 @@ const fakeUsers = [
 
 export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
   const [selectedUsers, setSelectedUsers] = createSignal<String[]>([]);
+  const [targetFriends, setTargetFriends] = createSignal<Friends | undefined>();
+
+  createEffect(() => {
+    // Fetch user Friends
+    fetchWithAuth(config.API_URL + '/myfriends').then(async (res) => {
+      const body = await res.json();
+      if (res.ok) {
+        setTargetFriends(body);
+        return;
+      } else {
+        console.log('Error fetching friends');
+        return;
+      }
+    });
+  });
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
@@ -59,18 +77,18 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
         <div class='max-h-[200px] overflow-x-auto'>
           <Table class=''>
             <TableBody>
-              <For each={fakeUsers}>
+              <For each={targetFriends()?.following ?? []}>
                 {(user) => (
                   <TableRow>
                     <TableCell class='w-2'>
                       <Checkbox
                         onChange={() => {
-                          if (selectedUsers().includes(user)) {
+                          if (selectedUsers().includes(user.user_name)) {
                             setSelectedUsers(
-                              selectedUsers().filter((u) => u !== user),
+                              selectedUsers().filter((u) => u !== user.user_name),
                             );
                           } else {
-                            setSelectedUsers([...selectedUsers(), user]);
+                            setSelectedUsers([...selectedUsers(), user.user_name]);
                           }
                         }}
                         id={`npptchk-${user}`}
@@ -82,7 +100,7 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
                           loading='lazy'
                           src='https://thispersondoesnotexist.com'
                         />
-                        <AvatarFallback>{user[0].toUpperCase()}</AvatarFallback>
+                        <AvatarFallback>{user.user_name[0].toUpperCase()}</AvatarFallback>
                       </Avatar>
                     </TableCell>
                     <TableCell
@@ -93,7 +111,7 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
                           ?.click();
                       }}
                     >
-                      {user}
+                      {user.user_name}
                     </TableCell>
                   </TableRow>
                 )}

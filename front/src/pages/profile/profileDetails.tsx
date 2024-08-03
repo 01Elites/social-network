@@ -36,13 +36,20 @@ export default function ProfileDetails(props: {
                   /></Show></AvatarFallback>
             </Avatar>
           </div>
-        </AspectRatio> 
+        </AspectRatio>
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}
           <p class='text-2xl font-bold m-2'>{props.targetUser().first_name} {props.targetUser().last_name} </p>
           <div class='grid w-full grid-cols-2 text-sm m-2'>
             <p class='flex justify-center'>Followers {props.targetUser().follower_count}</p>
             <p class='flex justify-center'>Following {props.targetUser().following_count}</p>
           </div>
+          <p class='flex justify-center text-sm text-muted-foreground'> Account status: {props.targetUser().profile_privacy}</p>
+
+          <Show when={userDetails()?.user_name === props.targetUser().user_name}>
+            <p class='flex justify-center text-sm text-muted-foreground'> Email: {props.targetUser().email}</p>
+            <p class='flex justify-center text-sm text-muted-foreground'> Username: {props.targetUser().user_name}</p>
+            <p class='flex justify-center text-sm text-muted-foreground'> Nickname: {props.targetUser().nick_name}</p>
+          </Show>
         </div> {/* Username, followers, following */}
         <div class='m-4'> {/* Bio */}
           <p>{props.targetUser().about}</p>

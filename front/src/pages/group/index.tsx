@@ -37,23 +37,23 @@ export default function GroupPage(): JSXElement {
   })
   return (<><Layout>
     <section class='flex h-full gap-4'>
-    <div class='grid grid-cols-1 md:grid-cols-6 m-4'>
+    <div class='grid grid-cols-1 md:grid-cols-6 m-4 space-x-4'>
       <Show when={targetGroup()}>
-        <div class='col-span-2'>
+        <div class='col-span-1'>
           <GroupDetails targetGroup={() => targetGroup() as Group} />
         </div>
       </Show>
       <Show when={targetGroup()?.ismember}>
-        <div class='col-span-4 overflow-y-auto'>
+        <div class='col-span-5 overflow-y-auto'>
           <NewGroupPostCell targetGroup={() => targetGroup() as Group} />
             <GroupFeed groupID={groupID as string}
               creator={targetGroup()?.iscreator as boolean}
               requesters={targetGroup()?.requesters}
-              explore={targetGroup()?.explore} />
+              explore={targetGroup()?.explore}
+              members={targetGroup()?.members} />
         </div>
       </Show>
     </div> 
-      <GroupContacts members={targetGroup()?.members} class='hidden w-1/3 max-w-52 overflow-hidden md:flex' />
     </section>
   </Layout></>)
 }

@@ -12,12 +12,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { For } from 'solid-js';
 import { User } from '~/types/User';
 import { Button } from '~/components/ui/button';
+import GroupContacts from "./groupcontacts";
 
 type GroupPostFeedProps = {
   groupID: string;
   creator: boolean;
   requesters: requester[] | undefined;
   explore: User[] | undefined;
+  members: User[] | undefined;
 };
 
 export type requester = {
@@ -51,25 +53,31 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
   return (
     <Tabs aria-label='Main navigation' class='tabs'>
       <Tabs.List class='tabs__list'>
-        <Tabs.Trigger class='tabs__trigger' value='posts'>
-          Posts
-        </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='chat'>
-          Chat
-        </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='events'>
-          Events
-        </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='invite'>
-          Invite
-        </Tabs.Trigger>
-        <Show when={props.creator}>
-          <Tabs.Trigger class='tabs__trigger' value='requests'>
-            Requests
+        <div class='tabs__list__indicator' >
+          <Tabs.Trigger class='tabs__trigger' value='posts'>
+            Posts
           </Tabs.Trigger>
-        </Show>
+          <Tabs.Trigger class='tabs__trigger' value='chat'>
+            Chat
+          </Tabs.Trigger>
+          <Tabs.Trigger class='tabs__trigger' value='events'>
+            Events
+          </Tabs.Trigger>
+          <Tabs.Trigger class='tabs__trigger' value='invite'>
+            Invite
+          </Tabs.Trigger>
+          <Tabs.Trigger class='tabs__trigger' value='members'>
+            Members
+          </Tabs.Trigger>
+          <Show when={props.creator}>
+            <Tabs.Trigger class='tabs__trigger' value='requests'>
+              Requests
+            </Tabs.Trigger>
+          </Show>
+        </div>
         <Tabs.Indicator class='tabs__indicator' />
       </Tabs.List>
+
       <Tabs.Content
         class='tabs__content h-[80vh] overflow-scroll'
         value='posts'
@@ -82,7 +90,8 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
       </Tabs.Content>
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="chat">NOTHING!!!</Tabs.Content>
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="events">still NOTHING!!!</Tabs.Content>
-      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="invite">
+
+      <Tabs.Content class="tabs__content overflow-scroll flex flex-wrap " value="invite">
         <Index each={props?.explore ?? []}>
           {(explore, i) => <>
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
@@ -91,15 +100,16 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
                 class='flex flex-col items-center text-base font-bold text-blue-500'
               >
                 <Avatar class='w-[5rem] h-[5rem] mb-2'>
-        <AvatarFallback>
-          <Show when={explore().avatar} fallback={
-            explore().first_name.charAt(0).toUpperCase()
-          }><img
-              class='size-full rounded-md rounded-b-none object-cover'
-              loading='lazy'
-              src={`${config.API_URL}/image/${explore().avatar}`}
-            /></Show></AvatarFallback>
-      </Avatar>
+                  <AvatarFallback>
+                    <Show when={explore().avatar} fallback={
+                      explore().first_name.charAt(0).toUpperCase()
+                    }><img
+                        alt='avatar'
+                        class='size-full rounded-md rounded-b-none object-cover'
+                        loading='lazy'
+                        src={`${config.API_URL}/image/${explore().avatar}`}
+                      /></Show></AvatarFallback>
+                </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
                   <div>{explore().first_name}</div>
                   <div>{explore().last_name}</div>
@@ -131,6 +141,9 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
           <GroupRequests requesters={props.requesters} groupID={props.groupID} />
         </Tabs.Content>
       </Show>
+      <Tabs.Content class="tabs__content overflow-scroll" value="members">
+        <GroupContacts members={props.members} class=' flex flex-wrap' />
+      </Tabs.Content>
     </Tabs>
   );
 }

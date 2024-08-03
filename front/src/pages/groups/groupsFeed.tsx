@@ -88,7 +88,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
           <Tabs.Indicator class="tabs__indicator" />
         </Tabs.List>
 
-        <Tabs.Content class="m-6 flex flex-wrap gap-4" value="owned">
+        <Tabs.Content class="tabs__content  m-6 flex flex-wrap gap-4" value="owned">
           <For each={groups?.owned ?? []}>
             {(group) => (
               <Card class="flex w-44 flex-col items-center space-y-4 p-3">
@@ -107,7 +107,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
           </For>
         </Tabs.Content>
 
-        <Tabs.Content class="m-6 flex flex-wrap gap-4" value="joined">
+        <Tabs.Content class="tabs__content  m-6 flex flex-wrap gap-4" value="joined">
           <For each={groups?.joined ?? []}>
             {(group) => (
               <Card class="flex w-44 flex-col items-center space-y-4 p-3">
@@ -126,7 +126,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
           </For>
         </Tabs.Content>
 
-        <Tabs.Content class="m-6 flex flex-wrap gap-4" value="explore">
+        <Tabs.Content class="tabs__content  m-6 flex flex-wrap gap-4" value="explore">
           <For each={groups?.explore ?? []}>
             {(group) => (
               <Card class="flex w-44 flex-col items-center space-y-4 p-3">

@@ -41,7 +41,7 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
 
   const [formProcessing, setFormProcessing] = createSignal(false);
 
-  async function makePost() {
+  async function makeEvent() {
     setFormProcessing(true);
     if (eventTime() < moment().format('YYYY-MM-DD')) {
       showToast({
@@ -116,16 +116,16 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
         type="text"
          id="title"
          minLength={1}
-         maxLength={30}
+         maxLength={15}
           disabled={formProcessing()}
-        placeholder="event title." />
+        placeholder="event title. (max 15 characters)" />
         </TextField>
         <TextField onChange={setEventDescription} value={eventDescription()}>
           <TextFieldTextArea
-            placeholder='event description.'
+            placeholder='event description. (max 200 characters)'
             class='resize-none'
             minLength={1}
-            maxLength={400}
+            maxLength={200}
             disabled={formProcessing()}
           />
         </TextField>
@@ -174,7 +174,7 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
             <TextFieldInput
               class='block' // without it calendar icon gets ruined
               type='date'
-              min={moment().format('YYYY-MM-DD')}
+              min={moment().endOf(`day`).format('YYYY-MM-DD')}
               id='dob'
             />
           </TextField>
@@ -186,7 +186,7 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
               !title()||
               !eventTime() ||
                formProcessing()}
-            onClick={makePost}
+            onClick={makeEvent}
           >
             {formProcessing() && <img src={tailspin} class='h-full' alt='processing' />}
             {formProcessing() ? 'Posting...' : 'Create'}

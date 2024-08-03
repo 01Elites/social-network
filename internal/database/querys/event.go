@@ -2,7 +2,6 @@ package querys
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -27,7 +26,7 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 		}
 
 		// Get options for the event
-		optionQuery := `SELECT name FROM event_option WHERE event_id = $1`
+		optionQuery := `SELECT name, option_id FROM event_option WHERE event_id = $1`
 		optionRows, err := DB.Query(context.Background(), optionQuery, event.ID)
 		if err != nil {
 			log.Printf("database failed to query event options: %v\n", err)
@@ -36,8 +35,8 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 		defer optionRows.Close()
 
 		for optionRows.Next() {
-			var option string
-			if err = optionRows.Scan(&option); err != nil {
+			var option models.Options
+			if err = optionRows.Scan(&option.Name, &option.ID); err != nil {
 				log.Printf("database failed to scan event option: %v\n", err)
 				return nil, err
 			}
@@ -61,9 +60,9 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 			}
 
 			// Get username for each responded user
-			userQuery := `SELECT user_name FROM "user" WHERE user_id = $1`
-			var username string
-			if err = DB.QueryRow(context.Background(), userQuery, userID).Scan(&username); err != nil {
+			userQuery := `SELECT user_name, first_name, last_name FROM "user" INNER JOIN profile USING (user_id) WHERE user_id = $1`
+			var user models.PostFeedProfile
+			if err = DB.QueryRow(context.Background(), userQuery, userID).Scan(&user.UserName, &user.FirstName, &user.LastName); err != nil {
 				log.Printf("database failed to query user_name: %v\n", err)
 				return nil, err
 			}
@@ -75,12 +74,13 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 			}
 			optionQuery := `SELECT name FROM event_option WHERE option_id = $1`
 			var optionName string
-			fmt.Println(OptionID)
 			if err = DB.QueryRow(context.Background(), optionQuery, OptionID).Scan(&optionName); err != nil {
 				log.Printf("database failed to query reponse type for user %v: %v\n", userID, err)
 				return nil, err
 			}
-			event.RespondedUsers = append(event.RespondedUsers, username, optionName)
+			event.RespondedUsers = append(event.RespondedUsers, user.UserName)
+			event.Choices = append(event.Choices, optionName)
+			event.FullNames = append(event.FullNames, user.FirstName+" "+user.LastName)
 		}
 
 		events = append(events, event)

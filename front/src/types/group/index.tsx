@@ -9,7 +9,7 @@ type Group = {
   ismember: boolean;
   iscreator: boolean;
   request_made: boolean;
-  events: groupEvent[];
+  events: GroupEvent[];
   creator: creator;
   invited_by: requester;
   requesters: requester[];
@@ -23,13 +23,22 @@ type creator = {
   avatar?: string;
 };
 
-type groupEvent = {
+type GroupEvent = {
   id: number;
   title: string;
   description: string;
-  options: string[];
+  options: option[];
   event_time: number
-  responded_users: string[];
+  responded_users: string[] | undefined;
+  choices: string[] | undefined;
+  full_names: string[] | undefined;
 };
 
-export type { Group }
+type option = {
+  option_id: number;
+  option_name: string;
+};
+
+export type { Group, GroupEvent }
+
+

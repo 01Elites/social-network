@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import NewPostPreview from '../../components/Feed/NewPostPreview';
 import CreateEvent from './createevent';
+import EventsFeed from './eventsfeed';
 
 interface eventParams {
   groupTitle: string | undefined;
@@ -17,7 +18,7 @@ export default function NewEventCell(props: eventParams): JSXElement {
 
   const [postPreviewOpen, setPostPreviewOpen] = createSignal(false);
 
-  return (
+  return (<>
     <div class='flex gap-2 rounded border-[1px] p-2'>
       <CreateEvent setOpen={setPostPreviewOpen} open={postPreviewOpen()} groupTitle={props.groupTitle} groupID={props.groupID}/>
       <Avatar>
@@ -33,13 +34,6 @@ export default function NewEventCell(props: eventParams): JSXElement {
       >
         Create New Event
       </Button>
-      {/* <Button
-        variant='ghost'
-        title='Upload an image Button'
-        class='hidden xs:inline-flex'
-      >
-        <img src={photo} alt='Upload an image icon' />
-      </Button> */}
-    </div>
+    </div><EventsFeed groupID={props.groupID}/></>
   );
 }

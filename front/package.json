@@ -25,6 +25,7 @@
     "vite-tsconfig-paths": "^4.3.2"
   },
   "dependencies": {
+    "@corvu/tooltip": "^0.2.0",
     "@kobalte/core": "^0.13.3",
     "@solid-primitives/websocket": "^1.2.2",
     "@solidjs/router": "^0.13.6",

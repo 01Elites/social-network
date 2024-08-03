@@ -169,11 +169,11 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group.Events, err = database.GetGroupEvents(group.ID)
-	if err != nil {
-		http.Error(w, "Failed to get group events", http.StatusInternalServerError)
-		return
-	}
+	// group.Events, err = database.GetGroupEvents(group.ID)
+	// if err != nil {
+	// 	http.Error(w, "Failed to get group events", http.StatusInternalServerError)
+	// 	return
+	// }
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(group)
 }
@@ -246,4 +246,21 @@ func getGroupPostsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(posts)
+}
+
+func GetEventsHandler(w http.ResponseWriter, r *http.Request) {
+	groupIDstr := r.PathValue("id")
+	groupID, err := strconv.Atoi(groupIDstr)
+	groupExists := database.CheckGroupID(groupID) // check if the group has been created
+	if groupID == 0 || err != nil || !groupExists {
+		http.Error(w, "Invalid group ID", http.StatusBadRequest)
+		return
+	}
+	events, err := database.GetGroupEvents(groupID)
+	if err != nil {
+		helpers.HTTPError(w, "Failed to get group events", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(events)
 }

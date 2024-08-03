@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
@@ -26,11 +27,21 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("failed to decode request: %v", err)
 		return
 	}
-	log.Print(event)
-	if event.GroupID == 0 || event.Title == "" || event.EventTime.IsZero() {
+	if event.GroupID == 0 || event.Title == "" || event.EventTime.IsZero() || len(event.Options) < 2 {
 		http.Error(w, "missing required fields", http.StatusBadRequest)
 		return
 	}
+
+	if event.EventTime.Before(time.Now().Add(24 * time.Hour)) {
+		http.Error(w, "event time cannot be in the past", http.StatusBadRequest)
+		return
+	}
+
+	if len(event.Title) > 15 || len(event.Description) > 200 {
+		http.Error(w, "title or description too long", http.StatusBadRequest)
+		return
+	}
+
 	groupTitle, err := database.GetGroupTitle(event.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "group ID does not exist", http.StatusBadRequest)

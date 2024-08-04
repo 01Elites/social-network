@@ -75,36 +75,14 @@ function LoginDialog(): JSXElement {
         if (res.status === 200) {
           fetchUserDetails();
           setLoginOpen(false);
-          // Connect to the WebSocket
-          // const socket = new WebSocket(config.WS_URL);
+
           let token = res.headers.get('Authorization');
           if (token) {
             token = token.replace('Bearer ', '');
           } else {
             throw new Error('Authorization header is missing');
           }
-          const socket = new WebSocket(`${config.WS_URL}`, token);
-
-          socket.onopen = () => {
-            console.log('WebSocket connection established.');
-            // Optionally, you can send some initial data or messages here
-          };
-
-          socket.onmessage = (event) => {
-            console.log('Message received from server:', event.data);
-            // Handle incoming messages
-          };
-
-          socket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-          };
-
-          socket.onclose = () => {
-            console.log('WebSocket connection closed.');
-          };
-          return;
         }
-
         const error = await res.json();
         if (error.reason) {
           throw new Error(error.reason);

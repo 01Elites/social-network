@@ -14,7 +14,7 @@ import User, { UserDetailsHook } from '~/types/User';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
 import { TextField, TextFieldTextArea } from '../ui/text-field';
-import NewPostPrivacy from './NewPostPrivacy';
+// import NewPostPrivacy from './NewPostPrivacy';
 
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import config from '~/config';
@@ -35,7 +35,7 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
   const [uploadedImage, setUploadedImage] = createSignal<File | null>(null);
   const [postText, setPostText] = createSignal<string>('');
 
-  const [postPrivacyOpen, setPostPrivacyOpen] = createSignal(false);
+  // const [postPrivacyOpen, setPostPrivacyOpen] = createSignal(false);
   const [postPrivacy, setPostPrivacy] =
     createSignal<NewPostPrivacyOptions>('public');
   const [selectedUsers, setSelectedUsers] = createSignal<String[]>([]);
@@ -110,7 +110,7 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
-      <NewPostPrivacy
+      {/* <NewPostPrivacy
         onlyFollowersCallback={() => setPostPrivacy('private')}
         onlySelectedCallback={(selectedUsers) => {
           setPostPrivacy('almost_private');
@@ -118,7 +118,7 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
         }}
         open={postPrivacyOpen()}
         setOpen={setPostPrivacyOpen}
-      />
+      /> */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
@@ -186,7 +186,7 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
         <Separator />
         <DialogFooter class='!justify-between gap-4'>
           <Tooltip>
-            <TooltipTrigger
+            {/* <TooltipTrigger
               as={Button<'button'>}
               variant='secondary'
               disabled={formProcessing()}
@@ -195,7 +195,7 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
               {postPrivacy() === 'public' && 'Post Privacy'}
               {postPrivacy() === 'private' && 'Only My Followers'}
               {postPrivacy() === 'almost_private' && 'Only Selected Users'}
-            </TooltipTrigger>
+            </TooltipTrigger> */}
             <TooltipContent>
               <p>
                 Who do you wnat to see your post? we show it to everyone be

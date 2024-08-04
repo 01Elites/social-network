@@ -4,7 +4,6 @@ import { UserDetailsHook } from '~/types/User';
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
-import NewPostPreview from '../../components/Feed/NewPostPreview';
 import CreateEvent from './createevent';
 import EventsFeed from './eventsfeed';
 
@@ -34,6 +33,6 @@ export default function NewEventCell(props: eventParams): JSXElement {
       >
         Create New Event
       </Button>
-    </div><EventsFeed groupID={props.groupID}/></>
+    </div><EventsFeed groupID={props.groupID} /></>
   );
 }

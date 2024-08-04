@@ -1,18 +1,14 @@
 import { Tabs } from '@kobalte/core/tabs';
-import { createEffect, createSignal, Index, JSXElement, Show } from 'solid-js';
-import { showToast } from '~/components/ui/toast';
+import { createSignal, Index, JSXElement, Show } from 'solid-js';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
 import { cn } from "~/lib/utils";
-import { Post } from "~/types/Post";
 import FeedPosts from '~/components/Feed/FeedPosts';
 import { GroupRequests } from "~/pages/group/creatorsrequest";
 import { Card } from '~/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { For } from 'solid-js';
 import { User } from '~/types/User';
 import { Button } from '~/components/ui/button';
-import CreateEvent from './createevent';
 import NewEventCell from './neweventcell';
 import GroupContacts from "./groupcontacts";
 
@@ -92,8 +88,9 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         </div>
       </Tabs.Content>
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="chat">NOTHING!!!</Tabs.Content>
+
       <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="events">
-        <NewEventCell groupTitle={props.groupTitle} groupID={props.groupID}/>
+        <NewEventCell groupTitle={props.groupTitle} groupID={props.groupID} />
       </Tabs.Content>
 
       <Tabs.Content class="tabs__content overflow-scroll flex flex-wrap " value="invite">

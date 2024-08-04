@@ -3,59 +3,15 @@ import { JSXElement } from 'solid-js';
 import { Tabs } from '@kobalte/core/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Card } from '~/components/ui/card';
-import { fetchWithAuth } from '~/extensions/fetch';
-import config from '~/config';
 import Groups from '~/types/groups';
 import NewGroupPreview from '~/components/Feed/NewGroupPreview';
-import { UserDetailsHook } from '~/types/User';
-import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { Button } from '~/components/ui/button';
+import RequestToJoin from "../group/request";
+import { Group } from '~/types/group';
 
 export default function GroupsFeed(props: { targetGroups: () => Groups | undefined }): JSXElement {
   const groups = props.targetGroups();
-  console.log("groups", groups);
-  const [title, setTitle] = createSignal('');
-  const [description, setDescription] = createSignal('');
-  const [formProcessing, setFormProcessing] = createSignal(false);
-  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-
-  const submitGroupData = async () => {
-    setFormProcessing(true);
-
-    const groupData = {
-      title: title(),
-      description: description(),
-    };
-
-    fetchWithAuth(`${config.API_URL}/create_group`, {
-      method: 'POST',
-      body: JSON.stringify(groupData),
-    })
-      .then(async (res) => {
-        setFormProcessing(false);
-        if (res.status === 201) {
-          alert('Group created successfully');
-          return;
-        }
-
-        const error = await res.json();
-        if (error.reason) {
-          throw new Error(error.reason);
-        }
-        throw new Error('An error occurred while creating the group. Please try again.');
-      })
-      .catch((error) => {
-        alert(`Error: ${error.message}`);
-      })
-      .finally(() => {
-        setFormProcessing(false);
-      });
-  };
-
-  const handleSubmit = (event: Event) => {
-    event.preventDefault();
-    submitGroupData();
-  };
+  // console.log("groups", groups);
   const [groupPreviewOpen, setGroupPreviewOpen] = createSignal(false);
 
   return (
@@ -121,6 +77,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
                   </Avatar>
                   {group.title}
                 </a>
+                {/* <RequestToJoin targetGroup={() => group as Group} /> */}
               </Card>
             )}
           </For>
@@ -140,6 +97,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
                   </Avatar>
                   {group.title}
                 </a>
+                {/* <RequestToJoin targetGroup={() => group as Group} /> */}
               </Card>
             )}
           </For>

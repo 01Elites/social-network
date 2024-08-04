@@ -13,14 +13,15 @@ import { Card } from '~/components/ui/card';
 
 export default function RequestToJoin(props: { targetGroup: () => Group}):JSXElement{
   var [buttonData, setButtonData] = createSignal(["", ""]);
+  console.log(props.targetGroup())
   if (props.targetGroup().iscreator){
     return null
   }else if (props.targetGroup().ismember){
-    setButtonData(["Exit Group", "/exit_group"])
+    setButtonData(["Exit", "/exit_group"])
   } else if (props.targetGroup().request_made){
-  setButtonData(["Cancel Request", "/cancel_join_req"])
+  setButtonData(["Cancel", "/cancel_join_req"])
 } else {
-    setButtonData(["Request To Join", "/join_group_req"])
+    setButtonData(["Join", "/join_group_req"])
   }
   function sendRequestApi(){
     console.log(buttonData())
@@ -35,15 +36,15 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
   }).then(async (res) => {
     if (res.status === 200) {
       if (buttonData()[1] === "/join_group_req"){
-        setButtonData(["Cancel Request", "/cancel_join_req"])
+        setButtonData(["Cancel", "/cancel_join_req"])
         props.targetGroup().request_made = true
         console.log('RequestMade');
       } else if (buttonData()[1] === "/cancel_join_req"){
-        setButtonData(["Request To Join", "/join_group_req"])      
+        setButtonData(["Join", "/join_group_req"])      
         props.targetGroup().request_made = false
         console.log('RequestCancelled');
       } else if (buttonData()[1] === "/exit_group"){
-        setButtonData(["Request To Join", "/join_group_req"])
+        setButtonData(["Join", "/join_group_req"])
         props.targetGroup().ismember = false
         props.targetGroup().request_made = false
         console.log('GroupExited');
@@ -94,9 +95,9 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
     </div>
   </Card></div>      
 </Show>
-<Show when={buttonData()[0] == "Exit Group" || props.targetGroup().invited_by.user.first_name == ""}>
+<Show when={buttonData()[0] == "Exit" || props.targetGroup().invited_by.user.first_name == ""}>
 <Button class="flex grow" variant="default" onClick={sendRequestApi}>
-<Show when={buttonData()[0] == "Request To Join"}>
+<Show when={buttonData()[0] == "Join"}>
   <Follow_Icon />
 </Show>
 {buttonData()[0]}

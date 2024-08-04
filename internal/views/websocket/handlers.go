@@ -26,13 +26,8 @@ var (
 )
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	// get the token from the header wedsocket protocol
-	protocols := websocket.Subprotocols(r)
-	if len(protocols) == 0 {
-		helpers.HTTPError(w, "Authorization token required", http.StatusUnauthorized)
-		return
-	}
-	token := protocols[0]
+	token := r.URL.Query().Get("token")
+
 	userID, err := database.ValidateSessionToken(token)
 	if err != nil {
 		helpers.HTTPError(w, "Invalid session token", http.StatusUnauthorized)

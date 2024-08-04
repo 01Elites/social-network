@@ -84,6 +84,7 @@ function LoginDialog(): JSXElement {
           } else {
             throw new Error('Authorization header is missing');
           }
+          return;
         }
         const error = await res.json();
         if (error.reason) {
@@ -126,24 +127,35 @@ function LoginDialog(): JSXElement {
     }
   }
 
-  function handleSignupForm(e: SubmitEvent) {
+  async function handleSignupForm(e: SubmitEvent) {
     e.preventDefault();
     setFormProcessing(true);
 
+    const payload = {
+      first_name: signupFirstName(),
+      last_name: signupLastName(),
+      email: signupEmail(),
+      date_of_birth: new Date(signupDOB()).toISOString(),
+      profile_privacy: signupPrivate() ? 'private' : 'public',
+      password: signupPassword(),
+      gender: signupGender(),
+      image: '',
+      about: signupAbout(),
+      nick_name: signupNickname(),
+    };
+
+    if (signupUploadedImage()) {
+      try {
+        const base64 = await signupUploadedImage()?.toBase64();
+        payload.image = base64 as string;
+      } catch (error) {
+        console.error('Error converting image to base64:', error);
+      }
+    }
+
     fetchWithAuth(config.API_URL + '/auth/signup', {
       method: 'POST',
-      body: JSON.stringify({
-        first_name: signupFirstName(),
-        last_name: signupLastName(),
-        email: signupEmail(),
-        date_of_birth: new Date(signupDOB()).toISOString(),
-        profile_privacy: signupPrivate() ? 'private' : 'public',
-        password: signupPassword(),
-        gender: signupGender(),
-        image: signupUploadedImage(),
-        about: signupAbout(),
-        nick_name: signupNickname(),
-      }),
+      body: JSON.stringify(payload),
     })
       .then(async (res) => {
         setFormProcessing(false);

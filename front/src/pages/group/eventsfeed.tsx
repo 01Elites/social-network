@@ -71,7 +71,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
         {(event) => (
           <div>
             <div class='flex flex-col' id={event.title}>
-              <Card class='flex h-60 min-w-52 flex-col text-wrap justify-center items-center space-y-4 p-3 justfi'>
+              <Card class='flex h-60 min-w-52 flex-col text-wrap justify-center items-center space-y-4 p-3'>
                 <Tooltip
                   placement="bottom"
                   openDelay={200}
@@ -89,7 +89,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
                     <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
-                      <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3 border-white'><p class="block flex flex-col gap-2 place-items-right">
+                      <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3'><p class="block flex flex-col gap-2 place-items-right">
                         {event.description}</p>
                         <p class="text-lg font-light text-muted-foreground flex flex-col place-items-center">
                           event well happen <time>{moment(event.event_time).fromNow()}</time>
@@ -146,7 +146,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
-                        <Card class='flex flex-col justify-center items-center space-y-4 p-3 border-white'>
+                        <Card class='flex flex-col justify-center items-center space-y-4 p-3'>
                           Choosen By:
                           <Index each={event.responded_users}>
                             {(user, i) => (
@@ -178,7 +178,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
-                        <Card class='flex flex-col justify-center items-center space-y-4 p-3 border-white'>
+                        <Card class='flex flex-col justify-center items-center space-y-4 p-3'>
                           Choosen By:
                           <Index each={event.responded_users}>
                             {(user, i) => (

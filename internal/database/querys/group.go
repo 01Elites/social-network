@@ -286,5 +286,12 @@ func GetGroupFeedInfo(groupID int, userID string) (models.GroupFeed, error) {
 		return models.GroupFeed{}, err
 	}
 
+	if !group.IsMember {
+		group.RequestMade, err = CheckForGroupRequest(group.ID, userID)
+		if err != nil {
+			return models.GroupFeed{}, err
+		}
+	}
+
 	return group, nil
 }

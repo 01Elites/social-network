@@ -78,11 +78,17 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 				log.Printf("database failed to query reponse type for user %v: %v\n", userID, err)
 				return nil, err
 			}
+
+			if event.Options[0].Name == optionName {
+				event.Option1++
+			} else {
+				event.Option2++
+			}
+
 			event.RespondedUsers = append(event.RespondedUsers, user.UserName)
 			event.Choices = append(event.Choices, optionName)
 			event.FullNames = append(event.FullNames, user.FirstName+" "+user.LastName)
 		}
-
 		events = append(events, event)
 	}
 

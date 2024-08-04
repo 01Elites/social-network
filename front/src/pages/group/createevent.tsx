@@ -43,7 +43,7 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
 
   async function makeEvent() {
     setFormProcessing(true);
-    if (eventTime() < moment().format('YYYY-MM-DD')) {
+    if (moment(eventTime()).isBefore(moment().toISOString())) {
       showToast({
         title: 'Invalid date',
         description: 'Event date should be in the future',
@@ -88,19 +88,11 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
           variant: 'error',
         });
       });
+      window.location.reload();
   }
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
-      {/* <NewPostPrivacy
-        onlyFollowersCallback={() => setPostPrivacy('private')}
-        onlySelectedCallback={(selectedUsers) => {
-          setPostPrivacy('almost_private');
-          setSelectedOptions(selectedUsers);
-        }}
-        open={postPrivacyOpen()}
-        setOpen={setPostPrivacyOpen}
-      /> */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Event</DialogTitle>
@@ -132,21 +124,6 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
 
         <Separator />
         <DialogFooter class='!justify-between gap-4'>
-          {/* <Tooltip>
-            <TooltipTrigger
-              as={Button<'button'>}
-              variant='secondary'
-              disabled={formProcessing()}
-              onClick={() => setPostPrivacyOpen(true)}
-            >
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                Who do you wnat to see your post? we show it to everyone be
-                default.
-              </p>
-            </TooltipContent>
-          </Tooltip> */}
           <TextField onChange={setfirstoption} value={firstoption()}>
         <TextFieldInput 
         type="text"

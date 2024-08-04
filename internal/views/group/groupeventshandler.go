@@ -32,7 +32,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if event.EventTime.Before(time.Now().Add(24 * time.Hour)) {
+	if event.EventTime.Before(time.Now()) {
 		http.Error(w, "event time cannot be in the past", http.StatusBadRequest)
 		return
 	}

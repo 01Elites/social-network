@@ -65,6 +65,8 @@ type Event struct {
 	RespondedUsers []string  `json:"responded_users,omitempty"`
 	Choices				[]string  `json:"choices,omitempty"`
 	FullNames			[]string  `json:"full_names,omitempty"`
+	Option1       int			 `json:"option1"`
+	Option2			  int			 `json:"option2"`
 }
 
 type Options struct {

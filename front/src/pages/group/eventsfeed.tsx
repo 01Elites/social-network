@@ -10,9 +10,7 @@ import {
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { cn } from '~/lib/utils';
 import { UserDetailsHook } from '~/types/User';
-import Repeat from '../../components/core/repeat';
 import { showToast } from '../../components/ui/toast';
 import { GroupEvent } from '~/types/group/index';
 import moment from 'moment';
@@ -27,13 +25,6 @@ interface FeedPostsProps {
 export default function EventsFeed(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const [events, setEvents] = createSignal<GroupEvent[]>();
-
-  // function updatePost(updatedPost: Post) {
-  //   const updatedPosts = events()?.map((event) =>
-  //     post.post_id === updatedPost.post_id ? updatedPost : post,
-  //   );
-  //   setPosts(updatedPosts);
-  // }
   createEffect(() => {
     if (!userDetails()) return;
     fetchWithAuth(config.API_URL + `/group/${props.groupID}/events`)
@@ -94,7 +85,8 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                   <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3 border-white'><p class="block flex flex-col gap-2 place-items-right">
                     {event.description}</p>
                     <p class="text-lg font-light text-muted-foreground flex flex-col place-items-center">
-                      event well happen <time>{moment(event.event_time).fromNow()}</time>
+                      <Show when={moment(event.event_time).isAfter(moment())} fallback={<p>Event Done</p>}>
+                      event well happen <time>{moment(event.event_time).fromNow()}</time></Show>
                     </p></Card>
                   <Tooltip.Arrow class="text-corvu-100" />
                 </Tooltip.Content>
@@ -110,8 +102,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                     variant='ghost'
                     class='flex-1 gap-2'
                     onClick={() => {
-                      event.responded_users?.push(userDetails().user_name);
-                      handleEventOption(event.options[0].option_id, event.id);
+                      handleEventOption(event.options[0].option_id, event);
                     }}
                     
                   >
@@ -123,8 +114,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                     class='flex-1 gap-2'
                     color="red"
                     onClick={() => {
-                      event.responded_users?.push(userDetails().user_name);
-                      handleEventOption(event.options[1].option_id, event.id);
+                      handleEventOption(event.options[1].option_id, event);
                     }}
                   >
                     {event.options[1].option_name}
@@ -144,7 +134,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                 <Tooltip.Trigger
                   class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
                 >
-                  {event.options[0].option_name}
+                  {event.options[0].option_name} (<Show when={event.option1== null}>0</Show>{event.option1})
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
@@ -176,7 +166,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                 <Tooltip.Trigger
                   class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
                 >
-                  {event.options[1].option_name}
+                  {event.options[1].option_name} (<Show when={event.option2== null}>0</Show>{event.option2})
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
@@ -206,11 +196,11 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
   </>);
 }
 
-export function handleEventOption(option: number, eventID: number) {
+export function handleEventOption(option: number, event: GroupEvent) {
   fetchWithAuth(`${config.API_URL}/event_response`, {
     method: 'POST',
     body: JSON.stringify({
-      event_id: eventID,
+      event_id: event.id,
       option_id: option,
     })
   })
@@ -229,8 +219,21 @@ export function handleEventOption(option: number, eventID: number) {
         variant: 'error',
       });
     });
-    var button = document.getElementById("option1"+String(eventID));
+    if (event.options[0].option_id == option) {
+      event.option1++;
+    } else {
+      event.option2++;
+    }
+    if (event.option1 == null) {
+      event.option1 = 0;
+    }
+    if (event.option2 == null) {
+      event.option2 = 0;
+    }
+    var button = document.getElementById("option1"+String(event.id));
     button?.setAttribute('disabled', '');
-    var button = document.getElementById("option2"+String(eventID));
+    button.innerHTML = `${event.options[0].option_name} (${event.option1})`
+    var button = document.getElementById("option2"+String(event.id));
     button?.setAttribute('disabled', '');
+    button.innerHTML = `${event.options[1].option_name} (${event.option2})`
   }

@@ -32,6 +32,8 @@ type GroupEvent = {
   responded_users: string[] | undefined;
   choices: string[] | undefined;
   full_names: string[] | undefined;
+  option1: number;
+  option2: number;
 };
 
 type option = {

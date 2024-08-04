@@ -1,7 +1,7 @@
 import { createSignal, onMount } from 'solid-js';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '../../config';
-import User, { UserDetailsHook } from '../../types/User';
+import User from '../../types/User';
 
 function useUserDetails(): UserDetailsHook {
   const [userDetails, setUserDetails] = createSignal<User | null>(null);
@@ -61,5 +61,15 @@ function useUserDetails(): UserDetailsHook {
     updateUserDetails,
   };
 }
+
+interface UserDetailsHook {
+  userDetails: () => User | null;
+  setUserDetails: (details: User | null) => void;
+  userDetailsError: () => string | null;
+  fetchUserDetails: () => Promise<void>;
+  updateUserDetails: (partialDetails: Partial<User>) => Promise<void>;
+}
+
+export type { UserDetailsHook };
 
 export { useUserDetails };

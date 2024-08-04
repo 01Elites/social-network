@@ -11,10 +11,10 @@ import '~/extensions';
 import './index.css';
 import EventsPage from './pages/events';
 import FriendsPage from './pages/friends';
+import Group from './pages/group';
 import GroupsPage from './pages/groups';
 import HomePage from './pages/home';
 import Profile from './pages/profile';
-import Group from './pages/group';
 
 const root = document.getElementById('root');
 
@@ -37,9 +37,7 @@ function App() {
       )}
     >
       <Route path='/' component={HomePage} />
-      {/* </AuthGuard> */}
       <Route path='/group/:id' component={Group} />
-      {/* <AuthGuard> */}
       <Route path='/groups' component={GroupsPage} />
       <Route path='/friends' component={FriendsPage} />
       <Route path='/events' component={EventsPage} />

@@ -1,5 +1,5 @@
 import { createContext } from 'solid-js';
-import { UserDetailsHook } from '../../types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 
 const UserDetailsContext = createContext<UserDetailsHook>();
 

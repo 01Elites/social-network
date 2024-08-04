@@ -23,7 +23,7 @@ import { showToast } from '~/components/ui/toast';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';

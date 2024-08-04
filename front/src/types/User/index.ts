@@ -14,13 +14,4 @@ export type User = {
   following_count: number;
 };
 
-interface UserDetailsHook {
-  userDetails: () => User | null;
-  setUserDetails: (details: User | null) => void;
-  userDetailsError: () => string | null;
-  fetchUserDetails: () => Promise<void>;
-  updateUserDetails: (partialDetails: Partial<User>) => Promise<void>;
-}
-
 export default User;
-export type { UserDetailsHook };

@@ -10,7 +10,7 @@ import {
 } from '~/components/ui/dialog';
 import { Separator } from '~/components/ui/separator';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import User, { UserDetailsHook } from '~/types/User';
+import User from '~/types/User';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
 import { TextField, TextFieldTextArea } from '../ui/text-field';
@@ -19,6 +19,7 @@ import NewPostPrivacy from './NewPostPrivacy';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import config from '~/config';
 import { fetchWithAuth } from '~/extensions/fetch';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import { showToast } from '../ui/toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
@@ -121,8 +122,8 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
           <DialogDescription>
-            Share your thoughts with the world. Make sure you are respectful
-            and kind to others.
+            Share your thoughts with the world. Make sure you are respectful and
+            kind to others.
           </DialogDescription>
         </DialogHeader>
 
@@ -207,7 +208,9 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
             disabled={postText().length < 1 || formProcessing()}
             onClick={makePost}
           >
-            {formProcessing() && <img src={tailspin} class='h-full' alt='processing' />}
+            {formProcessing() && (
+              <img src={tailspin} class='h-full' alt='processing' />
+            )}
             {formProcessing() ? 'Posting...' : 'Post'}
           </Button>
         </DialogFooter>

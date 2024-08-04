@@ -99,6 +99,14 @@ export default function ProfileFeed(props: {
 
       </Tabs.Content>
       <Tabs.Content class="tabs__content flex flex-wrap gap-4" value="following">
+      <Show when={props.targetUser()?.follow_status === "following" || props.targetUser()?.profile_privacy === "public" || props.targetUser()?.email !== undefined}
+          fallback={
+            <div class="flex flex-col items-center justify-center h-full">
+              <p class="text-2xl font-bold">This user's profile is private</p>
+              <p class="text-lg">Follow this user to see their following</p>
+            </div>
+          }
+        >
         <For each={targetFriends()?.following ?? []}>
           {(following) => (
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
@@ -119,6 +127,7 @@ export default function ProfileFeed(props: {
             </Card>
           )}
         </For>
+      </Show>
       </Tabs.Content>
     </Tabs>
   )

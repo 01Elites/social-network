@@ -117,6 +117,7 @@ function LoginDialog(): JSXElement {
   const [signupUploadedImage, setSignupUploadedImage] =
     createSignal<File | null>(null);
   const [signupAbout, setSignupAbout] = createSignal('');
+  const [signupNickname, setSignupNickname] = createSignal('');
 
   function handleImageUpload(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -141,6 +142,7 @@ function LoginDialog(): JSXElement {
         gender: signupGender(),
         image: signupUploadedImage(),
         about: signupAbout(),
+        nick_name: signupNickname(),
       }),
     })
       .then(async (res) => {
@@ -250,6 +252,14 @@ function LoginDialog(): JSXElement {
                   </button>
                 </Avatar>
               </div>
+              <TextField
+                onChange={setSignupNickname}
+                value={signupNickname()}
+                class='col-span-2'
+              >
+                <TextFieldLabel>Nickname</TextFieldLabel>
+                <TextFieldInput type='text' placeholder='Your Nickname' />
+              </TextField>
               <TextField
                 class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
                 onChange={setSignupFirstName}

@@ -17,12 +17,14 @@ import {
   TextField,
   TextFieldInput,
   TextFieldLabel,
+  TextFieldTextArea,
 } from '~/components/ui/text-field';
 import { showToast } from '~/components/ui/toast';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/types/User';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import {
@@ -98,8 +100,6 @@ function LoginDialog(): JSXElement {
           variant: 'error',
         });
       });
-
-    // connect with the websocket
   }
 
   function handleLoginWithReboot() {
@@ -114,10 +114,21 @@ function LoginDialog(): JSXElement {
   const [signupGender, setSignupGender] = createSignal<'female' | 'male'>();
   const [signupPassword, setSignupPassword] = createSignal('');
   const [signupPrivate, setSignupPrivate] = createSignal(false);
+  const [signupUploadedImage, setSignupUploadedImage] =
+    createSignal<File | null>(null);
+  const [signupAbout, setSignupAbout] = createSignal('');
+
+  function handleImageUpload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      setSignupUploadedImage(target.files[0]);
+    }
+  }
 
   function handleSignupForm(e: SubmitEvent) {
     e.preventDefault();
     setFormProcessing(true);
+
     fetchWithAuth(config.API_URL + '/auth/signup', {
       method: 'POST',
       body: JSON.stringify({
@@ -127,7 +138,9 @@ function LoginDialog(): JSXElement {
         date_of_birth: new Date(signupDOB()).toISOString(),
         profile_privacy: signupPrivate() ? 'private' : 'public',
         password: signupPassword(),
-        gender: signupGender(), // Hardcoded for testing
+        gender: signupGender(),
+        image: signupUploadedImage(),
+        about: signupAbout(),
       }),
     })
       .then(async (res) => {
@@ -204,6 +217,39 @@ function LoginDialog(): JSXElement {
               class='grid w-full grid-cols-1 gap-4 xs:grid-cols-2'
               onSubmit={handleSignupForm}
             >
+              <div class='col-span-2 flex justify-center'>
+                <input
+                  class='hidden'
+                  type='file'
+                  id='signupImageUpload'
+                  accept='image/*'
+                  onChange={handleImageUpload}
+                />
+                <Avatar class='size-20'>
+                  <Show when={signupUploadedImage()}>
+                    <AvatarImage
+                      src={URL.createObjectURL(signupUploadedImage()!)}
+                    />
+                  </Show>
+                  <AvatarFallback class='text-xl'>
+                    {signupFirstName() && signupFirstName()[0]}
+                    {signupLastName() && signupLastName()[0]}
+                  </AvatarFallback>
+                  <button
+                    type='button'
+                    onClick={() => {
+                      if (signupUploadedImage()) {
+                        URL.revokeObjectURL(signupUploadedImage()!.name);
+                        setSignupUploadedImage(null);
+                      }
+                      document.getElementById('signupImageUpload')?.click();
+                    }}
+                    class='absolute bottom-0 w-full bg-primary/80 text-center text-primary-foreground'
+                  >
+                    {signupUploadedImage() ? 'change' : 'set'}
+                  </button>
+                </Avatar>
+              </div>
               <TextField
                 class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-1'
                 onChange={setSignupFirstName}
@@ -292,6 +338,18 @@ function LoginDialog(): JSXElement {
                 />
               </TextField>
 
+              <TextField
+                onChange={setSignupAbout}
+                value={signupAbout()}
+                class='col-span-2 grid w-full items-center gap-1.5'
+              >
+                <TextFieldLabel>About me</TextFieldLabel>
+                <TextFieldTextArea
+                  class='resize-none'
+                  placeholder='i am a big clown'
+                />
+              </TextField>
+
               <div class='items-top col-span-2 flex space-x-2'>
                 <Checkbox
                   id='terms1'
@@ -319,7 +377,9 @@ function LoginDialog(): JSXElement {
                   formProcessing()
                 }
               >
-                {formProcessing() && <img alt='' src={tailspin} class='h-full' />}
+                {formProcessing() && (
+                  <img alt='' src={tailspin} class='h-full' />
+                )}
                 Become a Looser
               </Button>
               <Button

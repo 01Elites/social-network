@@ -177,35 +177,42 @@ func CancelRequestHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		helpers.HTTPError(w, "failed to decode request", http.StatusBadRequest)
+		log.Println(err)
 		return
 	}
 	groupExists := database.CheckGroupID(request.GroupID)
 	if !groupExists {
 		helpers.HTTPError(w, "group ID does not exist", http.StatusBadRequest)
+		log.Println("group does not exist")
 		return
 	}
 	isMember, err := database.GroupMember(userID, request.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "error checking if user is a member", http.StatusBadRequest)
+		log.Println("error checking if user is a member")
 		return
 	}
 	if isMember {
 		helpers.HTTPError(w, "you already are a member", http.StatusBadRequest)
+		log.Println("user is a member")
 		return
 	}
 	requestID, err := database.CancelRequest(request.GroupID, userID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to cancel request", http.StatusNotFound)
+		log.Println("failed to cancel request")
 		return
 	}
 	creatorID, err := database.GetGroupCreatorID(request.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "error getting creator ID", http.StatusNotFound)
+		log.Println("error getting creator ID")
 		return
 	}
 	err = database.UpdateNotificationTable(requestID, "canceled", "join_request", creatorID)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
+		log.Println("error updating notification table")
 		return
 	}
 	w.WriteHeader(http.StatusOK)

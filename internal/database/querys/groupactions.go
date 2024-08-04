@@ -98,9 +98,9 @@ func CheckForGroupRequest(groupID int, senderID string) (bool, error) {
 		FROM
 			group_requests
 		WHERE
-		 requester_id = $1 AND status = $2
+		 requester_id = $1 AND group_id = $2 AND status = $3
 `
-	err := DB.QueryRow(context.Background(), query, senderID, "pending").Scan(&requestID)
+	err := DB.QueryRow(context.Background(), query, senderID, groupID, "pending").Scan(&requestID)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for request: %v", err)
 		return false, err // Return error if failed to insert post

@@ -1,4 +1,4 @@
-import { createSignal, For, useContext } from 'solid-js';
+import { createSignal, For, Index, useContext } from 'solid-js';
 import { JSXElement } from 'solid-js';
 import { Tabs } from '@kobalte/core/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
@@ -17,9 +17,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
   return (
     <div >
       <div >
-
         <NewGroupPreview setOpen={setGroupPreviewOpen} open={groupPreviewOpen()} />
-
         <Button
           variant='default'
           class='m-2'
@@ -27,7 +25,6 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
         >
           Create New Group
         </Button>
-
       </div>
       <Tabs aria-label="Main navigation" class="tabs">
         <Tabs.List class="tabs__list">
@@ -77,7 +74,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
                   </Avatar>
                   {group.title}
                 </a>
-                {/* <RequestToJoin targetGroup={() => group as Group} /> */}
+                <RequestToJoin targetGroup={() => group as Group} />
               </Card>
             )}
           </For>
@@ -97,7 +94,7 @@ export default function GroupsFeed(props: { targetGroups: () => Groups | undefin
                   </Avatar>
                   {group.title}
                 </a>
-                {/* <RequestToJoin targetGroup={() => group as Group} /> */}
+                <RequestToJoin targetGroup={() => group as Group} />
               </Card>
             )}
           </For>

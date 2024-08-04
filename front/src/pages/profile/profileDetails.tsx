@@ -7,7 +7,6 @@ import { AspectRatio } from '~/components/ui/aspect-ratio';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import config from '~/config';
-import Follow_Icon from '~/components/ui/icons/follow_icon';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
@@ -58,12 +57,7 @@ export default function ProfileDetails(props: {
           when={userDetails()?.user_name === props.targetUser().user_name}
           fallback={
             <div class='m-4 flex w-full flex-row justify-between gap-2'>
-              {/* <Button class='flex grow' variant='default'>
-                <Follow_Icon />
-                {props.targetUser().follow_status === 'following'
-                  ? 'Unfollow'
-                  : 'Follow'}
-              </Button> */}
+
               <div class='flex gap-2'>
                 {/* Follow button */}
                 <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status} privacy={props.targetUser().profile_privacy} />
@@ -74,7 +68,6 @@ export default function ProfileDetails(props: {
                   <Message_Icon class='w-5 justify-center' />
                 </Button>
               </div>
-              {/* Follow button */}
             </div>
           }
         >

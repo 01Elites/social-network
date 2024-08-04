@@ -19,7 +19,7 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
   }else if (props.targetGroup().ismember){
     setButtonData(["Exit", "/exit_group"])
   } else if (props.targetGroup().request_made){
-  setButtonData(["Cancel", "/cancel_join_req"])
+  setButtonData(["Requested", "/cancel_join_req"])
 } else {
     setButtonData(["Join", "/join_group_req"])
   }
@@ -36,7 +36,7 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
   }).then(async (res) => {
     if (res.status === 200) {
       if (buttonData()[1] === "/join_group_req"){
-        setButtonData(["Cancel", "/cancel_join_req"])
+        setButtonData(["Requested", "/cancel_join_req"])
         props.targetGroup().request_made = true
         console.log('RequestMade');
       } else if (buttonData()[1] === "/cancel_join_req"){

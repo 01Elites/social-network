@@ -13,6 +13,7 @@ import {
   TextField,
   TextFieldInput,
   TextFieldLabel,
+  TextFieldTextArea,
 } from '~/components/ui/text-field';
 import { showToast } from '~/components/ui/toast';
 import config from '~/config';
@@ -55,6 +56,7 @@ function ProfileEditDialog(): JSXElement {
   const [userGender, setGender] = createSignal<'female' | 'male' | 'undefined'>(
     userDetails()?.gender || 'undefined',
   );
+  const [userAbout, setAbout] = createSignal(userDetails()?.about);
 
   function handleEditProfileForm(e?: SubmitEvent) {
     e?.preventDefault();
@@ -68,6 +70,7 @@ function ProfileEditDialog(): JSXElement {
         date_of_birth: new Date(userDOB()).toISOString(),
         profile_privacy: userPrivate() ? 'private' : 'public',
         gender: userGender(),
+        about: userAbout(),
       }),
     })
       .then(async (res) => {
@@ -176,6 +179,14 @@ function ProfileEditDialog(): JSXElement {
               </SelectTrigger>
               <SelectContent />
             </Select>
+          </TextField>
+          <TextField
+            class='col-span-2 grid w-full items-center gap-1.5 xs:col-span-2'
+            onChange={setAbout}
+            value={userAbout()}
+          >
+            <TextFieldLabel for='about'>About</TextFieldLabel>
+            <TextFieldTextArea id='about' placeholder='about me' rows={2} />
           </TextField>
 
           <div class='items-top col-span-2 flex space-x-2'>

@@ -2,8 +2,10 @@ import { Button } from "~/components/ui/button";
 import Follow_Icon from '~/components/ui/icons/follow_icon';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
-import { JSXElement, Show } from 'solid-js';
-import { createSignal } from 'solid-js'
+import { JSXElement, Show, useContext } from 'solid-js';
+import { createSignal } from 'solid-js';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
+import User, { UserDetailsHook } from '~/types/User';
 
 type FollowRequestParams = {
   username: string | undefined;
@@ -11,7 +13,9 @@ type FollowRequestParams = {
   privacy: string;
 }
 export default function FollowRequest(props: FollowRequestParams): JSXElement {
-  console.log(props.username, props.status)
+  console.log(props.username, props)
+  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+
   var [buttonData, setButtonData] = createSignal("");
   if (props.status == "following") {
     setButtonData("Unfollow")
@@ -19,7 +23,7 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
     setButtonData("Requested")
   } else if (props.status == "not_following") {
     setButtonData("Follow")
-  } 
+  }
   function sendRequestApi() {
     console.log(buttonData())
     if (buttonData() === "") {
@@ -42,7 +46,7 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
           setButtonData("Follow")
         } else if (buttonData() === "Requested") {
           setButtonData("Follow")
-        } 
+        }
         return;
       } else {
         console.log(res.body);
@@ -52,10 +56,12 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
     })
   }
   return (<>
-    <Button class="flex grow" variant="default" onClick={sendRequestApi}>
-      <Show when={props.status == "not followed"}>
-        <Follow_Icon />
-      </Show>{buttonData()}
-    </Button>
+    <Show when={userDetails()?.user_name != props.username}>
+      <Button class="flex " variant="default" onClick={sendRequestApi}>
+        <Show when={props.status == "not followed"}>
+          <Follow_Icon />
+        </Show>{buttonData()}
+      </Button>
+    </Show>
   </>)
 }

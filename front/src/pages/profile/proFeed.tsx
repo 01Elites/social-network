@@ -13,6 +13,7 @@ import { fetchWithAuth } from '~/extensions/fetch';
 import { For } from 'solid-js';
 import { Card } from '~/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import FollowRequest from './followRequest';
 
 
 type ProfileParams = {
@@ -38,7 +39,7 @@ export default function ProfileFeed(props: {
         return;
       }
     });
-  });  return (
+  }); return (
     <Tabs aria-label="Main navigation" class="tabs">
       <Tabs.List class="tabs__list">
         <Tabs.Trigger class="tabs__trigger" value="posts">Posts</Tabs.Trigger>
@@ -88,6 +89,8 @@ export default function ProfileFeed(props: {
                   </Avatar>
                   {follower.first_name} {follower.last_name}
                 </a>
+                <FollowRequest username={follower.user_name} status={follower.follow_status} privacy={follower.profile_privacy} />
+
               </Card>
             )}
           </For>
@@ -111,6 +114,8 @@ export default function ProfileFeed(props: {
                 </Avatar>
                 {following.first_name} {following.last_name}
               </a>
+              <FollowRequest username={following.user_name} status={following.follow_status} privacy={following.profile_privacy} />
+
             </Card>
           )}
         </For>

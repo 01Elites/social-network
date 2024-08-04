@@ -9,6 +9,7 @@ import { Card } from '../../components/ui/card';
 import { Avatar, AvatarFallback } from '../../components/ui/avatar';
 import config from '../../config';
 import { Show, For } from 'solid-js';
+import FollowRequest from '../profile/followRequest';
 interface HomeContactsProps {
   members: User[] | undefined;
   class: string;
@@ -42,6 +43,7 @@ export default function GroupContacts(props: HomeContactsProps): JSXElement {
                 <div>{member.last_name}</div>
               </div>
             </a>
+            <FollowRequest username={member.user_name} status={member.follow_status} privacy={member.profile_privacy} />
           </Card>
         )}
       </For>

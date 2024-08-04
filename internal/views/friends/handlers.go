@@ -12,7 +12,7 @@ import (
 )
 
 // GetUsersLiteInfo returns the lite info of the users
-func GetUsersLiteInfo(users []string) []models.UserLiteInfo {
+func GetUsersLiteInfo(users []string, userID string) []models.UserLiteInfo {
 	var usersLite []models.UserLiteInfo
 	var userLiteInfo models.UserLiteInfo
 	for _, user := range users {
@@ -25,6 +25,9 @@ func GetUsersLiteInfo(users []string) []models.UserLiteInfo {
 		userLiteInfo.FirstName = userLite.FirstName
 		userLiteInfo.LastName = userLite.LastName
 		userLiteInfo.Avatar = userLite.Avatar
+		userLiteInfo.Privacy = userLite.ProfilePrivacy
+		userLiteInfo.Status = database.GetFollowStatus(userID, userLite.UserID)
+
 		usersLite = append(usersLite, userLiteInfo)
 	}
 	return usersLite
@@ -50,7 +53,7 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(followers) != 0 {
-		friendsList.Followers = GetUsersLiteInfo(followers)
+		friendsList.Followers = GetUsersLiteInfo(followers, userID)
 	}
 
 	following, err := database.GetUserFollowingUserNames(userID)
@@ -60,7 +63,7 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(following) != 0 {
-		friendsList.Following = GetUsersLiteInfo(following)
+		friendsList.Following = GetUsersLiteInfo(following, userID)
 	}
 
 	// If the user is the same as the user page, return the friend requests and explore
@@ -94,7 +97,7 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(explore) != 0 {
-		friendsList.Explore = GetUsersLiteInfo(explore)
+		friendsList.Explore = GetUsersLiteInfo(explore, userID)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -104,7 +107,7 @@ func GetMyFriendsHandler(w http.ResponseWriter, r *http.Request) {
 // GetFriendsHandler returns the friends of the user
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the userID from context using the same key defined globally
-	_, ok := r.Context().Value(middleware.UserIDKey).(string)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		log.Printf("User ID not found")
 		helpers.HTTPError(w, "User ID not found", http.StatusInternalServerError)
@@ -136,7 +139,7 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(followers) != 0 {
-		friendsList.Followers = GetUsersLiteInfo(followers)
+		friendsList.Followers = GetUsersLiteInfo(followers, userID)
 	}
 
 	following, err := database.GetUserFollowingUserNames(UserPageID)
@@ -147,7 +150,7 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(following) != 0 {
-		friendsList.Following = GetUsersLiteInfo(following)
+		friendsList.Following = GetUsersLiteInfo(following,userID)
 	}
 
 	w.WriteHeader(http.StatusOK)

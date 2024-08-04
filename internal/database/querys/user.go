@@ -103,6 +103,7 @@ func GetUserProfileByUserName(username string) (*models.UserProfile, error) {
 		public.profile.privacy, 
 		public.profile.nick_name, 
 		public.profile.about, 
+		public.profile.user_id,
 		public."user".user_name
 	FROM 
 		public.profile 
@@ -121,6 +122,7 @@ func GetUserProfileByUserName(username string) (*models.UserProfile, error) {
 		&userProfile.ProfilePrivacy,
 		&userProfile.NickName,
 		&userProfile.About,
+		&userProfile.UserID,
 		&userProfile.Username,
 	)
 	if err != nil {

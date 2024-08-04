@@ -31,11 +31,11 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
          {/* Profile picture */}
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}
           <p class='text-2xl font-bold m-4'>{props.targetGroup().title}</p>
-          <div class='grid w-full grid-cols-2 text-sm m-4'>
-          <p class='flex justify-center'>Group Creator:&nbsp<A
+          <div class='flex flex-row gap-2'>
+          <p class='flex justify-center'>Admin:&nbsp<A
               href={"/profile/" + props.targetGroup().creator.user_name} class='block text-sm font-bold hover:underline'>
           {props.targetGroup().creator.first_name}  {props.targetGroup().creator.last_name}</A></p>
-            <p class='flex justify-center'>Number of Members: {numberOfMembers}</p>
+            <p class='flex justify-center'>Members: {numberOfMembers}</p>
           </div>
         </div> {/* Username, followers, following */}
         <div class='m-4'> {/* Bio */}

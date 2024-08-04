@@ -6,7 +6,7 @@ type GroupFeed struct {
 	Title       string            `json:"title,omitempty"`
 	Description string            `json:"description,omitempty"`
 	ID          int               `json:"id,omitempty"`
-	Members     []PostFeedProfile `json:"members,omitempty"`
+	Members     []UserLiteInfo `json:"members,omitempty"`
 	Events      []Event           `json:"events,omitempty"`
 	IsMember    bool              `json:"ismember"`
 	IsCreator   bool              `json:"iscreator"`

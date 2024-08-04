@@ -54,10 +54,10 @@ func GetGroupInfo(groupID int) (string, string, error) {
 	return title, description, nil
 }
 
-func GetGroupMembers(groupID int) ([]models.PostFeedProfile, []string, error) {
-	var users []models.PostFeedProfile
+func GetGroupMembers(groupID int) ([]models.UserLiteInfo, []string, error) {
+	var users []models.UserLiteInfo
 	var userids []string
-	query := `SELECT user_id, user_name, first_name, last_name, image FROM group_member 
+	query := `SELECT user_id, user_name, first_name, last_name, image , privacy FROM group_member 
 						INNER JOIN profile USING (user_id)
 						INNER JOIN "user" USING (user_id)
 						WHERE group_id = $1`
@@ -67,12 +67,13 @@ func GetGroupMembers(groupID int) ([]models.PostFeedProfile, []string, error) {
 		return nil, nil, err
 	}
 	for rows.Next() {
-		var user models.PostFeedProfile
+		var user models.UserLiteInfo
 		var userid string
-		if err = rows.Scan(&userid, &user.UserName, &user.FirstName, &user.LastName, &user.Avatar); err != nil {
+		if err = rows.Scan(&userid, &user.UserName, &user.FirstName, &user.LastName, &user.Avatar, &user.Privacy); err != nil {
 			log.Printf("database failed to scan group user: %v\n", err)
-			return nil,nil, err
+			return nil, nil, err
 		}
+		user.Status = GetFollowStatus(userid, userid)
 		users = append(users, user)
 		userids = append(userids, userid)
 	}
@@ -266,7 +267,7 @@ func GetGroupFeedInfo(groupID int, userID string) (models.GroupFeed, error) {
 		return models.GroupFeed{}, err
 	}
 
-	group.Members,_, err = GetGroupMembers(group.ID)
+	group.Members, _, err = GetGroupMembers(group.ID)
 	if err != nil {
 		return models.GroupFeed{}, err
 	}

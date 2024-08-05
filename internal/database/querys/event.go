@@ -93,7 +93,6 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 		log.Printf("database rows error: %v\n", err)
 		return nil, err
 	}
-	log.Print("events: ", events)
 	return events, nil
 }
 

@@ -17,7 +17,7 @@ type WebsocketHook = {
    * @param callback a function that is ran when the event is received
    * @returns a function to unbind the callback, must be called or can cause a memory leak
    */
-  bind: (event: string, callback: (event: WSMessage) => void) => () => void;
+  bind: (event: string, callback: (data: any) => void) => () => void;
   send: (event: WSMessage) => void;
 };
 
@@ -51,13 +51,13 @@ function useWebsocket(): WebsocketHook {
   };
 
   ws.onmessage = async (_message) => {
-    const message = await JSON.parse(_message.data);
+    const message: WSMessage = await JSON.parse(_message.data);
     let broadcasted = false;
 
     listnersMap.forEach((callback, key) => {
       if (key.event === message.event) {
         broadcasted = true;
-        callback(message);
+        callback(message.payload);
       }
     });
 

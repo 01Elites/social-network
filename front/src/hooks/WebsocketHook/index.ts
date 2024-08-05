@@ -1,8 +1,8 @@
 import { createSignal } from 'solid-js';
 import config from '~/config';
 
-type WSEvent = {
-  type: string;
+type WSMessage = {
+  event: string;
   payload: any;
 };
 
@@ -11,8 +11,14 @@ type WebSocketState = 'disconnected' | 'connected' | 'connecting';
 type WebsocketHook = {
   state: WebSocketState;
   error: string | null;
-  bind: (event: string, callback: (event: WSEvent) => void) => () => void;
-  send: (event: WSEvent) => void;
+  /**
+   *
+   * @param event the event to listen to
+   * @param callback a function that is ran when the event is received
+   * @returns a function to unbind the callback, must be called or can cause a memory leak
+   */
+  bind: (event: string, callback: (event: WSMessage) => void) => () => void;
+  send: (event: WSMessage) => void;
 };
 
 function useWebsocket(): WebsocketHook {
@@ -25,7 +31,7 @@ function useWebsocket(): WebsocketHook {
   );
   const listnersMap = new Map<
     { event: string; id: string },
-    (event: WSEvent) => void
+    (event: WSMessage) => void
   >();
 
   ws.onopen = () => {
@@ -44,24 +50,24 @@ function useWebsocket(): WebsocketHook {
     setSocketError(error as any);
   };
 
-  ws.onmessage = (message) => {
-    const event = JSON.parse(message.data);
+  ws.onmessage = async (_message) => {
+    const message = await JSON.parse(_message.data);
     let broadcasted = false;
 
     listnersMap.forEach((callback, key) => {
-      if (key.event === event.type) {
+      if (key.event === message.event) {
         broadcasted = true;
-        callback(event);
+        callback(message);
       }
     });
 
     if (!broadcasted) {
-      console.warn('Unhandled event:', event);
+      console.warn('Unhandled event:', message);
     }
   };
 
   // Bind a callback to a specific event, and return a function to unbind it
-  function bind(event: string, callback: (event: WSEvent) => void) {
+  function bind(event: string, callback: (event: WSMessage) => void) {
     const id = Math.random().toString(36).slice(2);
     listnersMap.set({ event, id }, callback);
 
@@ -70,7 +76,7 @@ function useWebsocket(): WebsocketHook {
     };
   }
 
-  function send(event: WSEvent) {
+  function send(event: WSMessage) {
     ws.send(JSON.stringify(event));
   }
 

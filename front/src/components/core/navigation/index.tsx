@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
+import { IconBell } from '~/components/ui/icons/IconBell';
 import { IconElites, IconElitesSmall } from '~/components/ui/icons/IconElites';
 import IconFlag from '~/components/ui/icons/IconFlag';
 import IconGroup from '~/components/ui/icons/IconGroup';
@@ -104,9 +105,22 @@ export default function Navigation(props: NavigationProps): JSXElement {
           )}
         </For>
 
+        <Show when={userCtx!.userDetails()}>
+          <Button
+            variant='ghost'
+            class='mt-auto w-fit justify-start gap-2 md:w-full'
+          >
+            <IconBell class='size-4' />
+            <span class='hidden md:block'>Notifications</span>
+          </Button>
+        </Show>
+
         <Button
           variant='ghost'
-          class='mt-auto w-fit justify-start gap-2 md:w-full'
+          class={cn(
+            'w-fit justify-start gap-2 md:w-full',
+            userCtx!.userDetails() ? '' : 'mt-auto',
+          )}
           onClick={showSettings}
         >
           <IconSettings class='size-4' />

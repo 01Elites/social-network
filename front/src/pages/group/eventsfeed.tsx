@@ -24,7 +24,7 @@ interface FeedPostsProps {
 
 export default function EventsFeed(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  const [events, setEvents] = createSignal<GroupEvent[]>();
+  const [events, setEvents] = createSignal<GroupEvent[]>(); 
   createEffect(() => {
     if (!userDetails()) return;
     fetchWithAuth(config.API_URL + `/group/${props.groupID}/events`)
@@ -35,6 +35,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
           return;
         }
         if (res.ok) {
+          console.log(body);
           setEvents(body);
           return;
         }
@@ -94,7 +95,9 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
             </Tooltip>
 
             <Show
-              when={event.responded_users?.includes(userDetails().user_name)}
+              when={(event.options[0].usernames && event.options[1].usernames) ||
+                (!event.options[1].usernames && event.options[0].usernames?.includes(userDetails().user_name))||
+                 (!event.options[0].usernames && event.options[1].usernames?.includes(userDetails().user_name))}
               fallback={
                 <>
                   <Button
@@ -134,21 +137,19 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                 <Tooltip.Trigger
                   class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
                 >
-                  {event.options[0].option_name} (<Show when={event.option1== null}>0</Show>{event.option1})
+                  {event.options[0].option_name} (<Show when={event.options[0].usernames == undefined}>0</Show>{event.options[0].usernames?.length})
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
                     <Card class='flex flex-col justify-center items-center space-y-4 p-3 border-white'>
                     Choosen By:
-                      <Index each={event.responded_users}>
-                        {(user, i) => (
-                          <Show when={event.choices[i] == event.options[0].option_name}>
+                      <For each={event.options[0].fullnames}>
+                        {(user) => (
                             <p class='block text-sm font-bold hover:underline'>
-                              {event.full_names[i]}
+                              {user}
                             </p>
-                          </Show>
                         )}
-                      </Index>
+                      </For>
                     </Card>
                     <Tooltip.Arrow class="text-corvu-100" />
                   </Tooltip.Content>
@@ -166,21 +167,19 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                 <Tooltip.Trigger
                   class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
                 >
-                  {event.options[1].option_name} (<Show when={event.option2== null}>0</Show>{event.option2})
+                  {event.options[1].option_name} (<Show when={event.options[1].usernames == undefined}>0</Show>{event.options[1].usernames?.length})
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
                     <Card class='flex flex-col justify-center items-center space-y-4 p-3 border-white'>
                       Choosen By:
-                      <Index each={event.responded_users}>
-                        {(user, i) => (
-                          <Show when={event.choices[i] == event.options[1].option_name}>
+                      <For each={event.options[1].fullnames}>
+                        {(user) => (
                             <p class='block text-sm font-bold hover:underline'>
-                              {event.full_names[i]}
+                              {user}
                             </p>
-                          </Show>
                         )}
-                      </Index>
+                      </For>
                     </Card>
                     <Tooltip.Arrow class="text-corvu-100" />
                   </Tooltip.Content>
@@ -197,6 +196,8 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
 }
 
 export function handleEventOption(option: number, event: GroupEvent) {
+  let option1Count = 0;
+  let option2Count = 0;
   fetchWithAuth(`${config.API_URL}/event_response`, {
     method: 'POST',
     body: JSON.stringify({
@@ -220,20 +221,14 @@ export function handleEventOption(option: number, event: GroupEvent) {
       });
     });
     if (event.options[0].option_id == option) {
-      event.option1++;
+      option1Count = event.options[0].usernames.length+1;
     } else {
-      event.option2++;
-    }
-    if (event.option1 == null) {
-      event.option1 = 0;
-    }
-    if (event.option2 == null) {
-      event.option2 = 0;
+      option2Count = event.options[1].usernames.length+1;
     }
     var button = document.getElementById("option1"+String(event.id));
     button?.setAttribute('disabled', '');
-    button.innerHTML = `${event.options[0].option_name} (${event.option1})`
+    button.innerHTML = `${event.options[0].option_name} (${option1Count})`
     var button = document.getElementById("option2"+String(event.id));
     button?.setAttribute('disabled', '');
-    button.innerHTML = `${event.options[1].option_name} (${event.option2})`
+    button.innerHTML = `${event.options[1].option_name} (${option2Count})`
   }

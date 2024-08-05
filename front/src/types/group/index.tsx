@@ -29,16 +29,13 @@ type GroupEvent = {
   description: string;
   options: option[];
   event_time: number
-  responded_users: string[] | undefined;
-  choices: string[] | undefined;
-  full_names: string[] | undefined;
-  option1: number;
-  option2: number;
 };
 
 type option = {
   option_id: number;
   option_name: string;
+  usernames: string[] | null;
+  fullnames: string[] | null;
 };
 
 export type { Group, GroupEvent }

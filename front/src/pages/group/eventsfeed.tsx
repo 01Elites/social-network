@@ -141,7 +141,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
-                    <Card class='flex flex-col justify-center items-center space-y-4 p-3 border-white'>
+                    <Card class='flex flex-col justify-center items-center space-y-4 p-3'>
                     Choosen By:
                       <For each={event.options[0].fullnames}>
                         {(user) => (
@@ -171,7 +171,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
-                    <Card class='flex flex-col justify-center items-center space-y-4 p-3 border-white'>
+                    <Card class='flex flex-col justify-center items-center space-y-4 p-3'>
                       Choosen By:
                       <For each={event.options[1].fullnames}>
                         {(user) => (

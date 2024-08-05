@@ -24,6 +24,7 @@ func SetClientOffline(username string) {
 	// Remove the client from the Clients map
 	userID := clients[username].ID
 	cmutex.Lock()
+	clients[username].Conn.Close()
 	delete(clients, username)
 	cmutex.Unlock()
 	updateFollowersUserList(userID)

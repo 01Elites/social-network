@@ -11,11 +11,6 @@ import (
 )
 
 func ProcessEvents(user *types.User) {
-	defer func() {
-		// Remove the client from the Clients map when the connection is closed
-		user.Conn.Close()
-		SetClientOffline(user.Username)
-	}()
 
 	for {
 		// Read message from WebSocket connection

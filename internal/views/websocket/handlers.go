@@ -52,14 +52,31 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		Mutex:    &sync.Mutex{},
 	}
 	SetClientOnline(&user)
-	go ProcessNotifications(&user)
-	go ProcessEvents(&user)
 
 	// send all the notifications in database to the user
 	err = SendUsersNotifications(user.ID)
 	if err != nil {
 		log.Printf("error sending notifications:%v", err)
 	}
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		ProcessNotifications(&user)
+	}()
+
+	go func() {
+		defer wg.Done()
+		ProcessEvents(&user)
+	}()
+
+	// Wait for both goroutines to finish
+	go func() {
+		wg.Wait()
+		SetClientOffline(user.Username)
+	}()
 }
 
 // Function to send JSON data to a WebSocket connection
@@ -69,12 +86,12 @@ func sendMessageToWebSocket(user *types.User, eventType string, data interface{}
 		log.Println("Connection is nil")
 		return nil
 	}
-	fmt.Println(eventType, data)
 	// Format the message payload according to the given event type and data
 	eventMessage := types.Event{
 		Type:    eventType,
 		Payload: data,
 	}
+	fmt.Println(eventMessage)
 	messagesJSON, err := json.Marshal(eventMessage)
 	if err != nil {
 		log.Println("Error marshalling messages to JSON:", err)

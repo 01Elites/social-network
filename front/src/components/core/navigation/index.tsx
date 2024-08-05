@@ -24,7 +24,6 @@ import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { cn } from '~/lib/utils';
 import { showSettings } from '~/pages/settings';
-import { UserDetailsHook } from '~/types/User';
 
 interface NavigationProps {
   children: JSXElement;
@@ -39,9 +38,7 @@ type NavItem = {
 
 export default function Navigation(props: NavigationProps): JSXElement {
   const navigate = useNavigate();
-  const { userDetails, setUserDetails } = useContext(
-    UserDetailsContext,
-  ) as UserDetailsHook;
+  const userCtx = useContext(UserDetailsContext);
 
   const location = useLocation();
 
@@ -117,7 +114,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
         </Button>
         <Separator />
         <Show
-          when={userDetails()}
+          when={userCtx!.userDetails()}
           fallback={
             <Button
               variant='secondary'
@@ -132,19 +129,21 @@ export default function Navigation(props: NavigationProps): JSXElement {
           <DropdownMenu>
             <DropdownMenuTrigger class='flex w-full flex-row items-center justify-center gap-2 px-2 md:justify-start'>
               <Avatar>
-                <AvatarImage src={userDetails()?.avatar}></AvatarImage>
+                <AvatarImage src={userCtx!.userDetails()?.avatar}></AvatarImage>
                 <AvatarFallback>
-                  {userDetails()?.first_name.charAt(0).toUpperCase()}
+                  {userCtx!.userDetails()?.first_name.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span class='hidden md:block'>{userDetails()?.first_name}</span>
+              <span class='hidden md:block'>
+                {userCtx!.userDetails()?.first_name}
+              </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  navigate(`/profile/${userDetails()?.user_name}`);
+                  navigate(`/profile/${userCtx!.userDetails()?.user_name}`);
                 }}
               >
                 Profile
@@ -155,7 +154,8 @@ export default function Navigation(props: NavigationProps): JSXElement {
                   fetchWithAuth(config.API_URL + '/auth/logout', {
                     method: 'DELETE',
                   }).finally(() => {
-                    setUserDetails(null);
+                    localStorage.removeItem('SN_TOKEN');
+                    userCtx!.setUserDetails(null);
                   });
                 }}
               >

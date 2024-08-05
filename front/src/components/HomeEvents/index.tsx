@@ -1,7 +1,7 @@
-import { JSXElement, useContext } from 'solid-js';
-import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { JSXElement, onCleanup, useContext } from 'solid-js';
+import WebSocketContext from '~/contexts/WebSocketContext';
+import { WebsocketHook } from '~/hooks/WebsocketHook';
 import { cn } from '~/lib/utils';
-import { UserDetailsHook } from '~/types/User';
 import Repeat from '../core/repeat';
 import { Skeleton } from '../ui/skeleton';
 
@@ -10,7 +10,9 @@ interface HomeEventsProps {
 }
 
 export default function HomeEvents(props: HomeEventsProps): JSXElement {
-  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+  const wsCtx = useContext(WebSocketContext) as WebsocketHook;
+
+  onCleanup(() => {});
 
   return (
     <section class={cn('flex flex-col gap-3', props.class)}>

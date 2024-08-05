@@ -1,4 +1,4 @@
-import { Accessor, createSignal } from 'solid-js';
+import { createSignal } from 'solid-js';
 import config from '~/config';
 
 type WSEvent = {
@@ -9,9 +9,10 @@ type WSEvent = {
 type WebSocketState = 'disconnected' | 'connected' | 'connecting';
 
 type WebsocketHook = {
-  state: Accessor<WebSocketState>;
-  error: Accessor<string | null>;
+  state: WebSocketState;
+  error: string | null;
   bind: (event: string, callback: (event: WSEvent) => void) => () => void;
+  send: (event: WSEvent) => void;
 };
 
 function useWebsocket(): WebsocketHook {
@@ -44,15 +45,19 @@ function useWebsocket(): WebsocketHook {
   };
 
   ws.onmessage = (message) => {
-    console.log('Received message:', message);
-
     const event = JSON.parse(message.data);
+    let broadcasted = false;
 
     listnersMap.forEach((callback, key) => {
       if (key.event === event.type) {
+        broadcasted = true;
         callback(event);
       }
     });
+
+    if (!broadcasted) {
+      console.warn('Unhandled event:', event);
+    }
   };
 
   // Bind a callback to a specific event, and return a function to unbind it
@@ -65,10 +70,15 @@ function useWebsocket(): WebsocketHook {
     };
   }
 
+  function send(event: WSEvent) {
+    ws.send(JSON.stringify(event));
+  }
+
   return {
-    state: socketState,
-    error: socketError,
+    state: socketState(),
+    error: socketError(),
     bind: bind,
+    send: send,
   };
 }
 

@@ -179,8 +179,8 @@ func CreateFollowRequest(request *models.Request) error {
 	return nil
 }
 
-func RespondToFollow(response models.Response) error {
-	query := `UPDATE follow_requests SET status = $1 WHERE sender_id = $2 AND receiver_id = $3 RETURNING request_id`
+func RespondToFollow(response *models.Response) error {
+	query := `UPDATE follow_requests SET status = $1 WHERE sender_id = $2 AND receiver_id = $3 AND status = 'pending' RETURNING request_id`
 	err := DB.QueryRow(context.Background(), query, response.Status, response.Follower, response.Followee).Scan(&response.ID)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)

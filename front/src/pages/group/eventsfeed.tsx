@@ -60,12 +60,12 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
         Maybe you could post some{' '}
       </p>
     </Show>
-    <div class='flex w-4m-6 flex flex-wrap m-4 space-x-4'>
+    <div class='flex flex flex-wrap m-4'>
     <For each={events()}>
       {(event) => (
         <div>
           <div class='flex flex-col' id={event.title}>
-          <Card class='flex h-60 min-w-52 flex-col text-wrap justify-center items-center space-y-4 p-3'>
+          <Card class='flex h-80 w-60 flex-col text-wrap items-center space-y-5 p-3'>
             <Tooltip
               placement="bottom"
               openDelay={200}
@@ -79,16 +79,17 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
               <Tooltip.Trigger
                 class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
               >
-                Event Details
+                Event Description
               </Tooltip.Trigger>
+              <p class="text-lg font-light text-muted-foreground flex place-items-center">
+                      <Show when={moment(event.event_time).isAfter(moment())} fallback={<p>Event Done</p>}>
+                      event&nbsp<time>{moment(event.event_time).fromNow()}</time></Show>
+                    </p>
               <Tooltip.Portal>
                 <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
                   <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3'><p class="block flex flex-col gap-2 place-items-right">
                     {event.description}</p>
-                    <p class="text-lg font-light text-muted-foreground flex flex-col place-items-center">
-                      <Show when={moment(event.event_time).isAfter(moment())} fallback={<p>Event Done</p>}>
-                      event well happen <time>{moment(event.event_time).fromNow()}</time></Show>
-                    </p></Card>
+                    </Card>
                   <Tooltip.Arrow class="text-corvu-100" />
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -198,6 +199,16 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
 export function handleEventOption(option: number, event: GroupEvent) {
   let option1Count = 0;
   let option2Count = 0;
+  if (!event.options[0].usernames) {
+    option1Count = 0;
+  } else {
+    option1Count = event.options[0].usernames.length;
+  }
+  if (!event.options[1].usernames) {
+    option2Count = 0;
+  } else {
+    option2Count = event.options[1].usernames.length;
+  }
   fetchWithAuth(`${config.API_URL}/event_response`, {
     method: 'POST',
     body: JSON.stringify({
@@ -221,9 +232,9 @@ export function handleEventOption(option: number, event: GroupEvent) {
       });
     });
     if (event.options[0].option_id == option) {
-      option1Count = event.options[0].usernames.length+1;
+      option1Count++;
     } else {
-      option2Count = event.options[1].usernames.length+1;
+      option2Count++;
     }
     var button = document.getElementById("option1"+String(event.id));
     button?.setAttribute('disabled', '');

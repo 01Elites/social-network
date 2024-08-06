@@ -56,7 +56,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "you are not a member", http.StatusBadRequest)
 		return
 	}
-	groupMembers, groupMembersIDs, err := database.GetGroupMembers(event.GroupID)
+	groupMembers, groupMembersIDs, err := database.GetGroupMembers(userID, event.GroupID)
 	if err != nil {
 		helpers.HTTPError(w, "failed to get group members", http.StatusNotFound)
 		return

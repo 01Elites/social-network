@@ -124,7 +124,7 @@ func GetGroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group.Members,_, err = database.GetGroupMembers(group.ID)
+	group.Members,_, err = database.GetGroupMembers(userID, group.ID)
 	if err != nil {
 		http.Error(w, "Failed to get group members", http.StatusInternalServerError)
 		return

@@ -171,7 +171,7 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 
 	// Send the message to the group members if they are online and has
 	// connection
-	members, _, err := database.GetGroupMembers(groupID)
+	members, _, err := database.GetGroupMembers(user.ID, groupID)
 	if err != nil {
 		log.Println("Error getting group members:", err)
 		return
@@ -244,7 +244,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 			log.Printf("Error converting group ID to int: %v", err)
 			return
 		}
-		members, _, err := database.GetGroupMembers(groupID)
+		members, _, err := database.GetGroupMembers(user.ID, groupID)
 		if err != nil {
 			log.Println("Error getting group members:", err)
 			return

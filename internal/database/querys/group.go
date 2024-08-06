@@ -54,7 +54,7 @@ func GetGroupInfo(groupID int) (string, string, error) {
 	return title, description, nil
 }
 
-func GetGroupMembers(groupID int) ([]models.UserLiteInfo, []string, error) {
+func GetGroupMembers(loggedUser string, groupID int) ([]models.UserLiteInfo, []string, error) {
 	var users []models.UserLiteInfo
 	var userids []string
 	query := `SELECT user_id, user_name, first_name, last_name, image , privacy FROM group_member 
@@ -73,7 +73,7 @@ func GetGroupMembers(groupID int) ([]models.UserLiteInfo, []string, error) {
 			log.Printf("database failed to scan group user: %v\n", err)
 			return nil, nil, err
 		}
-		user.Status = GetFollowStatus(userid, userid)
+		user.Status = GetFollowStatus(loggedUser, userid)
 		users = append(users, user)
 		userids = append(userids, userid)
 	}
@@ -263,11 +263,6 @@ func GetGroupFeedInfo(groupID int, userID string) (models.GroupFeed, error) {
 	}
 
 	group.Title, group.Description, err = GetGroupInfo(group.ID)
-	if err != nil {
-		return models.GroupFeed{}, err
-	}
-
-	group.Members, _, err = GetGroupMembers(group.ID)
 	if err != nil {
 		return models.GroupFeed{}, err
 	}

@@ -78,7 +78,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
       </Tabs.List>
 
       <Tabs.Content
-        class='tabs__content h-[80vh] overflow-scroll'
+        class='tabs__content h-[80vh] overflow-y-scroll'
         value='posts'
       >
         <div class={cn('flex flex-col gap-4 p-2')}>
@@ -87,13 +87,13 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
           </div>
         </div>
       </Tabs.Content>
-      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="chat">NOTHING!!!</Tabs.Content>
+      <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="chat">NOTHING!!!</Tabs.Content>
 
-      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="events">
+      <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="events">
         <NewEventCell groupTitle={props.groupTitle} groupID={props.groupID} />
       </Tabs.Content>
 
-      <Tabs.Content class="tabs__content overflow-scroll flex flex-wrap " value="invite">
+      <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh] flex flex-wrap " value="invite">
         <Index each={props?.explore ?? []}>
           {(explore, i) => <>
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
@@ -134,7 +134,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         </Index>
       </Tabs.Content>
       <Show when={props.creator}>
-        <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="requests">
+        <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="requests">
           <Show when={props.requesters?.length === 0}>
             <h1 class='text-center font-bold text-muted-foreground'>
               Hmmm, we don't seem to have any requests
@@ -143,7 +143,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
           <GroupRequests requesters={props.requesters} groupID={props.groupID} />
         </Tabs.Content>
       </Show>
-      <Tabs.Content class="tabs__content overflow-scroll" value="members">
+      <Tabs.Content class="tabs__content overflow-scroll h-[80vh]" value="members">
         <GroupContacts members={props.members} class=' flex flex-wrap' />
       </Tabs.Content>
     </Tabs>

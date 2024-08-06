@@ -53,12 +53,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	SetClientOnline(&user)
 
-	// send all the notifications in database to the user
-	err = SendUsersNotifications(user.ID)
-	if err != nil {
-		log.Printf("error sending notifications:%v", err)
-	}
-
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -77,6 +71,13 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		wg.Wait()
 		SetClientOffline(user.Username)
 	}()
+	
+	// send all the notifications in database to the user
+	err = SendUsersNotifications(user.ID)
+	if err != nil {
+		log.Printf("error sending notifications:%v", err)
+	}
+
 }
 
 // Function to send JSON data to a WebSocket connection

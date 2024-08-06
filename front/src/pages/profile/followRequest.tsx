@@ -5,7 +5,7 @@ import config from '~/config';
 import { JSXElement, Show, useContext } from 'solid-js';
 import { createSignal } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import User, { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 
 type FollowRequestParams = {
   username: string | undefined;

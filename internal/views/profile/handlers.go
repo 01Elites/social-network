@@ -140,6 +140,14 @@ func patchProfile(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("Error with Image:", err)
 		}
+	} else {
+		avatar, err := database.GetUserProfileItem(userID, "image")
+		if err != nil {
+			log.Printf("Failed to get user profile image: %v\n", err)
+			helpers.HTTPError(w, "Failed to get user profile image", http.StatusInternalServerError)
+			return
+		}
+		update.Avatar = avatar.(string)
 	}
 
 	updatedProfile := models.UserProfile{

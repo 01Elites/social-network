@@ -29,7 +29,6 @@ export default function Profile(): JSXElement {
       }
       if (res.ok) {
         setTargetUser(body);
-        console.log(body);
         return;
       }
 

@@ -125,6 +125,18 @@ func GetUserProfile(userID string) (*models.UserProfile, error) {
 	return &userProfile, nil
 }
 
+func GetUserProfileItem(userID string, item string) (interface{}, error) {
+	// Fetch user profile from database
+	var itemValue interface{}
+	query := fmt.Sprintf(`SELECT %s FROM public.profile WHERE user_id = $1`, item)
+	err := DB.QueryRow(context.Background(), query, userID).Scan(&itemValue)
+	if err != nil {
+		log.Printf("Failed to fetch user profile item: %v\n", err)
+		return "", err
+	}
+	return itemValue, nil
+}
+
 func GetUserProfileByUserName(username string) (*models.UserProfile, error) {
 	// Fetch user profile by username from database
 	var userProfile models.UserProfile

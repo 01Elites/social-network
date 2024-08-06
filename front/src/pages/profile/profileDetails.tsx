@@ -10,7 +10,8 @@ import config from '~/config';
 import Globe_Icon from '~/components/ui/icons/globe_icon';
 import Message_Icon from '~/components/ui/icons/message_icon';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import User, { UserDetailsHook } from '~/types/User';
+import User from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import FollowRequest from './followRequest';
 
 export default function ProfileDetails(props: {

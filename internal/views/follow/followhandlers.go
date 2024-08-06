@@ -159,16 +159,18 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = database.RespondToFollow(response)
+	err = database.RespondToFollow(&response)
 	if err != nil {
 		helpers.HTTPError(w, "Something Went Wrong with the Follow Response!!", http.StatusBadRequest)
 		return
 	}
-	// requestIDjson := struct {
-	// 	ID int `json:"id"`
-	// }{
-	// 	ID: response.ID,
-	// }
+
+	// Update the notification table
+	err = database.UpdateNotificationTable(response.ID, response.Status, "follow_request", userID)
+	if err != nil {
+		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	// json.NewEncoder(w).Encode(requestIDjson)
 }

@@ -16,6 +16,11 @@ type Group = {
   explore: User[];
 };
 
+export type GroupInvite = {
+  invited_by: requester;
+  group_id: number
+}
+
 type creator = {
   user_name: string;
   first_name: string;

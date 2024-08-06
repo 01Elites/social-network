@@ -5,9 +5,11 @@ import config from '~/config';
 import { fetchWithAuth } from '~/extensions/fetch';
 import Friends from '~/types/friends';
 import NotificationsFeed from './notificationsfeed';
+import { Notifications } from '~/types/notifications';
+
 
 export default function NotificationsPage(): JSXElement {
-  const [targetnotifications, setTargetNotifications] = createSignal<Friends | undefined>();
+  const [targetnotifications, setTargetNotifications] = createSignal<Notifications | undefined>();
 
   createEffect(() => {
     // Fetch user Friends
@@ -29,7 +31,7 @@ export default function NotificationsPage(): JSXElement {
         <h1>Friends</h1>
         <Show when={targetnotifications()}>
           <div class='m-4 grid grid-cols-1'>
-            <NotificationsFeed targetFriends={() => targetnotifications() as Friends} />
+            <NotificationsFeed targetnotifications={() => targetnotifications() as Notifications} />
           </div>
         </Show>
       </section>

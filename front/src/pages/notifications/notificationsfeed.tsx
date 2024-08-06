@@ -12,96 +12,108 @@ import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
 import { Show } from 'solid-js';
 import FollowRequest from '../profile/followRequest';
+import { Notifications } from '~/types/notifications';
+import {createSignal} from 'solid-js'
+
+
 
 export default function NotificationsFeed(props: {
-  targetFriends: () => Friends | undefined;
+  targetnotifications: () => Notifications | undefined;
 }): JSXElement {
-  const friends = props.targetFriends();
-  console.log(friends);
+  const notifications = props.targetnotifications();
+  console.log(notifications);
+const [friendRequestCount, setFriendRequestCount] = createSignal<number>()
+const [groupInviteCount, setGroupInviteCount] = createSignal<number>()
+const [eventsCount, setEventsCount] = createSignal<number>()
+const [groupRequestCount, setGroupRequestCount] = createSignal<number>()
+setFriendRequestCount(notifications?.FollowRequest.length)
+setGroupInviteCount(notifications?.GroupInvite.length)
+setEventsCount(notifications?.Events.length)
+setGroupRequestCount(notifications?.GroupRequests.length)
 
   return (
     <Tabs aria-label='Main navigation' class='tabs'>
       <Tabs.List class='tabs__list'>
-        <Tabs.Trigger class='tabs__trigger' value='followers'>
-          Followers ({friends?.followers?.length || 0})
-        </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='following'>
-          Following ({friends?.following?.length || 0})
-        </Tabs.Trigger>
         <Tabs.Trigger class='tabs__trigger' value='friend_requests'>
-          Requests ({friends?.friend_requests?.length || 0})
+          friendRequests ({friendRequestCount()})
         </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='explore'>
-          Explore ({friends?.explore?.length || 0})
+        <Tabs.Trigger class='tabs__trigger' value='invites'>
+          Events ({eventsCount()})
+        </Tabs.Trigger>
+        <Tabs.Trigger class='tabs__trigger' value='events'>
+          groupInvite ({groupInviteCount()})
+        </Tabs.Trigger>
+        <Tabs.Trigger class='tabs__trigger' value='group_requests'>
+          groupRequests ({groupRequestCount()})
         </Tabs.Trigger>
         <Tabs.Indicator class='tabs__indicator' />
       </Tabs.List>
 
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='followers'>
-        <For each={friends?.followers ?? []}>
+      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='friends_requests'>
+        <For each={notifications?.FollowRequest?? []}>
           {(follower) => (
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
-                href={`/profile/${follower.user_name}`}
+                href={`/profile/${follower.user_info.user_name}`}
                 class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
                 <Avatar class='w-[5rem] h-[5rem] mb-2'>
                   <AvatarFallback>
-                    <Show when={follower.avatar} fallback={
-                      follower.first_name.charAt(0).toUpperCase()
+                    <Show when={follower.user_info.avatar} fallback={
+                      follower.user_info.first_name.charAt(0).toUpperCase()
                     }><img
                         alt='avatar'
                         class='size-full rounded-md rounded-b-none object-cover'
                         loading='lazy'
-                        src={`${config.API_URL}/image/${follower.avatar}`}
+                        src={`${config.API_URL}/image/${follower.user_info.avatar}`}
                       /></Show></AvatarFallback>
                 </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
-                  <div>{follower.first_name}</div>
-                  <div>{follower.last_name}</div>
+                  <div>{follower.user_info.first_name}</div>
+                  <div>{follower.user_info.last_name}</div>
                 </div>
               </a>
-              <FollowRequest username={follower.user_name} status={follower.follow_status} privacy={follower.profile_privacy} />
+              <FollowRequest username={follower.user_info.user_name} status={follower.user_info.follow_status} privacy={follower.user_info.profile_privacy} />
 
             </Card>
           )}
         </For>
       </Tabs.Content>
 
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='following'>
-        <For each={friends?.following ?? []}>
-          {(following) => (
+      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='invites'>
+        <For each={notifications?.GroupInvite ?? []}>
+          {(invite) => (
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
-                href={`/profile/${following.user_name}`}
+                href={`/profile/${invite.invited_by.user.user_name}`}
                 class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
               >
                 <Avatar class='w-[5rem] h-[5rem] mb-2'>
                   <AvatarFallback>
-                    <Show when={following.avatar} fallback={
-                      following.first_name.charAt(0).toUpperCase()
+                    <Show when={invite.invited_by.user.avatar} fallback={
+                      invite.invited_by.user.first_name.charAt(0).toUpperCase()
                     }><img
                         alt='avatar'
                         class='size-full rounded-md rounded-b-none object-cover'
                         loading='lazy'
-                        src={`${config.API_URL}/image/${following.avatar}`}
+                        src={`${config.API_URL}/image/${invite.invited_by.user.avatar}`}
                       /></Show></AvatarFallback>
                 </Avatar>
                 <div class='flex flex-wrap items-center justify-center space-x-1'>
-                  <div>{following.first_name}</div>
-                  <div>{following.last_name}</div>
+                  <div>{invite.invited_by.user.first_name}</div>
+                  <div>{invite.invited_by.user.last_name}</div>
                 </div>
               </a>
-              <FollowRequest username={following.user_name} status={following.follow_status} privacy={following.profile_privacy} />
+              <FollowRequest username={invite.invited_by.user.user_name} status={invite.invited_by.user.follow_status} privacy={invite.invited_by.user.profile_privacy} />
             </Card>
           )}
         </For>
       </Tabs.Content>
 
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='friend_requests'>
-        <For each={friends?.friend_requests ?? []}>
-          {(request) => (
-            <div id={request.requester} class='flex w-full space-x-1'>
+      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='events'>
+        <For each={notifications?.Events ?? []}>
+          {(event) => (
+            <div id={event.requester} class='flex w-full space-x-1'>
               <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
                 <a
                   href={`/profile/${request.user_info.user_name}`}

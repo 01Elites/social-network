@@ -119,7 +119,7 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 			log.Printf("Unknown notification type: %s", notificationType)
 			continue
 		}
-		if notification != nil {
+		if notification != nil && !read{
 			notification.ID = notificationID
 			notification.Read = read
 			notifications = append(notifications, *notification)

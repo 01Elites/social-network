@@ -11,7 +11,7 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
   const numberOfMembers = props.targetGroup().members.length;
   const groupID = String(props.targetGroup().id)
   return (
-    <div class='flex flex-col min-w-24'> {/* Left div */}
+    <div class='flex flex-col'> {/* Left div */}
       <div class='flex flex-col justify-center items-center'>
         <AspectRatio ratio={16 / 9}>
           <div class='absolute inset-0 bg-black bg-opacity-50 flex justify-center items-end rounded-lg'>
@@ -31,14 +31,14 @@ export default function GroupDetails(props: { targetGroup: () => Group}): JSXEle
          {/* Profile picture */}
         <div class='flex flex-col items-center w-full'> {/* Username, followers, following */}
           <p class='text-2xl font-bold m-4'>{props.targetGroup().title}</p>
-          <div class='flex flex-row gap-2'>
+          <div class='flex-row gap-5'>
           <p class='flex justify-center'>Admin:&nbsp<A
               href={"/profile/" + props.targetGroup().creator.user_name} class='block text-sm font-bold hover:underline'>
-          {props.targetGroup().creator.first_name}  {props.targetGroup().creator.last_name}</A></p>
+                {props.targetGroup().creator.first_name} {props.targetGroup().creator.last_name}</A></p>
             <p class='flex justify-center'>Members: {numberOfMembers}</p>
           </div>
         </div> {/* Username, followers, following */}
-        <div class='m-4'> {/* Bio */}
+        <div class='flex m-4 justify-center w-full items-center'> {/* Bio */}
           <p>{props.targetGroup().description}</p>
         </div>
        <RequestToJoin targetGroup={() => props.targetGroup() as Group}/>

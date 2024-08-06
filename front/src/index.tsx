@@ -41,7 +41,7 @@ function App() {
       <Route path='/groups' component={GroupsPage} />
       <Route path='/friends' component={FriendsPage} />
       <Route path='/events' component={EventsPage} />
-
+      <Route path='/notifications' component={NotificationsPage} />
       <Route path='/profile/:username' component={Profile} />
     </Router>
   );

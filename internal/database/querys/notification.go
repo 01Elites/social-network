@@ -150,22 +150,23 @@ func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile, c
 	return notification
 }
 
-func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile) types.Notification {
+func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile, createdAt string) types.Notification {
 	notification := types.Notification{
 		Type:    "REQUEST_TO_JOIN_GROUP",
 		Message: "You have a new group request",
 		ToUser:  groupCreator,
-		Metadata: types.GroupRequestMetadata{
-			UserDetails: types.UserDetails{
-				Username:  requester.Username,
-				FirstName: requester.FirstName,
-				LastName:  requester.LastName,
+		Metadata: types.GroupRequestNotification{
+			Requester: models.Requester{
+				User: models.PostFeedProfile{
+					UserName:  requester.Username,
+					FirstName: requester.FirstName,
+					LastName:  requester.LastName,
+				},
+				CreationDate: createdAt,
 			},
-			Group: types.GroupNotification{
 				ID:    groupID,
 				Title: GroupTitle,
 			},
-		},
 	}
 	return notification
 }

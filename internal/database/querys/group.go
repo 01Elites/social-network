@@ -3,7 +3,6 @@ package querys
 import (
 	"context"
 	"log"
-	"time"
 
 	"social-network/internal/models"
 )
@@ -152,14 +151,16 @@ func LeaveGroup(userID string, groupID int) error {
 	return nil
 }
 
-func getGroupFromRequest(requestID int) (int, string, string, error) {
+func getGroupFromRequest(requestID int) (int, string, string, string, error) {
 	var groupID int
 	var groupTitle string
 	var creator_id string
+	var requested_at string
 	query := `SELECT
 						group_id,
 						title,
-						creator_id
+						creator_id,
+						requested_at
 						FROM
 						group_requests
 						INNER JOIN
@@ -167,12 +168,12 @@ func getGroupFromRequest(requestID int) (int, string, string, error) {
 						WHERE
 						request_id = $1
 						`
-	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID, &groupTitle, &creator_id)
+	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID, &groupTitle, &creator_id, &requested_at)
 	if err != nil {
 		log.Printf("database failed to scan group user: %v\n", err)
-		return 0, "", "", err
+		return 0, "", "", "", err
 	}
-	return groupID, groupTitle, creator_id, nil
+	return groupID, groupTitle, creator_id, requested_at,  nil
 }
 
 func getGroupFromInvitation(invitationID int) (string, int, string, models.Requester, error) {
@@ -180,7 +181,7 @@ func getGroupFromInvitation(invitationID int) (string, int, string, models.Reque
 	var groupTitle string
 	var invitedUser string
 	var senderID string
-	var sentAt time.Time
+	var sentAt string
 	query := `SELECT
 						receiver_id,
 						group_id,

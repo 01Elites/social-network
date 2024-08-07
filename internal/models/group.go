@@ -24,7 +24,7 @@ type CreateGroup struct {
 
 type Requester struct {
 	User         PostFeedProfile `json:"user,omitempty"`
-	CreationDate time.Time       `json:"creation_date"`
+	CreationDate string       `json:"creation_date"`
 }
 
 type GroupAction struct {

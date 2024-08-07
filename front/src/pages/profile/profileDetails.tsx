@@ -59,7 +59,7 @@ export default function ProfileDetails(props: {
           fallback={
             <div class='m-4 flex w-full flex-row justify-center gap-2'>
 
-              <div class='flex gap-2 '>
+              <div class='flex gap-2 w-full '>
                 {/* Follow button */}
                 <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status} privacy={props.targetUser().profile_privacy} />
                 <Button variant='default'>

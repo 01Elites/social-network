@@ -435,6 +435,12 @@ func usernameExists(username string) (bool, error) {
 func GenerateUniqueUsername(firstName, lastName string) (string, error) {
 	// Create a base username
 	baseUsername := strings.ToLower(fmt.Sprintf("%s.%s", firstName, lastName))
+
+	// Ensure the base username is within the 10 character limit
+	if len(baseUsername) > 10 {
+		baseUsername = baseUsername[:10]
+	}
+
 	username := baseUsername
 	counter := 1
 

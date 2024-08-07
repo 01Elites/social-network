@@ -77,6 +77,19 @@ func getMyProfile(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to get user profile", http.StatusInternalServerError)
 		return
 	}
+	followingCount, err := database.GetFollowingCount(userID)
+	if err != nil {
+		log.Printf("Failed to get following count: %v\n", err)
+		helpers.HTTPError(w, "Failed to get following count", http.StatusInternalServerError)
+		return
+	}
+
+	followerCount, err := database.GetFollowerCount(userID)
+	if err != nil {
+		log.Printf("Failed to get follower count: %v\n", err)
+		helpers.HTTPError(w, "Failed to get follower count", http.StatusInternalServerError)
+		return
+	}
 	profile = profileData{
 		UserName:       user.UserName,
 		Email:          user.Email,
@@ -88,6 +101,8 @@ func getMyProfile(w http.ResponseWriter, r *http.Request) {
 		Avatar:         prof.Avatar,
 		About:          prof.About,
 		ProfilePrivacy: prof.ProfilePrivacy,
+		FollowingCount: followingCount,
+		FollowerCount:  followerCount,
 	}
 	if err := json.NewEncoder(w).Encode(profile); err != nil {
 		log.Printf("Failed to encode profile data: %v\n", err)

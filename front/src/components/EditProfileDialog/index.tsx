@@ -80,15 +80,15 @@ function ProfileEditDialog(): JSXElement {
       profile_privacy: userPrivate() ? 'private' : 'public',
       gender: userGender(),
       about: userAbout(),
-      image: '',
+      avatar: '',
     };
 
     if (userUploadedImage()) {
       try {
         const base64 = await userUploadedImage()?.toBase64();
-        payload.image = base64 as string;
+        payload.avatar = base64 as string;
       } catch (error) {
-        console.error('Error converting image to base64:', error);
+        console.error('Error converting avatar to base64:', error);
       }
     }
 

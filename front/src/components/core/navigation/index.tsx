@@ -24,6 +24,7 @@ import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { cn } from '~/lib/utils';
+import {NotificationsPage, showNotifications} from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
 
 interface NavigationProps {
@@ -109,6 +110,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
           <Button
             variant='ghost'
             class='mt-auto w-fit justify-start gap-2 md:w-full'
+            onClick={showNotifications}
           >
             <IconBell class='size-4' />
             <span class='hidden md:block'>Notifications</span>

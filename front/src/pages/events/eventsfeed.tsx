@@ -22,7 +22,7 @@ type eventProps = {
   events: GroupEvent[] | undefined
 }
 
-export default function EventsFeed(props: eventProps): JSXElement{
+export function EventsFeed(props: eventProps): JSXElement{
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   return (<>
   <Show when={props.events?.length === 0}>

@@ -1,9 +1,5 @@
 import { JSXElement, useContext } from 'solid-js';
-import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { cn } from '~/lib/utils';
-import { UserDetailsHook } from '~/types/User';
-import Repeat from '../../components/core/repeat';
-import { Skeleton } from '../../components/ui/skeleton';
 import { User } from '../../types/User';
 import { Card } from '../../components/ui/card';
 import { Avatar, AvatarFallback } from '../../components/ui/avatar';
@@ -16,8 +12,6 @@ interface HomeContactsProps {
 }
 
 export default function GroupContacts(props: HomeContactsProps): JSXElement {
-  // const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-
   return (
     <section class={cn('flex flex-wrap ', props.class)}>
       <For each={props.members ?? []}>

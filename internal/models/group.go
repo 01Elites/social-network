@@ -29,15 +29,14 @@ type Requester struct {
 
 type GroupAction struct {
 	ID         int    `json:"id,omitempty"`
-	GroupIDstr string `json:"group_id,omitempty"`
-	GroupID    int    `json:"group_id_int,omitempty"`
+	// GroupIDstr string `json:"group_id,omitempty"`
+	GroupID    int    `json:"group_id,omitempty"`
 	Username   string `json:"receiver,omitempty"`
 	ReceiverID string `json:"receiver_id,omitempty"`
 }
 type GroupResponse struct {
 	ID          int    `json:"invite_id,omitempty"`
-	GroupIdstr  string `json:"group_id,omitempty"`
-	GroupID     int    `json:"group_id_int,omitempty"`
+	GroupID     int    `json:"group_id,omitempty"`
 	Requester   string `json:"requester,omitempty"`
 	RequesterID string
 	Status      string `json:"response,omitempty"`

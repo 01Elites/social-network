@@ -7,6 +7,7 @@ import { LoginDialog } from './components/LoginDialog';
 import WebSocketContext from './contexts/WebSocketContext';
 import { useWebsocket } from './hooks/WebsocketHook';
 import { SettingsPage } from './pages/settings';
+import { NotificationsPage } from './pages/notifications';
 
 type LayoutProps = {
   children: JSXElement;
@@ -21,6 +22,7 @@ export default function Layout(props: LayoutProps): JSXElement {
       <WebSocketContext.Provider value={websocketHook}>
         <Navigation>{props.children}</Navigation>
         <LoginDialog />
+        <NotificationsPage />
         <SettingsPage />
         <Toaster />
       </WebSocketContext.Provider>

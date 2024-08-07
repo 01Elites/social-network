@@ -49,6 +49,41 @@ func CreateUser(user models.User) error {
 	return nil
 }
 
+
+func GetUserPostFeedProfile(userID string) (*models.PostFeedProfile, error) {
+	// Fetch user profile from database
+	var userProfile models.PostFeedProfile
+	query := `
+	SELECT 
+		public.profile.first_name, 
+		public.profile.last_name, 
+		public.profile.image, 
+		public.profile.privacy, 
+		public."user".user_name
+	FROM 
+		public.profile 
+	INNER JOIN 
+		public."user" 
+	ON 
+		public.profile.user_id = public."user".user_id 
+	WHERE 
+		public.profile.user_id = $1`
+	err := DB.QueryRow(context.Background(), query, userID).Scan(
+		&userProfile.FirstName,
+		&userProfile.LastName,
+		&userProfile.Avatar,
+		&userProfile.ProfilePrivacy,
+		&userProfile.UserName,
+	)
+	if err != nil {
+		log.Printf("Failed to fetch user profile: %v\n", err)
+		return nil, err
+	}
+	
+	return &userProfile, nil
+}
+
+
 func GetUserProfile(userID string) (*models.UserProfile, error) {
 	// Fetch user profile from database
 	var userProfile models.UserProfile

@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"fmt"
-	"strconv"
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/models"
@@ -39,11 +38,6 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&invite)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	invite.GroupID, err = strconv.Atoi(invite.GroupIDstr)
-	if err != nil {
-		helpers.HTTPError(w, "group ID must be an integer", http.StatusBadRequest)
 		return
 	}
 	groupExists := database.CheckGroupID(invite.GroupID)

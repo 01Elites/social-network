@@ -19,6 +19,7 @@ type Notification struct {
 
 type FollowRequestMetadata struct {
 	UserDetails UserDetails `json:"requester"`
+	CreationDate	string `json:"creation_date"`
 }
 
 // type comment notification metadata struct

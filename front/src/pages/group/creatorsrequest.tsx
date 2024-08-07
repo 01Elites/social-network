@@ -67,7 +67,7 @@ export function handleRequest(response: string, groupID: string, requester: stri
     method: 'PATCH',
     body: JSON.stringify({
       requester: requester,
-      group_id: groupID,
+      group_id: Number(groupID),
       response: response,
     })
   })

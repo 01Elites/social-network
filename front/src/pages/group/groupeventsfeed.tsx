@@ -13,7 +13,7 @@ import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/types/User';
 import { showToast } from '../../components/ui/toast';
 import { GroupEvent } from '~/types/group/index';
-import EventsFeed from "../events/eventsfeed"
+import {EventsFeed} from "../events/eventsfeed";
 
 interface FeedPostsProps {
   groupID: string;

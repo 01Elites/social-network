@@ -4,7 +4,6 @@ import { For, JSXElement } from 'solid-js';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
-import Friends from '~/types/friends';
 import moment from 'moment';
 import { FaSolidCheck } from 'solid-icons/fa';
 import { IoClose } from 'solid-icons/io';
@@ -14,74 +13,105 @@ import { Show } from 'solid-js';
 import FollowRequest from '../profile/followRequest';
 import { Notifications } from '~/types/notifications';
 import {createSignal} from 'solid-js'
+import { EventsFeed } from '../events/eventsfeed';
+import { handleInvite } from '../group/request';
+import { A } from '@solidjs/router';
 
+export default function NotificationsFeed(): JSXElement {
+  const [notifications, setnotification] = createSignal<Notifications>();
 
-
-export default function NotificationsFeed(props: {
-  targetnotifications: () => Notifications | undefined;
-}): JSXElement {
-  const notifications = props.targetnotifications();
-  console.log(notifications);
-const [friendRequestCount, setFriendRequestCount] = createSignal<number>()
-const [groupInviteCount, setGroupInviteCount] = createSignal<number>()
-const [eventsCount, setEventsCount] = createSignal<number>()
-const [groupRequestCount, setGroupRequestCount] = createSignal<number>()
-setFriendRequestCount(notifications?.FollowRequest.length)
-setGroupInviteCount(notifications?.GroupInvite.length)
-setEventsCount(notifications?.Events.length)
-setGroupRequestCount(notifications?.GroupRequests.length)
-
-  return (
-    <Tabs aria-label='Main navigation' class='tabs'>
-      <Tabs.List class='tabs__list'>
-        <Tabs.Trigger class='tabs__trigger' value='friend_requests'>
-          friendRequests ({friendRequestCount()})
-        </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='invites'>
-          Events ({eventsCount()})
-        </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='events'>
-          groupInvite ({groupInviteCount()})
-        </Tabs.Trigger>
-        <Tabs.Trigger class='tabs__trigger' value='group_requests'>
-          groupRequests ({groupRequestCount()})
-        </Tabs.Trigger>
-        <Tabs.Indicator class='tabs__indicator' />
-      </Tabs.List>
-
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='friends_requests'>
-        <For each={notifications?.FollowRequest?? []}>
-          {(follower) => (
+  return (<>
+        <Show when={notifications()?.payload.type == "FOLLOW_REQUEST"}>
+          <div id={notifications()?.payload.metadata.requester.user_name}>
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
-              <a
-                href={`/profile/${follower.user_info.user_name}`}
-                class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
-              >
-                <Avatar class='w-[5rem] h-[5rem] mb-2'>
-                  <AvatarFallback>
-                    <Show when={follower.user_info.avatar} fallback={
-                      follower.user_info.first_name.charAt(0).toUpperCase()
-                    }><img
-                        alt='avatar'
-                        class='size-full rounded-md rounded-b-none object-cover'
-                        loading='lazy'
-                        src={`${config.API_URL}/image/${follower.user_info.avatar}`}
-                      /></Show></AvatarFallback>
-                </Avatar>
-                <div class='flex flex-wrap items-center justify-center space-x-1'>
-                  <div>{follower.user_info.first_name}</div>
-                  <div>{follower.user_info.last_name}</div>
+                <a
+                  href={`/profile/${notifications()?.payload.metdata.requester.user_name}`}
+                  class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
+                >
+                  <Avatar class='w-[5rem] h-[5rem] mb-2'>
+                    <AvatarFallback>
+                      <Show when={notifications()?.payload.metadata.requester.avatar} fallback={
+                        notifications()?.payload.metdata.requester.first_name.charAt(0).toUpperCase()
+                      }><img
+                          alt='avatar'
+                          class='size-full rounded-md rounded-b-none object-cover'
+                          loading='lazy'
+                          src={`${config.API_URL}/image/${notifications()?.payload.metadata.requester.avatar}`}
+                        /></Show></AvatarFallback>
+                  </Avatar>
+                  <div class='flex flex-wrap items-center justify-center space-x-1'>
+                    <div>{notifications()?.payload.metadata.requester.first_name}</div>
+                    <div>{notifications()?.payload.metadata.requester.last_name}</div>
+                  </div>
+                </a>
+                <time
+                  class='text-xs font-light text-muted-foreground'
+                  dateTime={moment(notifications()?.payload.metadata.creation_date).calendar()}
+                  title={moment(notifications()?.payload.metadata.creation_date).calendar()}
+                >
+                  {moment(notifications()?.payload.metadata.creation_date).fromNow()}</time>
+                <div class='flex flex-row gap-2'>
+                  <Button
+                    variant='ghost'
+                    class='flex-1 gap-2'
+                    onClick={() => { handleFollowRequest("accepted", notifications()?.payload.metadata.requester.user_name); }}
+                  >
+                    <FaSolidCheck
+                      class='size-4'
+                      color='green'
+                    />
+                  </Button>
+                  <Button
+                    variant='ghost'
+                    class='flex-1 gap-2'
+                    color="red"
+                    onClick={() => { handleFollowRequest("rejected", notifications()?.payload.metdata.requester.user_name) }}
+                  >
+                    <IoClose class='size-4' color='red' />
+                  </Button>
                 </div>
-              </a>
-              <FollowRequest username={follower.user_info.user_name} status={follower.user_info.follow_status} privacy={follower.user_info.profile_privacy} />
-
-            </Card>
-          )}
-        </For>
-      </Tabs.Content>
-
-      <Tabs.Content class='m-6 flex flex-wrap gap-4' value='invites'>
-        <For each={notifications?.GroupInvite ?? []}>
+              </Card>
+              </div>
+              </Show>
+              <Show when={notifications()?.payload.type == "GROUP_INVITATION"}>
+              <div id={notifications()?.payload.metdata.requester.invited_by.user.user_name}>
+      <Card class='flex flex-col items-center space-y-4 p-3'>
+      <p class="flex-col justify-center items-center">
+            {<A
+        href={"/profile/" + notifications()?.payload.metdata.requester.invited_by.user.user_name} class='flex flex-col justify-center items-center'>
+    {notifications()?.payload.metdata.requester.invited_by.user.first_name}  {notifications()?.payload.metdata.requester.invited_by.user.last_name}</A> }
+    invited you to join {notifications()?.payload.metadata.group.title}<br></br>
+    <time
+    class='text-xs font-light text-muted-foreground'
+    dateTime={moment(notifications()?.payload.metdata.requester.invited_by.creation_date).calendar()}
+    title={moment(notifications()?.payload.metdata.requester.invited_by.creation_date).calendar()}
+  >
+    {moment(notifications()?.payload.metdata.requester.invited_by.creation_date).fromNow()}</time>
+    </p>
+    <div class='flex flex-row gap-2'>
+      <Button
+      variant='ghost'
+      class='flex-1 gap-2'
+      onClick={() => {handleInvite("accepted", notifications()?.payload.metdata.group.id, notifications()?.payload.metdata.requester.invited_by.user.user_name);}}
+    >
+      <FaSolidCheck
+       class='size-4'
+       color='green'
+      />
+    </Button>
+    <Button
+      variant='ghost'
+      class='flex-1 gap-2'
+      color="red"
+      onClick={() => {handleInvite("rejected", notifications()?.payload.metdata.group.id, notifications()?.payload.metdata.requester.invited_by.user.user_name)}}
+    >
+    <IoClose class='size-4' color='red'/>
+    </Button>
+    </div>
+  </Card></div>      </Show>
+              </>)
+      {/* <Tabs.Content class='m-6 flex flex-wrap gap-4' value='invites'> */}
+        {/* <For each={notifications?.GroupInvite ?? []}>
           {(invite) => (
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
               <a
@@ -111,63 +141,10 @@ setGroupRequestCount(notifications?.GroupRequests.length)
       </Tabs.Content>
 
       <Tabs.Content class='m-6 flex flex-wrap gap-4' value='events'>
-        <For each={notifications?.Events ?? []}>
-          {(event) => (
-            <div id={event.requester} class='flex w-full space-x-1'>
-              <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
-                <a
-                  href={`/profile/${request.user_info.user_name}`}
-                  class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
-                >
-                  <Avatar class='w-[5rem] h-[5rem] mb-2'>
-                    <AvatarFallback>
-                      <Show when={request.user_info.avatar} fallback={
-                        request.user_info.first_name.charAt(0).toUpperCase()
-                      }><img
-                          alt='avatar'
-                          class='size-full rounded-md rounded-b-none object-cover'
-                          loading='lazy'
-                          src={`${config.API_URL}/image/${request.user_info.avatar}`}
-                        /></Show></AvatarFallback>
-                  </Avatar>
-                  <div class='flex flex-wrap items-center justify-center space-x-1'>
-                    <div>{request.user_info.first_name}</div>
-                    <div>{request.user_info.last_name}</div>
-                  </div>
-                </a>
-                <time
-                  class='text-xs font-light text-muted-foreground'
-                  dateTime={moment(request.creation_date).calendar()}
-                  title={moment(request.creation_date).calendar()}
-                >
-                  {moment(request.creation_date).fromNow()}</time>
-                <div class='flex flex-row gap-2'>
-                  <Button
-                    variant='ghost'
-                    class='flex-1 gap-2'
-                    onClick={() => { handleFollowRequest("accepted", request.user_info.user_name); }}
-                  >
-                    <FaSolidCheck
-                      class='size-4'
-                      color='green'
-                    />
-                  </Button>
-                  <Button
-                    variant='ghost'
-                    class='flex-1 gap-2'
-                    color="red"
-                    onClick={() => { handleFollowRequest("rejected", request.user_info.user_name) }}
-                  >
-                    <IoClose class='size-4' color='red' />
-                  </Button>
-                </div>
-              </Card>
-            </div>
-          )}
-        </For>
-      </Tabs.Content>
+          <EventsFeed events={notifications?.Events} />
+      </Tabs.Content> */}
 
-      <Tabs.Content class='m-6 flex flex-wrap' value='explore'>
+      {/* <Tabs.Content class='m-6 flex flex-wrap' value='explore'>
         <For each={friends?.explore ?? []}>
           {(explore) => (
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
@@ -195,9 +172,7 @@ setGroupRequestCount(notifications?.GroupRequests.length)
             </Card>
           )}
         </For>
-      </Tabs.Content>
-    </Tabs>
-  );
+      </Tabs.Content> */}
 }
 
 function handleFollowRequest(response: string, follower: string) {

@@ -3,6 +3,7 @@ package querys
 import (
 	"context"
 	"log"
+	"time"
 
 	"social-network/internal/models"
 )
@@ -174,14 +175,18 @@ func getGroupFromRequest(requestID int) (int, string, string, error) {
 	return groupID, groupTitle, creator_id, nil
 }
 
-func getGroupFromInvitation(invitationID int) (string, int, string, error) {
+func getGroupFromInvitation(invitationID int) (string, int, string, models.Requester, error) {
 	var groupID int
 	var groupTitle string
 	var invitedUser string
+	var senderID string
+	var sentAt time.Time
 	query := `SELECT
 						receiver_id,
 						group_id,
-						title
+						title,
+						sender_id,
+						sent_at
 						FROM
 						group_invitations
 						INNER JOIN
@@ -189,12 +194,21 @@ func getGroupFromInvitation(invitationID int) (string, int, string, error) {
 						WHERE
 						invitation_id = $1
 						`
-	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser, &groupID, &groupTitle)
+	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser, &groupID, &groupTitle, &senderID, &sentAt)
 	if err != nil {
 		log.Printf("database failed to scan group user: %v\n", err)
-		return "", 0, "", err
+		return "", 0, "", models.Requester{}, err
 	}
-	return invitedUser, groupID, groupTitle, nil
+	inviter, err := GetUserPostFeedProfile(senderID)
+	if err != nil {
+		log.Printf("database failed to get user profile: %v\n", err)
+		return "", 0, "", models.Requester{}, err
+	}
+	inviteData := models.Requester{
+		User: *inviter,
+		CreationDate: sentAt,
+	} 
+	return invitedUser, groupID, groupTitle, inviteData, nil
 }
 
 func GetGroupRequests(groupID int) ([]models.Requester, error) {

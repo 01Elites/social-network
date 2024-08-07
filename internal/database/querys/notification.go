@@ -46,8 +46,8 @@ func UpdateNotificationTable(relatedID int, status string, notificationType stri
 
 func GetFollowRequest(requestID int) (*models.Request, error) {
 	request := models.Request{ID: requestID}
-	query := `SELECT sender_id, receiver_id, status FROM follow_requests WHERE request_id = $1`
-	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.Status)
+	query := `SELECT sender_id, receiver_id, status, created_at FROM follow_requests WHERE request_id = $1`
+	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.Status, &request.CreatedAt)
 	if err != nil {
 		log.Println("Failed to get follow request")
 		return nil, err
@@ -132,7 +132,7 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 	return notifications, err
 }
 
-func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile) types.Notification {
+func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile, createdAt string) types.Notification {
 	notification := types.Notification{
 		Type:    "FOLLOW_REQUEST",
 		Message: "You have a new follow request",
@@ -142,7 +142,9 @@ func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile) t
 				Username:  sender.Username,
 				FirstName: sender.FirstName,
 				LastName:  sender.LastName,
+				Avatar:    sender.Avatar,		
 			},
+			CreationDate: createdAt,
 		},
 	}
 	return notification
@@ -184,7 +186,7 @@ func OrganizeGroupEventRequest(member string, groupTitle string, groupID int, gr
 	return notification
 }
 
-func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle string) types.Notification {
+func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle string, invitedBy models.Requester) types.Notification {
 	notification := types.Notification{
 		Type:    "GROUP_INVITATION",
 		Message: "You have a new group invitation",
@@ -192,6 +194,7 @@ func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle st
 		Metadata: types.GroupNotification{
 			ID:    groupID,
 			Title: groupTitle,
+			InvitedBy: invitedBy,
 		},
 	}
 	return notification

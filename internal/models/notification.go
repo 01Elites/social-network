@@ -5,6 +5,7 @@ type Request struct {
 	Sender         string `json:"sender,omitempty"`   // user Name
 	Receiver       string `json:"receiver,omitempty"` // user Name
 	Status         string `json:"status,omitempty"`
+	CreatedAt 		string `json:"created_at,omitempty"`
 	NotificationID int    `json:"notification_id,omitempty"`
 }
 

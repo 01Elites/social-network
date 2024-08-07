@@ -31,7 +31,7 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
   fetchWithAuth(config.API_URL + buttonData()[1],{
     method:'POST',
     body:JSON.stringify({
-        group_id_int:props.targetGroup().id
+        group_id:props.targetGroup().id
     })
   }).then(async (res) => {
     if (res.status === 200) {
@@ -106,12 +106,11 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
      </>)
 }
 
-function handleInvite(response: string, groupID: number, invitee: string) {
-  console.log(response, groupID)
+export function handleInvite(response: string, groupID: number, invitee: string) {
   fetchWithAuth(`${config.API_URL}/invitation_response`, {
     method: 'PATCH',
     body: JSON.stringify({
-      group_id_int: (groupID),
+      group_id: Number(groupID),
       response: response,
   })})
     .then(async (res) => {

@@ -11,3 +11,5 @@ function EventsPage(): JSXElement {
     </Layout>
   );
 }
+
+export default EventsPage;

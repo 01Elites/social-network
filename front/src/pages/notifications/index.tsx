@@ -1,40 +1,53 @@
-import 'solid-devtools';
-import { createEffect, createSignal, JSXElement, Show } from 'solid-js';
-import Layout from '~/Layout';
-import config from '~/config';
-import { fetchWithAuth } from '~/extensions/fetch';
-import Friends from '~/types/friends';
+import { useColorMode } from '@kobalte/core/color-mode';
+import { createSignal, JSXElement } from 'solid-js';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '~/components/ui/sheet';
+import { Switch, SwitchControl, SwitchThumb } from '~/components/ui/switch';
 import NotificationsFeed from './notificationsfeed';
-import { Notifications } from '~/types/notifications';
 
+/**
+ * Opens the settings sheet.
+ */
+const [settingsOpen, setSettingsOpen] = createSignal(false);
 
-export default function NotificationsPage(): JSXElement {
-  const [targetnotifications, setTargetNotifications] = createSignal<Notifications | undefined>();
+/**
+ * Shows the settings sheet.
+ */
+function showNotifications() {
+  setSettingsOpen(true);
+}
 
-  createEffect(() => {
-    // Fetch user Friends
-    fetchWithAuth(config.API_URL + '/myfriends').then(async (res) => {
-      const body = await res.json();
-      if (res.ok) {
-        setTargetNotifications(body);
-        return;
-      } else {
-        console.log('Error fetching friends');
-        return;
-      }
-    });
-  });
+/**
+ * Renders the SettingsPage component.
+ * It should be added once in the app, and can be controlled using the `showSettings()`.
+ * @returns JSXElement representing the SettingsPage component.
+ */
+function NotificationsPage(): JSXElement {
+  const { colorMode, setColorMode } = useColorMode();
 
   return (
-    <Layout>
-      <section class='flex h-full flex-col gap-4'>
-        <h1>Friends</h1>
-        <Show when={targetnotifications()}>
-          <div class='m-4 grid grid-cols-1'>
-            <NotificationsFeed targetnotifications={() => targetnotifications() as Notifications} />
+    <Sheet open={settingsOpen()} onOpenChange={setSettingsOpen}>
+      <SheetContent position='left'>
+        <SheetHeader class='mb-4'>
+          <SheetTitle>Notifications</SheetTitle>
+        </SheetHeader>
+        <h3 class='text-base font-semibold'>Theme</h3>
+        <section>
+          <div class='flex items-center justify-between'>
+            <NotificationsFeed/>
+              <SwitchControl>
+                <SwitchThumb />
+              </SwitchControl>
           </div>
-        </Show>
-      </section>
-    </Layout>
+        </section>
+        {/* <Separator /> */}
+      </SheetContent>
+    </Sheet>
   );
 }
+
+export { showNotifications, NotificationsPage };

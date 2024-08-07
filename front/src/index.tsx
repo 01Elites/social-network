@@ -15,6 +15,7 @@ import Group from './pages/group';
 import GroupsPage from './pages/groups';
 import HomePage from './pages/home';
 import Profile from './pages/profile';
+// import NotificationsPage from './pages/notifications';
 
 const root = document.getElementById('root');
 
@@ -41,7 +42,7 @@ function App() {
       <Route path='/groups' component={GroupsPage} />
       <Route path='/friends' component={FriendsPage} />
       <Route path='/events' component={EventsPage} />
-      <Route path='/notifications' component={NotificationsPage} />
+      {/* <Route path='/notifications' component={NotificationsPage} /> */}
       <Route path='/profile/:username' component={Profile} />
     </Router>
   );

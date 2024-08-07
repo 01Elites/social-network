@@ -34,7 +34,6 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Something Went Wrong!!", http.StatusBadRequest)
 		return
 	}
-
 	// Get the userID of the receiver
 	request.Receiver, err = database.GetUserIDByUserName(request.Receiver)
 	if err != nil {
@@ -112,7 +111,6 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		notification.ID = notificationID
 		websocket.SendNotificationToChannel(*notification, websocket.FollowRequestChan)
 	}
-	
 	w.WriteHeader(http.StatusOK)
 }
 

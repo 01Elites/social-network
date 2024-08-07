@@ -35,7 +35,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
       method: 'POST',
       body: JSON.stringify({
         receiver: username,
-        group_id: props.groupID
+        group_id: Number(props.groupID)
       })
     }).then(async (res) => {
       if (res.status === 200) {

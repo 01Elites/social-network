@@ -13,7 +13,6 @@ type FollowRequestParams = {
   privacy: string;
 }
 export default function FollowRequest(props: FollowRequestParams): JSXElement {
-  console.log(props.username, props)
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   var [buttonData, setButtonData] = createSignal("");

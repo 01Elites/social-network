@@ -2,7 +2,7 @@ package querys
 
 import (
 	"log"
-
+	"time"
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
 )
@@ -18,7 +18,11 @@ func GetFollowRequestNotification(request models.Request) (*types.Notification, 
 		log.Println("Failed to get username of reciever")
 		return nil, err
 	}
-	notification := OrganizeFollowRequest(recieverUsername, *sender)
+	if request.CreatedAt == "" {
+		request.CreatedAt = time.Now().String()
+	}
+
+	notification := OrganizeFollowRequest(recieverUsername, *sender, request.CreatedAt)
 	return &notification, nil
 }
 
@@ -74,7 +78,7 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 
 
 func GetGroupInvitationData(userID string, invitationID int) (*types.Notification, error) {
-	invitedUserID,groupID, groupTitle, err := getGroupFromInvitation(invitationID)
+	invitedUserID,groupID, groupTitle, inviter, err := getGroupFromInvitation(invitationID)
 	if err != nil {
 		log.Print("error getting groupID")
 		return nil, err
@@ -84,6 +88,7 @@ func GetGroupInvitationData(userID string, invitationID int) (*types.Notificatio
 		log.Print("error getting user name")
 		return nil, err
 	}
-	notification := OrganizeGroupInvitation(invitedUser, groupID, groupTitle)
+
+	notification := OrganizeGroupInvitation(invitedUser, groupID, groupTitle, inviter)
 	return &notification, nil
 }

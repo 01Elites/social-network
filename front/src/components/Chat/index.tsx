@@ -7,12 +7,12 @@ interface FeedProps {
 }
 
 export default function ChatPage(props: FeedProps): JSXElement {
-  const token = localStorage.getItem('SN_TOKEN') || '';
-  const socket = new WebSocket('ws://localhost:8081/api/ws', `${token}`)
-
-  socket.onopen = () => {
-    console.log('WebSocket connection established');
-  }
+  // const token = localStorage.getItem('SN_TOKEN') || '';
+  // const socket = new WebSocket('ws://localhost:8081/api/ws', `${token}`)
+  //
+  // socket.onopen = () => {
+  //   console.log('WebSocket connection established');
+  // }
 
   return (
     <div class={props.class}>

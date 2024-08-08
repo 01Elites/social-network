@@ -8,6 +8,10 @@ import { render } from 'solid-js/web';
 
 import '~/extensions';
 
+import UserDetailsContext from './contexts/UserDetailsContext';
+import WebSocketContext from './contexts/WebSocketContext';
+import { useWebsocket } from './hooks/WebsocketHook';
+import { useUserDetails } from './hooks/userDetails';
 import './index.css';
 import EventsPage from './pages/events';
 import FriendsPage from './pages/friends';
@@ -27,13 +31,21 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 
 function App() {
   const storageManager = createLocalStorageManager('vite-ui-theme');
+  const userDetailsHook = useUserDetails();
+  const websocketHook = useWebsocket();
 
   return (
     <Router
       root={(props) => (
         <>
           <ColorModeScript storageType={storageManager.type} />
-          <ColorModeProvider>{props.children}</ColorModeProvider>
+          <ColorModeProvider>
+            <UserDetailsContext.Provider value={userDetailsHook}>
+              <WebSocketContext.Provider value={websocketHook}>
+                {props.children}
+              </WebSocketContext.Provider>
+            </UserDetailsContext.Provider>
+          </ColorModeProvider>
         </>
       )}
     >

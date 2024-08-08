@@ -6,8 +6,8 @@ import Navigation from './components/core/navigation';
 import { LoginDialog } from './components/LoginDialog';
 import WebSocketContext from './contexts/WebSocketContext';
 import { useWebsocket } from './hooks/WebsocketHook';
-import { SettingsPage } from './pages/settings';
 import { NotificationsPage } from './pages/notifications';
+import { SettingsPage } from './pages/settings';
 
 type LayoutProps = {
   children: JSXElement;

@@ -1,5 +1,3 @@
-import { Tabs } from '@kobalte/core/tabs';
-import 'solid-devtools';
 import { For, JSXElement } from 'solid-js';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
@@ -22,7 +20,8 @@ export default function NotificationsFeed(): JSXElement {
   const [notifications, setnotification] = createSignal<Notifications>();
 
   return (<>
-        <Show when={notifications()?.payload.type == "FOLLOW_REQUEST"}>
+  <div class="flex-row">
+        {/* <Show when={notifications()?.payload.type == "FOLLOW_REQUEST"}> */}
           <div id={notifications()?.payload.metadata.requester.user_name}>
             <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
                 <a
@@ -73,8 +72,9 @@ export default function NotificationsFeed(): JSXElement {
                 </div>
               </Card>
               </div>
-              </Show>
-              <Show when={notifications()?.payload.type == "GROUP_INVITATION"}>
+              <br></br>
+              {/* </Show> */}
+              {/* <Show when={notifications()?.payload.type == "GROUP_INVITATION"}> */}
               <div id={notifications()?.payload.metadata.requester.invited_by.user.user_name}>
       <Card class='flex flex-col items-center space-y-4 p-3'>
       <p class="flex-col justify-center items-center">
@@ -109,8 +109,9 @@ export default function NotificationsFeed(): JSXElement {
     <IoClose class='size-4' color='red'/>
     </Button>
     </div>
-  </Card></div>      </Show>
-  <Show when={notifications()?.payload.type == "REQUEST_TO_JOIN_GROUP"}>
+  </Card></div> 
+       {/* </Show> */}
+  {/* <Show when={notifications()?.payload.type == "REQUEST_TO_JOIN_GROUP"}> */}
               <div id={notifications()?.payload.metadata.requester.user.user_name}>
   <Card id={notifications()?.payload.metadata.requester.user.user_name} class='flex w-44 flex-col justify-center items-center space-y-4 p-3 justfi'>
           <p class="flex flex-col gap-2 place-items-center"><Avatar>
@@ -149,7 +150,9 @@ export default function NotificationsFeed(): JSXElement {
           </Button>
           </div>
         </Card>
-</div></Show>
+</div>
+{/* </Show> */}
+</div>
 </>)}
 
       {/* <Tabs.Content class='m-6 flex flex-wrap' value='explore'>

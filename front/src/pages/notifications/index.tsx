@@ -1,4 +1,3 @@
-import { useColorMode } from '@kobalte/core/color-mode';
 import { createSignal, JSXElement } from 'solid-js';
 import {
   Sheet,
@@ -6,7 +5,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '~/components/ui/sheet';
-import { Switch, SwitchControl, SwitchThumb } from '~/components/ui/switch';
 import NotificationsFeed from './notificationsfeed';
 
 /**
@@ -27,7 +25,6 @@ function showNotifications() {
  * @returns JSXElement representing the SettingsPage component.
  */
 function NotificationsPage(): JSXElement {
-  const { colorMode, setColorMode } = useColorMode();
 
   return (
     <Sheet open={settingsOpen()} onOpenChange={setSettingsOpen}>
@@ -39,9 +36,6 @@ function NotificationsPage(): JSXElement {
         <section>
           <div class='flex items-center justify-between'>
             <NotificationsFeed/>
-              <SwitchControl>
-                <SwitchThumb />
-              </SwitchControl>
           </div>
         </section>
         {/* <Separator /> */}

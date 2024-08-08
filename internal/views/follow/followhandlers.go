@@ -2,6 +2,7 @@ package follow
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -63,7 +64,6 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-
 	// Check if receiver account is private
 	isPrivateReceiver, err := database.IsPrivateUser(request.Receiver)
 	if err != nil {
@@ -110,9 +110,11 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		notification.ID = notificationID
+		fmt.Println("hello before")
 		websocket.SendNotificationToChannel(*notification, websocket.FollowRequestChan)
+		fmt.Println("hello after")
 	}
-	
+
 	w.WriteHeader(http.StatusOK)
 }
 

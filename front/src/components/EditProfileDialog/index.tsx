@@ -106,8 +106,7 @@ function ProfileEditDialog(): JSXElement {
           });
           console.log(userDetails());
           setEditOpen(false);
-          await fetchUserDetails();
-          console.log(userDetails());
+          fetchUserDetails();
           return;
         }
 

@@ -74,6 +74,7 @@ func buildUserListSection(sectionName string, usernames []string) types.Section 
 			Username:  userProfile.Username,
 			FirstName: userProfile.FirstName,
 			LastName:  userProfile.LastName,
+			Avatar:    userProfile.Avatar,
 		}
 		if _, ok := clients[username]; ok {
 			userDetails.State = "online"

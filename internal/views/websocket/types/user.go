@@ -25,4 +25,5 @@ type UserDetails struct {
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
 	State     string `json:"state,omitempty"`
+	Avatar		string `json:"avatar,omitempty"`
 }

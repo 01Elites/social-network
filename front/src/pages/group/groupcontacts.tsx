@@ -1,7 +1,7 @@
 import { JSXElement, useContext } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { cn } from '~/lib/utils';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import Repeat from '../../components/core/repeat';
 import { Skeleton } from '../../components/ui/skeleton';
 import { User } from '../../types/User';

@@ -11,7 +11,7 @@ import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { cn } from '~/lib/utils';
 import { Post } from '~/types/Post';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import Repeat from '../core/repeat';
 import { showToast } from '../ui/toast';
 import FeedPostCell from './FeedPostCell';

@@ -233,6 +233,7 @@ function LoginDialog(): JSXElement {
             >
               <div class='col-span-2 flex justify-center'>
                 <input
+                  placeholder='Upload Image'
                   class='hidden'
                   type='file'
                   id='signupImageUpload'

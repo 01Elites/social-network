@@ -2,7 +2,7 @@ import { JSXElement, Show, useContext } from 'solid-js';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { Comment } from '~/types/Comment';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import TextBreaker from '../core/textbreaker';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
@@ -21,6 +21,7 @@ export default function PostCommentCell(
       <Show when={props.comment.image}>
         <AspectRatio ratio={16 / 9}>
           <img
+            alt='comment'
             class='size-full rounded-md rounded-b-none object-cover'
             loading='lazy'
             src={`${config.API_URL}/image/${props.comment.image}`}

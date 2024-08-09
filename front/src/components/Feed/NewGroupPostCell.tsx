@@ -1,6 +1,6 @@
 import { createSignal, JSXElement, useContext } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import type { Group } from "~/types/group";
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';

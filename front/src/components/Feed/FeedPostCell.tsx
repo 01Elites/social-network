@@ -3,7 +3,7 @@ import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { Post } from '~/types/Post';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import TextBreaker from '../core/textbreaker';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';

@@ -10,7 +10,7 @@ import {
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import { showToast } from '../../components/ui/toast';
 import { GroupEvent } from '~/types/group/index';
 import moment from 'moment';
@@ -24,7 +24,7 @@ interface FeedPostsProps {
 
 export default function EventsFeed(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  const [events, setEvents] = createSignal<GroupEvent[]>(); 
+  const [events, setEvents] = createSignal<GroupEvent[]>();
   createEffect(() => {
     if (!userDetails()) return;
     fetchWithAuth(config.API_URL + `/group/${props.groupID}/events`)
@@ -231,15 +231,16 @@ export function handleEventOption(option: number, event: GroupEvent) {
         variant: 'error',
       });
     });
-    if (event.options[0].option_id == option) {
-      option1Count++;
-    } else {
-      option2Count++;
-    }
-    var button = document.getElementById("option1"+String(event.id));
-    button?.setAttribute('disabled', '');
-    button.innerHTML = `${event.options[0].option_name} (${option1Count})`
-    var button = document.getElementById("option2"+String(event.id));
-    button?.setAttribute('disabled', '');
-    button.innerHTML = `${event.options[1].option_name} (${option2Count})`
+  if (event.options[0].option_id == option) {
+    option1Count++;
+  } else {
+    option2Count++;
   }
+  var button1 = document.getElementById("option1" + String(event.id));
+  button1?.setAttribute('disabled', '');
+  button1 ? button1.innerHTML = `${event.options[0].option_name} (${option1Count})` : null;
+
+  var button2 = document.getElementById("option2" + String(event.id));
+  button2?.setAttribute('disabled', '');
+  button2 ? button2.innerHTML = `${event.options[1].option_name} (${option2Count})` : null;
+}

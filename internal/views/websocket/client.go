@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"fmt"
 	"log"
 
 	database "social-network/internal/database/querys"
@@ -22,6 +23,7 @@ func GetClient(userName string) (*types.User, bool) {
 
 func SetClientOffline(username string) {
 	// Remove the client from the Clients map
+	fmt.Printf("\nSetClientOffline %s\n\n", username)
 	userID := clients[username].ID
 	cmutex.Lock()
 	clients[username].Conn.Close()
@@ -32,6 +34,7 @@ func SetClientOffline(username string) {
 
 func SetClientOnline(user *types.User) {
 	// Add the client to the Clients map
+	fmt.Printf("\nSetClientOnline %s\n\n", user.Username)
 	cmutex.Lock()
 	clients[user.Username] = user
 	cmutex.Unlock()

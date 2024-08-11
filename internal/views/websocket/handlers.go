@@ -28,23 +28,30 @@ var (
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 
+	// Validate the session token
 	userID, err := database.ValidateSessionToken(token)
 	if err != nil {
 		helpers.HTTPError(w, "Invalid session token", http.StatusUnauthorized)
 		return
 	}
+
+	// Upgrade the HTTP connection to a WebSocket connection
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Error upgrading to WebSocket:", err)
 		helpers.HTTPError(w, "Could not upgrade to WebSocket", http.StatusInternalServerError)
 		return
 	}
+
+	// Retrieve the username from the database
 	username, err := database.GetUserNameByID(userID)
 	if err != nil {
 		log.Println("Error getting user name:", err)
 		helpers.HTTPError(w, "Could not get user name", http.StatusInternalServerError)
 		return
 	}
+
+	// Create the user object and mark the user as online
 	user := types.User{
 		ID:       userID,
 		Username: username,
@@ -52,34 +59,32 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		Mutex:    &sync.Mutex{},
 	}
 	SetClientOnline(&user)
+	defer SetClientOffline(user.Username) // Ensure the user is marked offline on function exit
 
+	// Use a WaitGroup to synchronize goroutines
 	var wg sync.WaitGroup
 	wg.Add(2)
 
+	// Goroutine to process notifications
 	go func() {
 		defer wg.Done()
 		ProcessNotifications(&user)
 	}()
 
+	// Goroutine to process events
 	go func() {
 		defer wg.Done()
 		ProcessEvents(&user)
 	}()
 
-	// Wait for both goroutines to finish
-	go func() {
-		wg.Wait()
-		SetClientOffline(user.Username)
-	}()
-	
-	// send all the notifications in database to the user
-	err = SendUsersNotifications(user.ID)
-	if err != nil {
-		log.Printf("error sending notifications:%v", err)
+	// Send all the notifications in the database to the user
+	if err := SendUsersNotifications(user.ID); err != nil {
+		log.Printf("Error sending notifications: %v", err)
 	}
 
+	// Wait for both goroutines to finish before closing the WebSocket connection
+	wg.Wait()
 }
-
 // Function to send JSON data to a WebSocket connection
 func sendMessageToWebSocket(user *types.User, eventType string, data interface{}) error {
 	// Check if the WebSocket connection is nil

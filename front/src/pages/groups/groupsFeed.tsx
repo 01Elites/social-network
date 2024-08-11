@@ -8,7 +8,7 @@ import NewGroupPreview from '~/components/Feed/NewGroupPreview';
 import { Button } from '~/components/ui/button';
 import RequestToJoin from "../group/request";
 import { Group } from '~/types/group';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 
 export default function GroupsFeed(props: { targetGroups: () => Groups | undefined }): JSXElement {

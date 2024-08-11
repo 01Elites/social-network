@@ -11,7 +11,7 @@ import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { Comment } from '~/types/Comment';
 import { Post } from '~/types/Post';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import Repeat from '../core/repeat';
 import { Button } from '../ui/button';
 import {
@@ -183,6 +183,7 @@ export function PostCommentsDialog(): JSXElement {
 
                 <div class='flex w-full flex-col justify-between gap-4 sm:flex-row'>
                   <input
+                    placeholder='Upload Image'
                     class='hidden'
                     type='file'
                     id='commentImageUpload'

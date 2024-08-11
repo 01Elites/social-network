@@ -10,7 +10,7 @@ import {
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import { showToast } from '../../components/ui/toast';
 import { GroupEvent } from '~/types/group/index';
 import {EventsFeed} from "../events/eventsfeed";

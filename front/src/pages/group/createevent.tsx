@@ -10,7 +10,8 @@ import {
 } from '~/components/ui/dialog';
 import { Separator } from '~/components/ui/separator';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import User, { UserDetailsHook } from '~/types/User';
+import User from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import PostAuthorCell from '../../components/PostAuthorCell';
 import { AspectRatio } from '../../components/ui/aspect-ratio';
 import { TextField,

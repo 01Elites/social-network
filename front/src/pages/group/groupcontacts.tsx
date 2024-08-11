@@ -1,8 +1,5 @@
 import { JSXElement, useContext } from 'solid-js';
 import { cn } from '~/lib/utils';
-import { UserDetailsHook } from '~/hooks/userDetails';
-import Repeat from '../../components/core/repeat';
-import { Skeleton } from '../../components/ui/skeleton';
 import { User } from '../../types/User';
 import { Card } from '../../components/ui/card';
 import { Avatar, AvatarFallback } from '../../components/ui/avatar';

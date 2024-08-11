@@ -5,7 +5,7 @@ import config from '~/config';
 import { JSXElement, Show, useContext } from 'solid-js';
 import { createSignal } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
-import User, { UserDetailsHook } from '~/types/User';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import Unfollow_Icon from "~/components/ui/icons/unfollow_icon";
 
 type FollowRequestParams = {
@@ -59,7 +59,7 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
     <Show when={userDetails()?.user_name != props.username}>
       <Button class="flex flex-row grow" variant="default" onClick={sendRequestApi}>
         <Show when={props.status === "not_following"} fallback={<Unfollow_Icon />}>
-        <Follow_Icon />
+          <Follow_Icon />
         </Show>{buttonData()}
       </Button>
     </Show>

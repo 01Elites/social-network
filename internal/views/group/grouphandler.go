@@ -2,6 +2,7 @@ package group
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -195,6 +196,7 @@ func ExitGroupHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	log.Print(group)
 	groupExists := database.CheckGroupID(group.ID) // check if the group has been created
 	if !groupExists {
 		http.Error(w, "Invalid group ID", http.StatusBadRequest)

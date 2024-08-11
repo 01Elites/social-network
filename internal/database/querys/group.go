@@ -152,15 +152,17 @@ func LeaveGroup(userID string, groupID int) error {
 	return nil
 }
 
-func getGroupFromRequest(requestID int) (int, string, string, string, error) {
+func getGroupFromRequest(requestID int) (int, string, string, string, string, error) {
 	var groupID int
 	var groupTitle string
 	var creator_id string
 	var requested_at time.Time
+	var requesterID string
 	query := `SELECT
 						group_id,
 						title,
 						creator_id,
+						requester_id,
 						requested_at
 						FROM
 						group_requests
@@ -169,12 +171,12 @@ func getGroupFromRequest(requestID int) (int, string, string, string, error) {
 						WHERE
 						request_id = $1
 						`
-	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID, &groupTitle, &creator_id, &requested_at)
+	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID, &groupTitle, &creator_id,&requesterID, &requested_at)
 	if err != nil {
 		log.Printf("database failed to scan group user3: %v\n", err)
-		return 0, "", "", "", err
+		return 0, "", "", "", "", err
 	}
-	return groupID, groupTitle, creator_id, requested_at.String(),  nil
+	return groupID, groupTitle, creator_id, requesterID, requested_at.String(),  nil
 }
 
 func getGroupFromInvitation(invitationID int) (string, int, string, models.Requester, error) {

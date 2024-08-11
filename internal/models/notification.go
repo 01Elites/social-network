@@ -1,12 +1,14 @@
 package models
 
+import "time"
+
 type Request struct {
-	ID             int    `json:"request_id,omitempty"`
-	Sender         string `json:"sender,omitempty"`   // user Name
-	Receiver       string `json:"receiver,omitempty"` // user Name
-	Status         string `json:"status,omitempty"`
-	CreatedAt 		string `json:"created_at,omitempty"`
-	NotificationID int    `json:"notification_id,omitempty"`
+	ID             int       `json:"request_id,omitempty"`
+	Sender         string    `json:"sender,omitempty"`   // user Name
+	Receiver       string    `json:"receiver,omitempty"` // user Name
+	Status         string    `json:"status,omitempty"`
+	CreatedAt      time.Time `json:"created_at,omitempty"`
+	NotificationID int       `json:"notification_id,omitempty"`
 }
 
 type Response struct {

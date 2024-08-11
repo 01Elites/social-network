@@ -18,11 +18,10 @@ func GetFollowRequestNotification(request models.Request) (*types.Notification, 
 		log.Println("Failed to get username of reciever")
 		return nil, err
 	}
-	if request.CreatedAt == "" {
-		request.CreatedAt = time.Now().String()
-	}
+		request.CreatedAt = time.Now()
+	
 
-	notification := OrganizeFollowRequest(recieverUsername, *sender, request.CreatedAt)
+	notification := OrganizeFollowRequest(recieverUsername, *sender, request.CreatedAt.String())
 	return &notification, nil
 }
 

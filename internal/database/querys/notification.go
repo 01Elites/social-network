@@ -49,6 +49,7 @@ func GetFollowRequest(requestID int) (*models.Request, error) {
 	query := `SELECT sender_id, receiver_id, status, created_at FROM follow_requests WHERE request_id = $1`
 	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.Status, &request.CreatedAt)
 	if err != nil {
+		log.Print(err)
 		log.Println("Failed to get follow request")
 		return nil, err
 	}

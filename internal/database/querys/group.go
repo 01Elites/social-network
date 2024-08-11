@@ -231,14 +231,16 @@ func GetGroupRequests(groupID int) ([]models.Requester, error) {
 	}
 	for rows.Next() {
 		var requester models.Requester
+		var created_at time.Time
 		if err = rows.Scan(&requester.User.UserName,
-			&requester.CreationDate,
+			&created_at,
 			&requester.User.FirstName,
 			&requester.User.LastName,
 			&requester.User.Avatar); err != nil {
 			log.Printf("database failed to scan group user6: %v\n", err)
 			return nil, err
 		}
+		requester.CreationDate = created_at.String()
 		requesters = append(requesters, requester)
 	}
 	return requesters, nil

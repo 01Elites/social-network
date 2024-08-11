@@ -26,11 +26,13 @@ export type requester = {
   creation_date: string;
 };
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
+  console.log(props)
   var [buttonData, setButtonData] = createSignal<{ [key: string]: string }>({});
   function sendRequestApi(username: string) {
     if (buttonData() === null) {
       return
     }
+    console.log(username)
     fetchWithAuth(config.API_URL + "/invitation", {
       method: 'POST',
       body: JSON.stringify({

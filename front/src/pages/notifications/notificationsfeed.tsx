@@ -207,7 +207,7 @@ export default function NotificationsFeed(): JSXElement {
             <Button
               variant='ghost'
               class='flex-1 gap-2'
-              onClick={() => { handleInvite("accepted", notification.metadata.group.id, notification.metadata.invited_by.user.user_name); }}
+              onClick={() => { handleInvite("accepted", notification.metadata.id, notification.metadata.invited_by.user.user_name); }}
             >
               <FaSolidCheck
                 class='size-4'
@@ -218,7 +218,7 @@ export default function NotificationsFeed(): JSXElement {
               variant='ghost'
               class='flex-1 gap-2'
               color="red"
-              onClick={() => { handleInvite("rejected", notification.metadata.group.id, notification.metadata.invited_by.user.user_name) }}
+              onClick={() => { handleInvite("rejected", notification.metadata.id, notification.metadata.invited_by.user.user_name) }}
             >
               <IoClose class='size-4' color='red' />
             </Button>

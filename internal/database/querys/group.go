@@ -3,6 +3,7 @@ package querys
 import (
 	"context"
 	"log"
+	"time"
 
 	"social-network/internal/models"
 )
@@ -155,7 +156,7 @@ func getGroupFromRequest(requestID int) (int, string, string, string, error) {
 	var groupID int
 	var groupTitle string
 	var creator_id string
-	var requested_at string
+	var requested_at time.Time
 	query := `SELECT
 						group_id,
 						title,
@@ -173,7 +174,7 @@ func getGroupFromRequest(requestID int) (int, string, string, string, error) {
 		log.Printf("database failed to scan group user: %v\n", err)
 		return 0, "", "", "", err
 	}
-	return groupID, groupTitle, creator_id, requested_at,  nil
+	return groupID, groupTitle, creator_id, requested_at.String(),  nil
 }
 
 func getGroupFromInvitation(invitationID int) (string, int, string, models.Requester, error) {

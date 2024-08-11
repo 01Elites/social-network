@@ -21,14 +21,15 @@ function useNotifications(): NotificationsHook {
 
   const nsUnbind = wsCtx.bind('NOTIFICATION', (data) => {
     setStore((prev) => {
-      return [...prev, data];
+      let count = prev.push(data);
+      return prev
     });
   });
 
   onCleanup(() => {
     nsUnbind();
   });
-
+  console.log(store)
   return {
     store,
     markRead,

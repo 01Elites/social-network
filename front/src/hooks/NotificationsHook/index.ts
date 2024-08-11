@@ -1,7 +1,8 @@
-import { onCleanup } from 'solid-js';
+import { onCleanup, useContext } from 'solid-js';
 import { createStore } from 'solid-js/store';
+import WebSocketContext from '~/contexts/WebSocketContext';
 import { SNNotification } from '~/types/Notification';
-import { useWebsocket } from '../WebsocketHook';
+import { WebsocketHook } from '../WebsocketHook';
 
 type NotificationsHook = {
   store: SNNotification[];
@@ -10,7 +11,7 @@ type NotificationsHook = {
 
 function useNotifications(): NotificationsHook {
   const [store, setStore] = createStore([] as SNNotification[]);
-  const wsCtx = useWebsocket();
+  const wsCtx = useContext(WebSocketContext) as WebsocketHook;
 
   function markRead(notificationId: string): void {
     wsCtx.send({

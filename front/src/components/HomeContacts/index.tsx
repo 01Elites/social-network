@@ -29,14 +29,14 @@ interface Section {
 
 export default function HomeContacts(props: HomeContactsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  const useWebsocket = useContext(WebSocketContext) as WebsocketHook;
+  const wsCtx = useContext(WebSocketContext) as WebsocketHook;
   const [sections, setSections] = createSignal<Section[]>([
     { name: 'Following', users: [] },
     { name: 'Direct Messages', users: [] }
   ]);
-  if (userDetails != null && useWebsocket != null) {
+  if (userDetails != null && wsCtx != null) {
     createEffect(() => {
-      useWebsocket.bind('USERLIST', (data) => {
+      wsCtx.bind('USERLIST', (data) => {
         if (data != null) {
           setSections((prevSections) => {
             const updatedSections = [...prevSections];

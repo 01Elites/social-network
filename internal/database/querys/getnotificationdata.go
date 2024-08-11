@@ -27,7 +27,7 @@ func GetFollowRequestNotification(request models.Request) (*types.Notification, 
 }
 
 func GetGroupRequestData(userID string, requestID int) (*types.Notification, error) {
-	groupID, groupTitle,groupCreatorID, createdAt,  err := getGroupFromRequest(requestID)
+	groupID, groupTitle,groupCreatorID, requesterID, createdAt,  err := getGroupFromRequest(requestID)
 	if err != nil {
 		log.Print("error getting groupID")
 		return nil, err
@@ -37,7 +37,7 @@ func GetGroupRequestData(userID string, requestID int) (*types.Notification, err
 		log.Print("error getting group creator username")
 		return nil, err
 	}
-	user, err := GetUserProfile(userID)
+	user, err := GetUserProfile(requesterID)
 	if err != nil {
 		log.Print("error getting user profile")
 		return nil, err

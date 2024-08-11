@@ -243,7 +243,7 @@ export default function NotificationsFeed(): JSXElement {
             </Avatar><A
               href={"/profile/" + notification.metadata.requester.user.user_name} class='block text-sm font-bold hover:underline'>
               {notification.metadata.requester.user.first_name}  {notification.metadata.requester.user.last_name} </A>
-            Requested to join {notification.metadata.group.title}<br></br>
+            Requested to join {notification.metadata.title}<br></br>
             <time
               class='text-xs font-light text-muted-foreground'
               dateTime={moment(notification.metadata.requester.creation_date).calendar()}
@@ -255,7 +255,7 @@ export default function NotificationsFeed(): JSXElement {
             <Button
               variant='ghost'
               class='flex-1 gap-2'
-              onClick={() => { handleRequest("accepted", notification.metadata.requester.id, notification.metadata.requester.user.user_name) }}
+              onClick={() => { handleRequest("accepted", notification.metadata.id, notification.metadata.requester.user.user_name) }}
             >
               <FaSolidCheck
                 class='size-4'
@@ -266,7 +266,7 @@ export default function NotificationsFeed(): JSXElement {
               variant='ghost'
               class='flex-1 gap-2'
               color="red"
-              onClick={() => { handleRequest("rejected", notification.metadata.requester.id, notification.metadata.requester.user.user_name) }}
+              onClick={() => { handleRequest("rejected", notification.metadata.id, notification.metadata.requester.user.user_name) }}
             >
               <IoClose class='size-4' color='red' />
             </Button>

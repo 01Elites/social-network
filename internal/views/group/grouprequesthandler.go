@@ -118,7 +118,7 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "error decoding response", http.StatusBadRequest)
 		return
 	}
-
+	log.Print(response)
 	if response.Status != "accepted" && response.Status != "rejected" {
 		helpers.HTTPError(w, "status can only be rejected or accepted", http.StatusBadRequest)
 		return
@@ -138,22 +138,29 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "error checking if user is a member", http.StatusBadRequest)
 		return
 	}
+
 	if isMember {
 		helpers.HTTPError(w, "user already a member", http.StatusBadRequest)
 		return
 	}
+
 	creatorID, err := database.GetGroupCreatorID(response.GroupID)
 	if err != nil || creatorID != userID {
 		helpers.HTTPError(w, "only group creator can respond to request", http.StatusBadRequest)
 		return
 	}
+	log.Print(response, "22")
+
 	requestID, err := database.RespondToRequest(response)
 	if err != nil {
 		helpers.HTTPError(w, "error when responding to request", http.StatusNotFound)
 		return
 	}
-	err = database.UpdateNotificationTable(requestID, response.Status, "group_invite", userID)
+	log.Print(response, "22")
+
+	err = database.UpdateNotificationTable(requestID, response.Status, "join_request", userID)
 	if err != nil {
+		log.Print(err)
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}

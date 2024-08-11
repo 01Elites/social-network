@@ -46,8 +46,8 @@ func UpdateNotificationTable(relatedID int, status string, notificationType stri
 
 func GetFollowRequest(requestID int) (*models.Request, error) {
 	request := models.Request{ID: requestID}
-	query := `SELECT sender_id, receiver_id, status FROM follow_requests WHERE request_id = $1`
-	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.Status)
+	query := `SELECT sender_id, receiver_id, status, created_at FROM follow_requests WHERE request_id = $1`
+	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.Status, &request.CreatedAt)
 	if err != nil {
 		log.Println("Failed to get follow request")
 		return nil, err
@@ -119,7 +119,7 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 			log.Printf("Unknown notification type: %s", notificationType)
 			continue
 		}
-		if notification != nil {
+		if notification != nil && !read{
 			notification.ID = notificationID
 			notification.Read = read
 			notifications = append(notifications, *notification)
@@ -132,7 +132,7 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 	return notifications, err
 }
 
-func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile) types.Notification {
+func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile, createdAt string) types.Notification {
 	notification := types.Notification{
 		Type:    "FOLLOW_REQUEST",
 		Message: "You have a new follow request",
@@ -142,28 +142,32 @@ func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile) t
 				Username:  sender.Username,
 				FirstName: sender.FirstName,
 				LastName:  sender.LastName,
+				Avatar:    sender.Avatar,		
 			},
+			CreationDate: createdAt,
 		},
 	}
 	return notification
 }
 
-func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile) types.Notification {
+func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, requester models.UserProfile, createdAt string) types.Notification {
 	notification := types.Notification{
 		Type:    "REQUEST_TO_JOIN_GROUP",
 		Message: "You have a new group request",
 		ToUser:  groupCreator,
-		Metadata: types.GroupRequestMetadata{
-			UserDetails: types.UserDetails{
-				Username:  requester.Username,
-				FirstName: requester.FirstName,
-				LastName:  requester.LastName,
+		Metadata: types.GroupRequestNotification{
+			Requester: models.Requester{
+				User: models.PostFeedProfile{
+					UserName:  requester.Username,
+					FirstName: requester.FirstName,
+					LastName:  requester.LastName,
+					Avatar: 	requester.Avatar,
+				},
+				CreationDate: createdAt,
 			},
-			Group: types.GroupNotification{
 				ID:    groupID,
 				Title: GroupTitle,
 			},
-		},
 	}
 	return notification
 }
@@ -184,7 +188,7 @@ func OrganizeGroupEventRequest(member string, groupTitle string, groupID int, gr
 	return notification
 }
 
-func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle string) types.Notification {
+func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle string, invitedBy models.Requester) types.Notification {
 	notification := types.Notification{
 		Type:    "GROUP_INVITATION",
 		Message: "You have a new group invitation",
@@ -192,6 +196,7 @@ func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle st
 		Metadata: types.GroupNotification{
 			ID:    groupID,
 			Title: groupTitle,
+			InvitedBy: invitedBy,
 		},
 	}
 	return notification

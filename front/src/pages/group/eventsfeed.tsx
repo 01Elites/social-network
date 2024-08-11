@@ -90,7 +90,7 @@ export default function EventsFeed(props: FeedPostsProps): JSXElement {
                   <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3'><p class="block flex flex-col gap-2 place-items-right">
                     {event.description}</p>
                     </Card>
-                  <Tooltip.Arrow class="text-corvu-100" />
+                  {/* <Tooltip.Arrow class="text-corvu-100" /> */}
                 </Tooltip.Content>
               </Tooltip.Portal>
             </Tooltip>

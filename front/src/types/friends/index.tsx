@@ -8,10 +8,10 @@ type Friends = {
   explore: User[];
 };
 
-type FriendRequest = {
+export type FriendRequest = {
   requester: string;
   creation_date: string;
   user_info: User;
 };
 
-export default Friends;
+export default Friends

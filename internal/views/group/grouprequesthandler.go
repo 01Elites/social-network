@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
@@ -117,12 +116,6 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		helpers.HTTPError(w, "error decoding response", http.StatusBadRequest)
-		return
-	}
-
-	response.GroupID, err = strconv.Atoi(response.GroupIdstr)
-	if err != nil {
-		helpers.HTTPError(w, "error converting group ID", http.StatusBadRequest)
 		return
 	}
 

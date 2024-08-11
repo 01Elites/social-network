@@ -188,7 +188,7 @@ export default function FriendsFeed(props: {
   );
 }
 
-function handleFollowRequest(response: string, follower: string) {
+export function handleFollowRequest(response: string, follower: string) {
   fetchWithAuth(`${config.API_URL}/follow_response`, {
     method: 'POST',
     body: JSON.stringify({

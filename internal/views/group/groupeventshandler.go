@@ -66,7 +66,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "failed to create event", http.StatusNotFound)
 		return
 	}
-	err = database.CreateEventOptions(eventID, event.Options)
+	options, err := database.CreateEventOptions(eventID, event.Options)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create event options", http.StatusNotFound)
 		return
@@ -74,7 +74,8 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 	groupEvent := types.EventDetails{
 		ID:      eventID,
 		Title:   event.Title,
-		Options: event.Options,
+		Options: options,
+		EventTime: event.EventTime,
 	}
 	for i, member := range groupMembers {
 		notificationID, err := database.AddToNotificationTable(groupMembersIDs[i], "event_notification", eventID)

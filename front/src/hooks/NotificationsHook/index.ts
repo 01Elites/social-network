@@ -9,7 +9,7 @@ type NotificationsHook = {
 };
 
 function useNotifications(): NotificationsHook {
-  const [store, setStore] = createStore({} as SNNotification[]);
+  const [store, setStore] = createStore([] as SNNotification[]);
   const wsCtx = useWebsocket();
 
   function markRead(notificationId: string): void {

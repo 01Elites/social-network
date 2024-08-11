@@ -1,7 +1,6 @@
 import { JSXElement, useContext, createEffect, createSignal, For, Show } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { cn } from '~/lib/utils';
-import { UserDetailsHook } from '~/types/User';
 import Repeat from '../core/repeat';
 import { Skeleton } from '../ui/skeleton';
 import WebSocketContext from '~/contexts/WebSocketContext';
@@ -9,6 +8,7 @@ import { WebsocketHook } from '~/hooks/WebsocketHook';
 import { Avatar, AvatarFallback } from '../../components/ui/avatar';
 import config from '../../config';
 import { Card } from '../../components/ui/card';
+import { UserDetailsHook } from '~/hooks/userDetails';
 
 interface HomeContactsProps {
   class?: string;

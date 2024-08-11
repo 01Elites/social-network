@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type Event struct {
 	Type    string      `json:"event"`
 	Id      string      `json:"id,omitempty"`
@@ -19,7 +21,7 @@ type Notification struct {
 
 type FollowRequestMetadata struct {
 	UserDetails UserDetails `json:"requester"`
-	CreationDate	string `json:"creation_date"`
+	CreationDate	time.Time `json:"creation_date"`
 }
 
 // type comment notification metadata struct

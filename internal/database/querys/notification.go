@@ -3,6 +3,7 @@ package querys
 import (
 	"context"
 	"log"
+	"time"
 
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
@@ -133,7 +134,7 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 	return notifications, err
 }
 
-func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile, createdAt string) types.Notification {
+func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile, createdAt time.Time) types.Notification {
 	notification := types.Notification{
 		Type:    "FOLLOW_REQUEST",
 		Message: "You have a new follow request",

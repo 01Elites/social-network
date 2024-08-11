@@ -26,13 +26,11 @@ export type requester = {
   creation_date: string;
 };
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
-  console.log(props)
   var [buttonData, setButtonData] = createSignal<{ [key: string]: string }>({});
   function sendRequestApi(username: string) {
     if (buttonData() === null) {
       return
     }
-    console.log(username)
     fetchWithAuth(config.API_URL + "/invitation", {
       method: 'POST',
       body: JSON.stringify({
@@ -45,7 +43,6 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         setButtonData((prev) => ({ ...prev, [username]: "Invite Pending" }));
         return;
       } else {
-        console.log(res.body);
         console.log('Error making request');
         return
       }

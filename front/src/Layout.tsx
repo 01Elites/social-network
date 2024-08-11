@@ -14,19 +14,12 @@ type LayoutProps = {
 };
 
 export default function Layout(props: LayoutProps): JSXElement {
-  const userDetailsHook = useUserDetails();
-  const websocketHook = useWebsocket();
-  // const notificationHook = useNotifications();
-
   return (
-    <UserDetailsContext.Provider value={userDetailsHook}>
-      <WebSocketContext.Provider value={websocketHook}>
-        <Navigation>{props.children}</Navigation>
-        <LoginDialog />
-        <NotificationsPage />
-        <SettingsPage />
-        <Toaster />
-      </WebSocketContext.Provider>
-    </UserDetailsContext.Provider>
+    <>
+      <Navigation>{props.children}</Navigation>
+      <LoginDialog />
+      <NotificationsPage />
+      <SettingsPage />
+      <Toaster /></>
   );
 }

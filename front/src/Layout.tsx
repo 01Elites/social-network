@@ -16,6 +16,7 @@ type LayoutProps = {
 export default function Layout(props: LayoutProps): JSXElement {
   const userDetailsHook = useUserDetails();
   const websocketHook = useWebsocket();
+  const notificationHook = useNotifications();
 
   return (
     <UserDetailsContext.Provider value={userDetailsHook}>

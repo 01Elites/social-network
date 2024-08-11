@@ -24,101 +24,101 @@ import { UserDetailsHook } from '~/hooks/userDetails';
 export default function NotificationsFeed(): JSXElement {
   const [notifications, setnotification] = createSignal<Notifications[]>([]);
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-// setnotification([{
-//   event: "NOTIFICATION",
-//   id: 2,
-//   payload: {
-//       type: "FOLLOW_REQUEST",
-//       message: "You have a new follow request",
-//       notification_id: 666,
-//       read: false,
-//       metadata: {
-//           requester: {
-//               first_name: "John",
-//               last_name: "Doe",
-//               username: "johndoe",
-//               avatar:""
-//           },
-//        creation_date:"2025-07-07 00:00:00 +0000 UTC"
-//   }
-// }
-// },
-// {
-//   event: "NOTIFICATION",
-//   id: 1,
-//   payload: {
-//       type: "GROUP_INVITATION",
-//       message: "You have a new group invitation",
-//       notification_id: 777,
-//       read: false,
-//       metadata: {
-//               id: "1",
-//               title: "Group 1",
-//              invited_by:{
-//               user:{ first_name:"test",
-//               last_name:"next",
-//               user_name:"user",
-//               avatar:"",},
-//              created_by: "2025-07-07 00:00:00 +0000 UTC"
-//           }
-//       }
-// }
-// },
-// {
-//   event: "NOTIFICATION",
-//   id: 3,
-//   payload: {
-//       type: "REQUEST_TO_JOIN_GROUP",
-//       message: "You have a new request to join the group",
-//       notification_id: 888,
-//       read: false,
-//       metadata: {
-//           group: {
-//               id: "1",
-//               title: "Group 1"
-//           },
-//           requester: {
-//             user:{
-//              first_name: "John",
-//              last_name: "Doe",
-//              username: "johndoe",
-//              avatar:"",
-//               },
-//             creation_date:"2024-12-31 00:00:00 +0000 UTC"
-//          }
-//       }
-//   }
-// },
-// {
-//   event: "NOTIFICATION",
-//   id: 4,
-//   payload: {
-//       type: "EVENT",
-//       message: "You have a new event in the group",
-//       notification_id: 222,
-//       read: false,
-//       metadata: {
-//           group: {
-//               id: "1",
-//               title: "Group 1",
-//           },
-//           event: {
-//               id: "1",
-//               title: "Event 1",
-//               description: "description",
-//               event_time:"2025-07-07 00:00:00 +0000 UTC",
-//               options: [{
-//                        id: 0,
-//                        name:"option1",
-//           }, {
-//             id: 1,
-//             name:"option2",
-//           }]
-//       }
-//   }
-// }
-// }
-// ])
+setnotification([{
+  event: "NOTIFICATION",
+  id: 2,
+  payload: {
+      type: "FOLLOW_REQUEST",
+      message: "You have a new follow request",
+      notification_id: 666,
+      read: false,
+      metadata: {
+          requester: {
+              first_name: "John",
+              last_name: "Doe",
+              username: "johndoe",
+              avatar:""
+          },
+       creation_date:"2025-07-07 00:00:00 +0000 UTC"
+  }
+}
+},
+{
+  event: "NOTIFICATION",
+  id: 1,
+  payload: {
+      type: "GROUP_INVITATION",
+      message: "You have a new group invitation",
+      notification_id: 777,
+      read: false,
+      metadata: {
+              id: "1",
+              title: "Group 1",
+             invited_by:{
+              user:{ first_name:"test",
+              last_name:"next",
+              user_name:"user",
+              avatar:"",},
+             created_by: "2025-07-07 00:00:00 +0000 UTC"
+          }
+      }
+}
+},
+{
+  event: "NOTIFICATION",
+  id: 3,
+  payload: {
+      type: "REQUEST_TO_JOIN_GROUP",
+      message: "You have a new request to join the group",
+      notification_id: 888,
+      read: false,
+      metadata: {
+          group: {
+              id: "1",
+              title: "Group 1"
+          },
+          requester: {
+            user:{
+             first_name: "John",
+             last_name: "Doe",
+             username: "johndoe",
+             avatar:"",
+              },
+            creation_date:"2024-12-31 00:00:00 +0000 UTC"
+         }
+      }
+  }
+},
+{
+  event: "NOTIFICATION",
+  id: 4,
+  payload: {
+      type: "EVENT",
+      message: "You have a new event in the group",
+      notification_id: 222,
+      read: false,
+      metadata: {
+          group: {
+              id: "1",
+              title: "Group 1",
+          },
+          event: {
+              id: "1",
+              title: "Event 1",
+              description: "description",
+              event_time:"2025-07-07 00:00:00 +0000 UTC",
+              options: [{
+                       option_id: 0,
+                       option_name:"option1",
+          }, {
+            option_id: 1,
+            option_name:"option2",
+          }]
+      }
+  }
+}
+}
+])
   return (<>
     <div class="flex-row">
       <div class="flex-row">
@@ -277,15 +277,6 @@ export default function NotificationsFeed(): JSXElement {
       <Show when={notification.payload.type == "EVENT"}>
         <div id={notification.payload.metadata.group.title}>
           <Card class='flex h-80 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>
-            <Tooltip
-              placement="bottom"
-              openDelay={200}
-              floatingOptions={{
-                offset: 1,
-                flip: true,
-                shift: true,
-              }}
-            >
               <Avatar class='w-[5rem] h-[5rem] mb-2'>
                 <AvatarFallback>
                   {notification.payload.metadata.group.title.charAt(0).toUpperCase()}
@@ -293,8 +284,17 @@ export default function NotificationsFeed(): JSXElement {
               </Avatar>
               <p class='block text-xl border= "white" gap-4 font-bold flex flex-col place-items-center'>{notification.payload.metadata.group.title}</p>
               <p class='block text-xl border= "white" gap-4 font-bold flex flex-col place-items-center'>{notification.payload.metadata.event.title}</p>
+            <Tooltip
+              placement="right"
+              openDelay={200}
+              floatingOptions={{
+                offset: 1,
+                flip: true,
+                shift: true,
+              }}
+            >
               <Tooltip.Trigger
-                class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
+                class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-100 active:translate-y-2"
               >
                 Event Description
               </Tooltip.Trigger>
@@ -304,10 +304,11 @@ export default function NotificationsFeed(): JSXElement {
               </p>
               <Tooltip.Portal>
                 <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
-                  <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3'><p class="block flex flex-col gap-2 place-items-right">
-                    {notification.payload.metadata.event.description}</p>
+                  <Card class='flex flex-col justify-center items-center space-y-4 p-3'>
+                    <p class="block flex flex-col gap-2 place-items-right">
+                    {notification.payload.metadata.event.description}
+                    </p>
                   </Card>
-                  <Tooltip.Arrow class="text-corvu-100" />
                 </Tooltip.Content>
               </Tooltip.Portal>
             </Tooltip>

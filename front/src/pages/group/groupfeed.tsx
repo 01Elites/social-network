@@ -93,7 +93,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         <NewEventCell groupTitle={props.groupTitle} groupID={props.groupID} />
       </Tabs.Content>
 
-      <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh] flex flex-wrap " value="invite">
+      <Tabs.Content class="tabs__content overflow-y-scroll flex flex-wrap " value="invite">
         <Index each={props?.explore ?? []}>
           {(explore, i) => <>
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>

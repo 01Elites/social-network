@@ -28,15 +28,14 @@ function NotificationsPage(): JSXElement {
 
   return (
     <Sheet open={settingsOpen()} onOpenChange={setSettingsOpen}>
-      <SheetContent position='left'>
+      <SheetContent position='left' class='overflow-y-scroll'>
         <SheetHeader class='mb-4'>
           <SheetTitle>Notifications</SheetTitle>
         </SheetHeader>
-        <h3 class='text-base font-semibold'>Theme</h3>
         <section>
-          <div class='flex items-center justify-between'>
+          {/* <div class='flex items-center justify-between'> */}
             <NotificationsFeed/>
-          </div>
+          {/* </div> */}
         </section>
         {/* <Separator /> */}
       </SheetContent>

@@ -161,6 +161,7 @@ func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, r
 					UserName:  requester.Username,
 					FirstName: requester.FirstName,
 					LastName:  requester.LastName,
+					Avatar: 	requester.Avatar,
 				},
 				CreationDate: createdAt,
 			},

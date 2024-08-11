@@ -57,7 +57,7 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 		log.Print("error getting event options")
 		return nil, err
 	}
-	title, groupID, err := GetEventDetails(eventID)
+	title, groupID, eventTime, err := GetEventDetails(eventID)
 	if err != nil {
 		log.Print("error getting event title", err)
 		return nil, err
@@ -71,6 +71,7 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 		ID:      eventID,
 		Title:   title,
 		Options: options,
+		EventTime: eventTime,
 	}
 	notification := OrganizeGroupEventRequest(username, groupTitle, groupID, eventDetails)
 	return &notification, nil

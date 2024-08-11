@@ -136,16 +136,19 @@ func CreateEvent(GroupID int, userID string, Title string, Description string, E
 	return eventID, nil
 }
 
-func CreateEventOptions(eventID int, options []string) error {
-	query := `INSERT INTO event_option (event_id, name) VALUES ($1, $2)`
-	for _, option := range options {
-		_, err := DB.Exec(context.Background(), query, eventID, option)
+func CreateEventOptions(eventID int, optionNames []string) ([]models.Options, error) {
+	var options []models.Options
+	query := `INSERT INTO event_option (event_id, name) VALUES ($1, $2) RETURNING option_id`
+	for _, optionName := range optionNames {
+		var optionID int
+		err := DB.QueryRow(context.Background(), query, eventID, optionName).Scan(&optionID)
 		if err != nil {
 			log.Printf("database: Failed to create event options: %v", err)
-			return err
+			return nil, err
 		}
+		options = append(options, models.Options{ID: optionID, Name: optionName})
 	}
-	return nil
+	return options, nil
 }
 
 func RespondToEvent(response models.EventResp, userID string) error {
@@ -180,30 +183,31 @@ func CancelEvent(eventID int) error {
 	return nil
 }
 
-func GetEventOptions(eventID int) ([]string, error) {
-	var options []string
-	query := `SELECT name FROM event_option WHERE event_id = $1`
+func GetEventOptions(eventID int) ([]models.Options, error) {
+	var options []models.Options
+	query := `SELECT option_id, name FROM event_option WHERE event_id = $1`
 	rows, err := DB.Query(context.Background(), query, eventID)
 	if err != nil {
 		log.Print("error getting options")
 		return nil, err
 	}
 	for rows.Next() {
-		var option string
-		rows.Scan(&option)
+		var option models.Options
+		rows.Scan(&option.ID, &option.Name)
 		options = append(options, option)
 	}
 	return options, nil
 }
 
-func GetEventDetails(eventID int) (string, int, error) {
+func GetEventDetails(eventID int) (string, int, time.Time, error) {
 	var title string
 	var groupID int
-	query := `SELECT title, group_id FROM event WHERE event_id = $1`
-	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &groupID)
+	var eventTime time.Time
+	query := `SELECT title, group_id, event_date FROM event WHERE event_id = $1`
+	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &groupID, &eventTime)
 	if err != nil {
 		log.Print("error scanning title", err)
-		return "", 0, err
+		return "", 0, time.Time{} ,err
 	}
-	return title, groupID, nil
+	return title, groupID, eventTime, nil
 }

@@ -1,5 +1,7 @@
 import { JSXElement } from 'solid-js';
 import { Toaster } from '~/components/ui/toast';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { useUserDetails } from '~/hooks/userDetails';
 import Navigation from './components/core/navigation';
 import { LoginDialog } from './components/LoginDialog';
 import WebSocketContext from './contexts/WebSocketContext';
@@ -12,7 +14,10 @@ type LayoutProps = {
 };
 
 export default function Layout(props: LayoutProps): JSXElement {
-  return (<>
+  const userDetailsHook = useUserDetails();
+  const websocketHook = useWebsocket();
+
+  return (
     <UserDetailsContext.Provider value={userDetailsHook}>
       <WebSocketContext.Provider value={websocketHook}>
         <Navigation>{props.children}</Navigation>
@@ -22,11 +27,5 @@ export default function Layout(props: LayoutProps): JSXElement {
         <Toaster />
       </WebSocketContext.Provider>
     </UserDetailsContext.Provider>
-    <>
-      <Navigation>{props.children}</Navigation>
-      <LoginDialog />
-      <SettingsPage />
-      <Toaster />
-    </></>
   );
 }

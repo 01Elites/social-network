@@ -1,7 +1,9 @@
 package types
 
-import "social-network/internal/models"
-
+import (
+	"social-network/internal/models"
+	"time"
+)
 
 type GroupEventMetadata struct {
 	Group GroupNotification `json:"group"`
@@ -20,8 +22,9 @@ type GroupRequestNotification struct {
 	Requester models.Requester `json:"requester,omitempty"`
 }
 type EventDetails struct {
-	ID          int      `json:"id"`
-	Title       string   `json:"title"`
-	Options     []string `json:"options"`
-	Description string   `json:"description,omitempty"`
+	ID          int              `json:"id"`
+	Title       string           `json:"title"`
+	Description string           `json:"description,omitempty"`
+	EventTime   time.Time        `json:"event_time"`
+	Options     []models.Options `json:"options"`
 }

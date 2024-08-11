@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { JSXElement, Show, createSignal, useContext } from 'solid-js';
-import { JSXElement, Show, createSignal, useContext } from 'solid-js';
 import logo from '~/assets/logo.svg';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import { Button } from '~/components/ui/button';
@@ -20,8 +19,6 @@ import { showToast } from '~/components/ui/toast';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { UserDetailsHook } from '~/hooks/userDetails';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Checkbox } from '../ui/checkbox';
@@ -49,8 +46,6 @@ function ProfileEditDialog(): JSXElement {
 
   const [userUploadedImage, setUploadedImage] = createSignal<File | null>(null);
   const [userNickName, setNickName] = createSignal(userDetails()?.nick_name);
-  const [userUploadedImage, setUploadedImage] = createSignal<File | null>(null);
-  const [userNickName, setNickName] = createSignal(userDetails()?.nick_name);
   const [userFirstName, setFirstName] = createSignal(userDetails()?.first_name);
   const [userLastName, setLastName] = createSignal(userDetails()?.last_name);
   const [userDOB, setDOB] = createSignal(
@@ -66,14 +61,6 @@ function ProfileEditDialog(): JSXElement {
   );
   const [userAbout, setAbout] = createSignal(userDetails()?.about);
 
-  function handleImageUpload(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-      setUploadedImage(target.files[0]);
-    }
-  }
-
-  async function handleEditProfileForm(e?: SubmitEvent) {
   function handleImageUpload(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
@@ -108,29 +95,6 @@ function ProfileEditDialog(): JSXElement {
     fetchWithAuth(config.API_URL + '/profile', {
       method: 'PATCH',
       body: JSON.stringify(payload),
-    const payload = {
-      nick_name: userNickName(),
-      first_name: userFirstName(),
-      last_name: userLastName(),
-      date_of_birth: new Date(userDOB()).toISOString(),
-      profile_privacy: userPrivate() ? 'private' : 'public',
-      gender: userGender(),
-      about: userAbout(),
-      avatar: '',
-    };
-
-    if (userUploadedImage()) {
-      try {
-        const base64 = await userUploadedImage()?.toBase64();
-        payload.avatar = base64 as string;
-      } catch (error) {
-        console.error('Error converting avatar to base64:', error);
-      }
-    }
-
-    fetchWithAuth(config.API_URL + '/profile', {
-      method: 'PATCH',
-      body: JSON.stringify(payload),
     })
       .then(async (res) => {
         setFormProcessing(false);
@@ -142,14 +106,7 @@ function ProfileEditDialog(): JSXElement {
           });
           console.log(userDetails());
           setEditOpen(false);
-          showToast({
-            title: 'Profile Updated',
-            description: 'Your Profile has been updated successfully',
-            variant: 'success',
-          });
-          console.log(userDetails());
-          await fetchUserDetails();
-          console.log(userDetails());
+          fetchUserDetails();
           return;
         }
 
@@ -193,54 +150,6 @@ function ProfileEditDialog(): JSXElement {
           class='grid w-full grid-cols-1 gap-4 xs:grid-cols-2'
           onSubmit={handleEditProfileForm}
         >
-          <div class='col-span-2 flex justify-center'>
-            <input
-              class='hidden'
-              type='file'
-              id='signupImageUpload'
-              accept='image/*'
-              onChange={handleImageUpload}
-            />
-            <Avatar class='size-20'>
-              <Show
-                when={userUploadedImage()}
-                fallback={
-                  <AvatarImage src={userDetails()?.avatar}></AvatarImage>
-                }
-              >
-                <AvatarImage src={URL.createObjectURL(userUploadedImage()!)} />
-              </Show>
-              <AvatarFallback class='text-xl'>
-                {userFirstName()?.[0]}
-                {userLastName()?.[0]}
-              </AvatarFallback>
-              <button
-                type='button'
-                onClick={() => {
-                  if (userUploadedImage()) {
-                    URL.revokeObjectURL(userUploadedImage()!.name);
-                    setUploadedImage(null);
-                  }
-                  document.getElementById('signupImageUpload')?.click();
-                }}
-                class='absolute bottom-0 w-full bg-primary/80 text-center text-primary-foreground'
-              >
-                {userUploadedImage() ? 'change' : 'set'}
-              </button>
-            </Avatar>
-          </div>
-          <TextField
-            class='col-span-2 grid w-full items-center gap-1.5'
-            onChange={setNickName}
-            value={userNickName()}
-          >
-            <TextFieldLabel for='nickname'>NickName</TextFieldLabel>
-            <TextFieldInput
-              type='text'
-              id='nickname'
-              placeholder='Your Nickname'
-            />
-          </TextField>
           <div class='col-span-2 flex justify-center'>
             <input
               class='hidden'
@@ -349,7 +258,6 @@ function ProfileEditDialog(): JSXElement {
             </Select>
           </TextField>
           <TextField
-            class='col-span-2 grid w-full items-center gap-1.5'
             class='col-span-2 grid w-full items-center gap-1.5'
             onChange={setAbout}
             value={userAbout()}

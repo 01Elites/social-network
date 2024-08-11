@@ -58,9 +58,8 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
   return (<>
     <Show when={userDetails()?.user_name != props.username}>
       <Button class="flex flex-row grow" variant="default" onClick={sendRequestApi}>
+        <Show when={props.status === "not_following"} fallback={<Unfollow_Icon />}>
         <Follow_Icon />
-        <Show when={props.status == "not followed"}>
-          <Unfollow_Icon />
         </Show>{buttonData()}
       </Button>
     </Show>

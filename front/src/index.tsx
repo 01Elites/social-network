@@ -19,6 +19,8 @@ import Group from './pages/group';
 import GroupsPage from './pages/groups';
 import HomePage from './pages/home';
 import Profile from './pages/profile';
+import { useNotifications } from './hooks/NotificationsHook';
+import NotificationsContext from './contexts/NotificationsContext';
 
 const root = document.getElementById('root');
 
@@ -32,6 +34,12 @@ function App() {
   const storageManager = createLocalStorageManager('vite-ui-theme');
   const userDetailsHook = useUserDetails();
   const websocketHook = useWebsocket();
+  const notificationHook = useNotifications();
+
+  const notificationsCtx = useNotifications();
+  // notificationsCtx.markRead('asd')
+
+
 
   return (
     <Router
@@ -41,8 +49,11 @@ function App() {
           <ColorModeProvider>
             <UserDetailsContext.Provider value={userDetailsHook}>
               <WebSocketContext.Provider value={websocketHook}>
-                {props.children}
+                <NotificationsContext.Provider value={notificationHook}>
+                  {props.children}
+                </NotificationsContext.Provider>
               </WebSocketContext.Provider>
+
             </UserDetailsContext.Provider>
           </ColorModeProvider>
         </>

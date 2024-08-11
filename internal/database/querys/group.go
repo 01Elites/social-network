@@ -64,14 +64,14 @@ func GetGroupMembers(loggedUser string, groupID int) ([]models.UserLiteInfo, []s
 						WHERE group_id = $1`
 	rows, err := DB.Query(context.Background(), query, groupID)
 	if err != nil {
-		log.Printf("database failed to scan group user: %v\n", err)
+		log.Printf("database failed to scan group user1: %v\n", err)
 		return nil, nil, err
 	}
 	for rows.Next() {
 		var user models.UserLiteInfo
 		var userid string
 		if err = rows.Scan(&userid, &user.UserName, &user.FirstName, &user.LastName, &user.Avatar, &user.Privacy); err != nil {
-			log.Printf("database failed to scan group user: %v\n", err)
+			log.Printf("database failed to scan group user2: %v\n", err)
 			return nil, nil, err
 		}
 		user.Status = GetFollowStatus(loggedUser, userid)
@@ -86,7 +86,7 @@ func GroupMember(userID string, groupID int) (bool, error) {
 	query := `SELECT COUNT(*) FROM group_member WHERE group_id = $1 AND user_id = $2`
 	err := DB.QueryRow(context.Background(), query, groupID, userID).Scan(&IsMember)
 	if err != nil {
-		log.Printf("database failed to scan group user: %v\n", err)
+		log.Printf("database failed to scan group user11: %v\n", err)
 		return false, err
 	}
 	if IsMember == 0 {
@@ -100,7 +100,7 @@ func CheckGroupID(groupID int) bool {
 	query := `SELECT COUNT(*) FROM "group" WHERE group_id = $1`
 	err := DB.QueryRow(context.Background(), query, groupID).Scan(&groupExists)
 	if err != nil {
-		log.Printf("database failed to scan group user: %v\n", err)
+		log.Printf("database failed to scan group user12: %v\n", err)
 		return false
 	}
 	if groupExists == 0 {
@@ -171,7 +171,7 @@ func getGroupFromRequest(requestID int) (int, string, string, string, error) {
 						`
 	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID, &groupTitle, &creator_id, &requested_at)
 	if err != nil {
-		log.Printf("database failed to scan group user: %v\n", err)
+		log.Printf("database failed to scan group user3: %v\n", err)
 		return 0, "", "", "", err
 	}
 	return groupID, groupTitle, creator_id, requested_at.String(),  nil
@@ -182,7 +182,7 @@ func getGroupFromInvitation(invitationID int) (string, int, string, models.Reque
 	var groupTitle string
 	var invitedUser string
 	var senderID string
-	var sentAt string
+	var sentAt time.Time
 	query := `SELECT
 						receiver_id,
 						group_id,
@@ -198,7 +198,7 @@ func getGroupFromInvitation(invitationID int) (string, int, string, models.Reque
 						`
 	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser, &groupID, &groupTitle, &senderID, &sentAt)
 	if err != nil {
-		log.Printf("database failed to scan group user: %v\n", err)
+		log.Printf("database failed to scan group user4: %v\n", err)
 		return "", 0, "", models.Requester{}, err
 	}
 	inviter, err := GetUserPostFeedProfile(senderID)
@@ -208,7 +208,7 @@ func getGroupFromInvitation(invitationID int) (string, int, string, models.Reque
 	}
 	inviteData := models.Requester{
 		User: *inviter,
-		CreationDate: sentAt,
+		CreationDate: sentAt.String(),
 	} 
 	return invitedUser, groupID, groupTitle, inviteData, nil
 }
@@ -226,7 +226,7 @@ func GetGroupRequests(groupID int) ([]models.Requester, error) {
 										WHERE group_id = $1 AND status = 'pending'`
 	rows, err := DB.Query(context.Background(), query, groupID)
 	if err != nil {
-		log.Printf("database failed to scan group user: %v\n", err)
+		log.Printf("database failed to scan group user5: %v\n", err)
 		return nil, err
 	}
 	for rows.Next() {
@@ -236,7 +236,7 @@ func GetGroupRequests(groupID int) ([]models.Requester, error) {
 			&requester.User.FirstName,
 			&requester.User.LastName,
 			&requester.User.Avatar); err != nil {
-			log.Printf("database failed to scan group user: %v\n", err)
+			log.Printf("database failed to scan group user6: %v\n", err)
 			return nil, err
 		}
 		requesters = append(requesters, requester)
@@ -254,13 +254,13 @@ func GetAllGroupIDs() ([]int, error) {
 	query := `SELECT group_id FROM "group"`
 	rows, err := DB.Query(context.Background(), query)
 	if err != nil {
-		log.Printf("database failed to scan group user: %v\n", err)
+		log.Printf("database failed to scan group user7: %v\n", err)
 		return nil, err
 	}
 	for rows.Next() {
 		var groupID int
 		if err = rows.Scan(&groupID); err != nil {
-			log.Printf("database failed to scan group user: %v\n", err)
+			log.Printf("database failed to scan group user8: %v\n", err)
 			return nil, err
 		}
 		groupIDs = append(groupIDs, groupID)

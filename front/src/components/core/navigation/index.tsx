@@ -27,7 +27,7 @@ import { useNotifications } from '~/hooks/NotificationsHook';
 import { cn } from '~/lib/utils';
 import {NotificationsPage, showNotifications} from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
-import { SNNotification } from '~/types/Notification';
+import NotificationsContext from '~/contexts/NotificationsContext';
 
 interface NavigationProps {
   children: JSXElement;
@@ -43,19 +43,8 @@ type NavItem = {
 export default function Navigation(props: NavigationProps): JSXElement {
   const navigate = useNavigate();
   const userCtx = useContext(UserDetailsContext);
-  const notificationsCtx = useNotifications();
-  const [notifications, setNotifications] = createSignal<SNNotification[]>();
+  const notificationsCtx = useContext(NotificationsContext);
   const [bellColor, setBellColor] = createSignal(false);
-
-  setNotifications(notificationsCtx.store);
-  console.log('notifications is', notifications());
-  notifications()?.forEach(element => {
-    console.log('element.read is', element);
-    if (element.read === false) {
-      setBellColor(true);
-      console.log('bellColor is true');
-    } 
-  });
 
   const location = useLocation();
 
@@ -128,6 +117,13 @@ export default function Navigation(props: NavigationProps): JSXElement {
             color='red'
             onClick={showNotifications}
           >
+            <For each={notificationsCtx?.store}>
+          {(notification) => (
+            <>
+            <Show when={!notification.read}>
+              {setBellColor(true)}
+            </Show>
+            </>)}</For>
             <Show when={bellColor()}>
             <IconBell class='size-5 bg-red-500'/>
             </Show>

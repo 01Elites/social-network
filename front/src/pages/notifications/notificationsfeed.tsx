@@ -8,83 +8,81 @@ import { IoClose } from 'solid-icons/io';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
 import { Show } from 'solid-js';
-import { Notifications } from '~/types/notifications';
-import { createSignal } from 'solid-js'
 import { handleInvite } from '../group/request';
-import { A, Route } from '@solidjs/router';
+import { A } from '@solidjs/router';
 import { handleRequest } from '../group/creatorsrequest';
 import { handleEventOption } from '../events/eventsfeed';
 import Tooltip from '@corvu/tooltip'
-import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { useContext } from 'solid-js';
-import { UserDetailsHook } from '~/hooks/userDetails';
-import { NotificationsHook, useNotifications } from '~/hooks/NotificationsHook';
 import NotificationsContext from '~/contexts/NotificationsContext';
 
 export default function NotificationsFeed(): JSXElement {
   // const [test, setnotification] = createSignal<NotificationsHook>();
-  const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  const notifications = useContext(NotificationsContext);
-  return (<>
+  const notifications = useContext(NotificationsContext); return (<>
     <div class="flex-row">
       <div class="flex-row">
         <For each={notifications?.store}>
           {(notification) => (
             <>
-              <Show when={notification.type == "FOLLOW_REQUEST"}>
+
+              <Show when={notification.type === "FOLLOW_REQUEST"}>
                 <div id={notification.metadata.requester.user_name}>
-                  <Card class='flex h-80 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>
-                    <a
-                      href={`/profile/${notification.metadata.requester.user_name}`}
-                      class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
-                    >
-                      <Avatar class='w-[5rem] h-[5rem] mb-2'>
+                  <Card class="flex flex-col items-center justify-center w-80 p-3 space-y-4 h-fit">
+                    <div class="flex items-center space-x-4 text-base">
+                      <Avatar class="w-20 h-20 mb-2">
                         <AvatarFallback>
-                          <Show when={notification.metadata.requester.avatar} fallback={
-                            notification.metadata.requester.first_name.charAt(0).toUpperCase()
-                          }><img
-                              alt='avatar'
-                              class='size-full rounded-md rounded-b-none object-cover'
-                              loading='lazy'
+                          <Show
+                            when={notification.metadata.requester.avatar}
+                            fallback={notification.metadata.requester.first_name.charAt(0).toUpperCase()}
+                          >
+                            <img
+                              alt="avatar"
+                              class="object-cover rounded-md"
+                              loading="lazy"
                               src={`${config.API_URL}/image/${notification.metadata.requester.avatar}`}
-                            /></Show></AvatarFallback>
-                      </Avatar><br></br>
-                      <div class='flex flex-wrap items-center justify-center space-x-1'>
-                        <div>{notification.metadata.requester.first_name}</div>
-                        <div>{notification.metadata.requester.last_name}</div>
+                            />
+                          </Show>
+                        </AvatarFallback>
+                      </Avatar>
+                      <div class="flex flex-col items-start justify-center space-y-1">
+                        <a
+                          href={`/profile/${notification.metadata.requester.user_name}`}
+                          class="text-base font-bold text-blue-500 hover:underline"
+                        >
+                          <div>{notification.metadata.requester.first_name} {notification.metadata.requester.last_name}</div>
+                        </a>
+                        <div>requested to follow you</div>
+                        <time
+                          class="text-xs font-light text-muted-foreground"
+                          dateTime={moment(notification.metadata.creation_date).calendar()}
+                          title={moment(notification.metadata.creation_date).calendar()}
+                        >
+                          {moment(notification.metadata.creation_date).fromNow()}
+                        </time>
+                        <div class="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            class="flex-1 gap-2"
+                            onClick={() => handleFollowRequest("accepted", notification.metadata.requester.user_name)}
+                          >
+                            <FaSolidCheck class="text-green-500 size-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            class="flex-1 gap-2"
+                            onClick={() => handleFollowRequest("rejected", notification.metadata.requester.user_name)}
+                          >
+                            <IoClose class="text-red-500 size-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </a>
-                    requsted to follow you
-                    <time
-                      class='text-xs font-light text-muted-foreground'
-                      dateTime={moment(notification.metadata.creation_date).calendar()}
-                      title={moment(notification.metadata.creation_date).calendar()}
-                    >
-                      {moment(notification.metadata.creation_date).fromNow()}</time>
-                    <div class='flex flex-row gap-2'>
-                      <Button
-                        variant='ghost'
-                        class='flex-1 gap-2'
-                        onClick={() => { handleFollowRequest("accepted", notification.metadata.requester.user_name); }}
-                      >
-                        <FaSolidCheck
-                          class='size-4'
-                          color='green'
-                        />
-                      </Button>
-                      <Button
-                        variant='ghost'
-                        class='flex-1 gap-2'
-                        color="red"
-                        onClick={() => { handleFollowRequest("rejected", notification.metadata.requester.user_name) }}
-                      >
-                        <IoClose class='size-4' color='red' />
-                      </Button>
                     </div>
                   </Card>
                 </div>
                 <br></br>
               </Show>
+
+
               <Show when={notification.type == "GROUP_INVITATION"}>
                 <div id={notification.metadata.invited_by.user.user_name}>
                   <Card class='flex h-80 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>
@@ -130,6 +128,8 @@ export default function NotificationsFeed(): JSXElement {
                   </Card></div>
                 <br></br>
               </Show>
+
+
               <Show when={notification.type == "REQUEST_TO_JOIN_GROUP"}>
                 <div id={notification.metadata.requester.user.user_name} class="flex items-center">
                   <Card id={notification.metadata.requester.user.user_name} class='flex h-80 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>
@@ -180,6 +180,7 @@ export default function NotificationsFeed(): JSXElement {
                 </div>
                 <br></br>
               </Show>
+
               <Show when={notification.type == "EVENT"}>
                 <div id={notification.metadata.group.title}>
                   <Card class='flex h-90 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>

@@ -23,9 +23,11 @@ import { Separator } from '~/components/ui/separator';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
+import { useNotifications } from '~/hooks/NotificationsHook';
 import { cn } from '~/lib/utils';
 import {NotificationsPage, showNotifications} from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
+import { SNNotification } from '~/types/Notification';
 
 interface NavigationProps {
   children: JSXElement;
@@ -41,6 +43,14 @@ type NavItem = {
 export default function Navigation(props: NavigationProps): JSXElement {
   const navigate = useNavigate();
   const userCtx = useContext(UserDetailsContext);
+  const notificationsCtx = useNotifications();
+  const [bellColor, setBellColor] = createSignal('false');
+  for (let i=0; i < notificationsCtx.store.length; i++) {
+    if (notificationsCtx.store[i].read) {
+      setBellColor('true');
+      break
+    }
+  }
 
   const location = useLocation();
 
@@ -110,9 +120,13 @@ export default function Navigation(props: NavigationProps): JSXElement {
           <Button
             variant='ghost'
             class='mt-auto w-fit justify-start gap-2 md:w-full'
+            color='red'
             onClick={showNotifications}
           >
-            <IconBell class='size-4' />
+            <Show when={bellColor()== "true"}>
+            <IconBell class='size-5 bg-red-500'/>
+            </Show>
+            <IconBell class='size-5 bg-red-600'/>
             <span class='hidden md:block'>Notifications</span>
           </Button>
         </Show>

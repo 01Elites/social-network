@@ -123,6 +123,5 @@ export function handleInvite(response: string, groupID: number, invitee: string)
     .catch((err) => {
       console.log('Error responding to request');
     });
-    const elem = document.getElementById(invitee);
-    elem?.remove();
+window.location.reload();
 }

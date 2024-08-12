@@ -52,7 +52,7 @@ export function EventsFeed(props: eventProps): JSXElement{
           <Tooltip.Trigger
             class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
           >
-            Event Description
+            Event Details
           </Tooltip.Trigger>
           <p class="text-lg font-light text-muted-foreground flex place-items-center">
                   <Show when={moment(event.event_time).isAfter(moment())} fallback={<p>Event Done</p>}>
@@ -62,6 +62,7 @@ export function EventsFeed(props: eventProps): JSXElement{
             <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
               <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3'><p class="block flex flex-col gap-2 place-items-right">
                 {event.description}</p>
+                {moment(event.event_time).calendar()}
                 </Card>
               <Tooltip.Arrow class="text-corvu-100" />
             </Tooltip.Content>

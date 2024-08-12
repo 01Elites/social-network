@@ -199,15 +199,16 @@ func GetEventOptions(eventID int) ([]models.Options, error) {
 	return options, nil
 }
 
-func GetEventDetails(eventID int) (string, int, time.Time, error) {
+func GetEventDetails(eventID int) (string, string,int, time.Time, error) {
 	var title string
 	var groupID int
 	var eventTime time.Time
-	query := `SELECT title, group_id, event_date FROM event WHERE event_id = $1`
-	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &groupID, &eventTime)
+	var description string
+	query := `SELECT title, description, group_id, event_date FROM event WHERE event_id = $1`
+	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &description, &groupID, &eventTime)
 	if err != nil {
 		log.Print("error scanning title", err)
-		return "", 0, time.Time{} ,err
+		return "", "", 0, time.Time{} ,err
 	}
-	return title, groupID, eventTime, nil
+	return title, description, groupID, eventTime, nil
 }

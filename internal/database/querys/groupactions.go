@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"social-network/internal/models"
+	"time"
 )
 
 // CreateInvite adds an invitation to the group_invitations table
@@ -68,6 +69,7 @@ func RespondToInvite(response models.GroupResponse, userID string) (int, error) 
 
 func CheckForGroupInvitation(groupID int, userID string) (models.Requester, error) {
 	var invitation models.Requester
+	var invitedAt time.Time
 	query := `
 	SELECT
 		 sent_at, first_name, last_name, user_name
@@ -78,7 +80,7 @@ func CheckForGroupInvitation(groupID int, userID string) (models.Requester, erro
 		WHERE
 		 group_id = $1 AND receiver_id = $2 AND status = $3
 `
-	err := DB.QueryRow(context.Background(), query, groupID, userID, "pending").Scan(&invitation.CreationDate,
+	err := DB.QueryRow(context.Background(), query, groupID, userID, "pending").Scan(&invitedAt,
 		&invitation.User.FirstName, &invitation.User.LastName, &invitation.User.UserName)
 	if err != nil && err.Error() != "no rows in result set" {
 		log.Printf("database: Failed check for invitation: %v", err)
@@ -87,6 +89,7 @@ func CheckForGroupInvitation(groupID int, userID string) (models.Requester, erro
 	if invitation.User.FirstName == "" {
 		return models.Requester{}, nil
 	}
+	invitation.CreationDate = invitedAt.String()
 	return invitation, nil
 }
 

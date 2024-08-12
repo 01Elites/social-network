@@ -104,7 +104,7 @@ function LoginDialog(): JSXElement {
   }
 
   function handleLoginWithReboot() {
-    console.error('Login with Reboot01 is not implemented yet');
+    window.location.href = config.API_URL + "/auth/gitea/login";
   }
 
   // -------- Signup Dialog --------
@@ -422,7 +422,7 @@ function LoginDialog(): JSXElement {
               class='gap-4'
               onClick={handleLoginWithReboot}
               // disabled={formProcessing()}
-              disabled={true}
+              disabled={false}
             >
               <img alt='' src={rebootLogo} class='h-5'></img>
               Login with Reboot01

@@ -31,6 +31,13 @@ var Gender = struct {
 	Female: "female",
 }
 
+// GiteaUser struct defines the structure for storing user information from Gitea
+type GiteaUser = struct {
+	Login     string `json:"login"`
+	FullName  string `json:"full_name"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
+}
 // User struct defines the structure for storing user information
 type User struct {
 	UserID    string          `db:"user_id"`

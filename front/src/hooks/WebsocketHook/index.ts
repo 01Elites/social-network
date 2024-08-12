@@ -53,6 +53,7 @@ function useWebsocket(): WebsocketHook {
   ws.onmessage = async (_message) => {
     const message: WSMessage = await JSON.parse(_message.data);
     let broadcasted = false;
+    console.log('Received message:', message);
     listnersMap.forEach((callback, key) => {
       if (key.event === message.event) {
         broadcasted = true;

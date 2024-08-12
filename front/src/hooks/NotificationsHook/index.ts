@@ -16,7 +16,7 @@ type UseNotificationsProps = {
 function useNotifications(props?: UseNotificationsProps): NotificationsHook {
   const [store, setStore] = createStore<SNNotification[]>([]);
 
-  let wsCtx: WebsocketHook = props!.wsCtx as WebsocketHook;
+  let wsCtx: WebsocketHook = props?.wsCtx as WebsocketHook;
 
   if (!wsCtx) {
     wsCtx = useContext(WebSocketContext) as WebsocketHook;

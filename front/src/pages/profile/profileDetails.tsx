@@ -66,7 +66,7 @@ export default function ProfileDetails(props: {
                   <Globe_Icon class='w-5 justify-center' />
                 </Button>
                 <Button variant='default'>
-                  <Message_Icon class='w-5 justify-center' />
+                  <Message_Icon darkBack={true} class='w-5 justify-center' />
                 </Button>
               </div>
             </div>

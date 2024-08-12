@@ -47,7 +47,7 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
               const userMap = new Map(updatedSections[sectionIndex].users.map(user => [user.username, user]));
 
               // Update or add new users
-              data.users.forEach(user => {
+              data.users.forEach((user: Contact) => {
                 userMap.set(user.username, user);
               });
 

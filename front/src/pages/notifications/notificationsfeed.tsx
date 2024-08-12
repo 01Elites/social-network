@@ -19,15 +19,16 @@ import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { useContext } from 'solid-js';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import { NotificationsHook, useNotifications } from '~/hooks/NotificationsHook';
+import NotificationsContext from '~/contexts/NotificationsContext';
 
 export default function NotificationsFeed(): JSXElement {
   // const [test, setnotification] = createSignal<NotificationsHook>();
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  const notifications = useNotifications();
+  const notifications = useContext(NotificationsContext);
   return (<>
     <div class="flex-row">
       <div class="flex-row">
-        <For each={notifications.store}>
+        <For each={notifications?.store}>
           {(notification) => (
             <>
               <Show when={notification.type == "FOLLOW_REQUEST"}>

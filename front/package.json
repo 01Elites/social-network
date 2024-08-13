@@ -7,11 +7,13 @@
     "start": "vite",
     "dev": "vite --host",
     "build": "vite build",
+    "build:pages": "RELATIVE_BUILD=true vite build",
     "serve": "vite preview",
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^22.2.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "prettier": "^3.3.2",

@@ -41,7 +41,7 @@ jobs:
       - name: Build project
         run: |
           cd front/
-          npm run build
+          npm run build:pages
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

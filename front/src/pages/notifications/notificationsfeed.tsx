@@ -26,8 +26,8 @@ export default function NotificationsFeed(): JSXElement {
             <>
 
               <Show when={notification.type === "FOLLOW_REQUEST"}>
-                <div id={notification.metadata.requester.user_name}>
-                  <Card class="flex flex-col items-center justify-center w-80 p-3 space-y-4 h-fit">
+                <div id={notification.metadata.requester.user_name+"follow"}>
+                  <Card class="flex flex-col items-center justify-center w-90 p-3 space-y-4 h-fit">
                     <div class="flex items-center space-x-4 text-base">
                       <Avatar class="w-20 h-20 mb-2">
                         <AvatarFallback>
@@ -45,12 +45,12 @@ export default function NotificationsFeed(): JSXElement {
                         </AvatarFallback>
                       </Avatar>
                       <div class="flex flex-col items-start justify-center space-y-1">
-                        <a
+                        <div><a
                           href={`/profile/${notification.metadata.requester.user_name}`}
                           class="text-base font-bold text-blue-500 hover:underline"
                         >
-                          <div>{notification.metadata.requester.first_name} {notification.metadata.requester.last_name}</div>
-                        </a>
+                          {notification.metadata.requester.first_name} {notification.metadata.requester.last_name}
+                        </a></div>
                         <div>requested to follow you</div>
                         <time
                           class="text-xs font-light text-muted-foreground"
@@ -80,61 +80,63 @@ export default function NotificationsFeed(): JSXElement {
                   </Card>
                 </div>
                 <br></br>
+                
               </Show>
-
-
               <Show when={notification.type == "GROUP_INVITATION"}>
-                <div id={notification.metadata.invited_by.user.user_name}>
-                  <Card class='flex h-80 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>
-                    <Avatar class='w-[5rem] h-[5rem] mb-2'>
-                      <AvatarFallback>
+                <div id={notification.metadata.id+"invite"}>
+                <Card class="flex flex-col items-center justify-center w-90 p-3 space-y-4 h-fit">
+                <div class="flex items-center space-x-4 text-base">
+                <div></div><Avatar class="w-20 h-20 mb-2">
+                <AvatarFallback>
                         {notification.metadata.title.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <p class="flex-col justify-center items-center">
-                      {<A
-                        href={"/profile/" + notification.metadata.invited_by.user.user_name} class='flex flex-col justify-center items-center'>
-                        {notification.metadata.invited_by.user.first_name}  {notification.metadata.invited_by.user.last_name}</A>}
-                      invited you to join {<A
-                        href={"/group/" + notification.metadata.id} class='flex flex-col justify-center items-center'>
-                        {notification.metadata.title}<br></br></A>}
-                      <time
+                      <div class="flex flex-col items-start justify-center space-y-1">
+                      <div>{<a
+                        href={"/profile/" + notification.metadata.invited_by.user.user_name} class="text-base font-bold text-blue-500 hover:underline">
+                       {notification.metadata.invited_by.user.first_name}  {notification.metadata.invited_by.user.last_name}</a>}
+                      &nbspinvited you to join:  {<A
+                        href={"/group/" + notification.metadata.id} class="text-base font-bold hover:underline">
+                        {notification.metadata.title}</A>}</div> 
+                        <time
                         class='text-xs font-light text-muted-foreground'
                         dateTime={moment(notification.metadata.invited_by.creation_date).calendar()}
                         title={moment(notification.metadata.invited_by.creation_date).calendar()}
                       >
                         {moment(notification.metadata.invited_by.creation_date).fromNow()}</time>
-                    </p>
-                    <div class='flex flex-row gap-2'>
+                    <div class='flex gap-2'>
                       <Button
                         variant='ghost'
                         class='flex-1 gap-2'
                         onClick={() => { handleInvite("accepted", notification.metadata.id, notification.metadata.invited_by.user.user_name); }}
-                      >
+                        >
                         <FaSolidCheck
                           class='size-4'
                           color='green'
-                        />
+                          />
                       </Button>
                       <Button
                         variant='ghost'
                         class='flex-1 gap-2'
                         color="red"
                         onClick={() => { handleInvite("rejected", notification.metadata.id, notification.metadata.invited_by.user.user_name) }}
-                      >
+                        >
                         <IoClose class='size-4' color='red' />
                       </Button>
                     </div>
-                  </Card></div>
-                <br></br>
+                        </div>
+                    </div>
+                  </Card>
+                  </div>
+                  <br></br>
               </Show>
 
 
               <Show when={notification.type == "REQUEST_TO_JOIN_GROUP"}>
-                <div id={notification.metadata.requester.user.user_name} class="flex items-center">
-                  <Card id={notification.metadata.requester.user.user_name} class='flex h-80 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>
-                    <p class="flex flex-col gap-2 place-items-center">
-                      <Avatar class='w-[5rem] h-[5rem] mb-2'>
+                <div id={notification.metadata.id + notification.metadata.requester.user.user_name}>
+                <Card class="flex flex-col items-center justify-center w-90 p-3 space-y-4 h-fit">
+                <div class="flex items-center space-x-4 text-base">
+                <div></div><Avatar class="w-20 h-20 mb-2">
                         <AvatarFallback>
                           <Show when={notification.metadata.requester.user.avatar} fallback={
                             notification.metadata.requester.user.first_name.charAt(0).toUpperCase()
@@ -144,17 +146,21 @@ export default function NotificationsFeed(): JSXElement {
                               loading='lazy'
                               src={`${config.API_URL}/image/${notification.metadata.requester.user.avatar}`}
                             /></Show></AvatarFallback>
-                      </Avatar><A
-                        href={"/profile/" + notification.metadata.requester.user.user_name} class='block text-sm font-bold hover:underline'>
-                        {notification.metadata.requester.user.first_name}  {notification.metadata.requester.user.last_name} </A>
-                      Requested to join {notification.metadata.title}<br></br>
+                      </Avatar>
+                      <div class="flex flex-col items-start justify-center space-y-1">
+                      <div><a
+                        href={"/profile/" + notification.metadata.requester.user.user_name} class='text-base font-bold text-blue-500 hover:underline'>
+                        {notification.metadata.requester.user.first_name}  {notification.metadata.requester.user.last_name} </a>
+                      requested to join: {<A
+                        href={"/group/" + notification.metadata.id} class="text-base font-bold hover:underline">
+                        {notification.metadata.title}</A>}</div>
                       <time
                         class='text-xs font-light text-muted-foreground'
                         dateTime={moment(notification.metadata.requester.creation_date).calendar()}
                         title={moment(notification.metadata.requester.creation_date).calendar()}
                       >
-                        {moment(notification.metadata.requester.creation_date).fromNow()}</time></p>
-                    <div class='flex flex-row gap-2'>
+                        {moment(notification.metadata.requester.creation_date).fromNow()}</time>
+                    <div class='flex gap-2'>
 
                       <Button
                         variant='ghost'
@@ -175,15 +181,18 @@ export default function NotificationsFeed(): JSXElement {
                         <IoClose class='size-4' color='red' />
                       </Button>
                     </div>
+                    </div>
+                    </div>
                   </Card>
-
+                      
                 </div>
                 <br></br>
+
               </Show>
 
               <Show when={notification.type == "EVENT"}>
                 <div id={notification.metadata.group.title}>
-                  <Card class='flex h-90 w-80 flex-col justify-center items-center space-y-4 p-3 justfi'>
+                <Card class="flex flex-col items-center justify-center w-90 p-3 space-y-4 h-fit">
                     <A href={"/group/" + notification.metadata.group.id}><Avatar class='w-[5rem] h-[5rem] mb-2'>
                       <AvatarFallback>
                         {notification.metadata.group.title.charAt(0).toUpperCase()}
@@ -225,7 +234,7 @@ export default function NotificationsFeed(): JSXElement {
                       id={"option1" + String(notification.metadata.event.id)}
                       variant='ghost'
                       class='flex-1 gap-2'
-                      onClick={() => {
+                      onClick={() => { let elem = document.getElementById(notification.metadata.group.title);elem?.remove();
                         handleEventOption(notification.metadata.event.options[0].option_id, notification.metadata.event);
                       }}
 
@@ -237,7 +246,7 @@ export default function NotificationsFeed(): JSXElement {
                       variant='ghost'
                       class='flex-1 gap-2'
                       color="red"
-                      onClick={() => {
+                      onClick={() => { let elem = document.getElementById(notification.metadata.group.title);elem?.remove();
                         handleEventOption(notification.metadata.event.options[1].option_id, notification.metadata.event);
                       }}
                     >
@@ -245,6 +254,7 @@ export default function NotificationsFeed(): JSXElement {
                     </Button>
                   </Card>
                 </div>
+                <br></br>
               </Show>
             </>)}
         </For>
@@ -273,6 +283,6 @@ function handleFollowRequest(response: string, follower: string) {
     .catch((err) => {
       console.log('Error responding to request');
     });
-  const elem = document.getElementById(follower);
+  const elem = document.getElementById(follower+"follow");
   elem?.remove();
 }

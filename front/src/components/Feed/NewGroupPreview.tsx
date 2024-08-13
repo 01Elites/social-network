@@ -83,7 +83,7 @@ export default function NewGroupPreview(props: NewGroupPreviewProps): JSXElement
             onChange={(e) => setGroupName(e.target.value)}
             class='resize-none'
             minLength={1}
-            maxLength={20}
+            maxLength={13}
             disabled={formProcessing()}
           />
         </TextField>

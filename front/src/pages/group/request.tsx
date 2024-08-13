@@ -59,7 +59,7 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
 }
   return (<>
     <Show when={props.targetGroup().invited_by.user.first_name !== ""}>
-      <div id={props.targetGroup().invited_by.user.user_name}>
+      <div id={props.targetGroup().id + "invite"}>
       <Card class='flex flex-col items-center space-y-4 p-3'>
       <p class="flex-col justify-center items-center">
             {<A
@@ -123,5 +123,6 @@ export function handleInvite(response: string, groupID: number, invitee: string)
     .catch((err) => {
       console.log('Error responding to request');
     });
-window.location.reload();
+    let invite = document.getElementById(groupID + "invite");
+    invite?.remove();
 }

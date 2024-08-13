@@ -21,7 +21,7 @@ export function GroupRequests(params: GroupRequestParams): JSXElement {
   return (
     <Index each={params.requesters}>
       {(requester, i) => <> <div class='flex w-full space-x-1 '>
-        <Card id={requester().user.user_name} class='flex w-44 flex-col justify-center items-center space-y-4 p-3 justfi'>
+        <Card id={params.groupID+requester().user.user_name} class='flex w-44 flex-col justify-center items-center space-y-4 p-3 justfi'>
           <p class="flex flex-col gap-2 place-items-center"><Avatar>
             <AvatarImage src={requester().user.avatar} />
             <AvatarFallback>
@@ -85,6 +85,7 @@ export function handleRequest(response: string, groupID: string, requester: stri
         variant: 'error',
       });
     });
-  const elem = document.getElementById(requester);
+  const elem = document.getElementById(groupID + requester);
   elem?.remove();
+  
 }

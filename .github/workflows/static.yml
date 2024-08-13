@@ -43,6 +43,11 @@ jobs:
           cd front/
           npm run build:pages
 
+      - name: Link routes
+        run: |
+          cd front/dist
+          cp index.html 404.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -10,7 +10,8 @@ import (
 
 func GetGroupEvents(groupID int) ([]models.Event, error) {
 	var events []models.Event
-	query := `SELECT event_id, title, description, event_date FROM event WHERE group_id = $1`
+	query := `SELECT event_id, title, description, event_date, first_name, last_name FROM event 
+	INNER JOIN profile ON (event.creator_id = profile.user_id) WHERE group_id = $1`
 	rows, err := DB.Query(context.Background(), query, groupID)
 	if err != nil {
 		log.Printf("database failed to query group events: %v\n", err)
@@ -20,7 +21,7 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 
 	for rows.Next() {
 		var event models.Event
-		if err = rows.Scan(&event.ID, &event.Title, &event.Description, &event.EventTime); err != nil {
+		if err = rows.Scan(&event.ID, &event.Title, &event.Description, &event.EventTime, &event.Creator.FirstName, &event.Creator.LastName); err != nil {
 			log.Printf("database failed to scan event: %v\n", err)
 			return nil, err
 		}

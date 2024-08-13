@@ -13,7 +13,7 @@ export type ChatState = {
 
 export default function HomePage(): JSXElement {
   const [chatState, setChatState] = createSignal<ChatState>({
-    isOpen: true,
+    isOpen: false,
     chatWith: ''
   });
 
@@ -22,9 +22,9 @@ export default function HomePage(): JSXElement {
       <section class='flex h-full gap-4'>
         <HomeEvents class='hidden w-5/12 max-w-60 overflow-hidden md:flex' />
         <Show when={chatState().isOpen} fallback={<Feed class='grow overflow-hidden' />}>
-          <ChatPage class='grow flex-col place-content-end' />
+          <ChatPage class='grow place-content-end overflow-hidden' chatState={chatState()} setChatState={setChatState} />
         </Show>
-        <HomeContacts class='hidden w-1/3 max-w-52 overflow-hidden md:flex' />
+        <HomeContacts class='hidden w-1/3 max-w-52 overflow-hidden md:flex' setChatState={setChatState} />
       </section>
     </Layout>
   );

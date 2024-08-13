@@ -1,4 +1,4 @@
-import { JSXElement, useContext, createEffect, createSignal, For, Show } from 'solid-js';
+import { JSXElement, useContext, createEffect, createSignal, For, Show, Setter } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { cn } from '~/lib/utils';
 import Repeat from '../core/repeat';
@@ -9,15 +9,17 @@ import { Avatar, AvatarFallback } from '../../components/ui/avatar';
 import config from '../../config';
 import { Card } from '../../components/ui/card';
 import { UserDetailsHook } from '~/hooks/userDetails';
+import { ChatState } from '~/pages/home';
 
 interface HomeContactsProps {
   class?: string;
+  setChatState?: Setter<ChatState>
 }
 
 interface Contact {
   first_name: string;
   last_name: string;
-  username: string;
+  user_name: string;
   state: string;
   avatar: string;
 }
@@ -44,11 +46,11 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
 
             if (sectionIndex > -1) {
               // Create a map for updating users within the section
-              const userMap = new Map(updatedSections[sectionIndex].users.map(user => [user.username, user]));
+              const userMap = new Map(updatedSections[sectionIndex].users.map(user => [user.user_name, user]));
 
               // Update or add new users
               data.users.forEach((user: Contact) => {
-                userMap.set(user.username, user);
+                userMap.set(user.user_name, user);
               });
 
               // Update the section with the new list of users
@@ -91,7 +93,16 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
                 </Repeat>
               }>
                 <For each={section.users}>{(item) => (
-                  <Card class='bg-primary/10'>
+                  // set chat state when a user is clicked
+                  <Card class='bg-primary cursor-pointer' onClick={() => {
+                    if (props.setChatState != null) {
+                      console.log('Opening chat with', item.user_name);
+                      props.setChatState({
+                        isOpen: true,
+                        chatWith: item.user_name
+                      });
+                    }
+                  }}>
                     <div class='flex items-center gap-3 relative'>
                       <div class='relative'>
                         <Avatar>
@@ -111,10 +122,10 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
                           'bg-red-500': item.state !== 'online',
                         })}></div>
                       </div>
-                      <div class='grow space-y-2'>
+                      <div class='grow space-y-2 text-accent'>
                         <div class='flex flex-col items-center justify-center space-x-1'>
                           <div>{item.first_name} {item.last_name}</div>
-                          <div>{item.username}</div>
+                          <div>{item.user_name}</div>
                         </div>
                       </div>
                     </div>

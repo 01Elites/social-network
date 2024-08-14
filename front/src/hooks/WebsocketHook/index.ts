@@ -41,6 +41,15 @@ function useWebsocket(): WebsocketHook {
   let ws: WebSocket;
 
   function connect() {
+    if (ws) {
+      ws.close();
+    }
+
+    if (!localStorage.getItem('SN_TOKEN')) {
+      setSocketError('No token found');
+      return;
+    }
+
     ws = new WebSocket(
       `${config.WS_URL}?token=${localStorage.getItem('SN_TOKEN')}`,
     );
@@ -87,7 +96,7 @@ function useWebsocket(): WebsocketHook {
   function send(event: WSMessage) {
     ws.send(JSON.stringify(event));
   }
-
+  connect();
   return {
     state: socketState(),
     error: socketError(),

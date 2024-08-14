@@ -34,6 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import WebSocketContext from '~/contexts/WebSocketContext';
+import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 
 const loginMessages = [
   'Waste your time here ✨',
@@ -52,9 +54,11 @@ function showLogin() {
 }
 
 function LoginDialog(): JSXElement {
-  const { fetchUserDetails } = useContext(
+  const userDetailsCtx = useContext(
     UserDetailsContext,
   ) as UserDetailsHook;
+
+  const wsCtx = useContext(WebSocketContext) as WebsocketHookPrivate;
 
   const [loginFormOpen, setLoginFormOpen] = createSignal(true);
 
@@ -75,7 +79,8 @@ function LoginDialog(): JSXElement {
       .then(async (res) => {
         setFormProcessing(false);
         if (res.status === 200) {
-          fetchUserDetails();
+          userDetailsCtx.fetchUserDetails();
+          wsCtx.connect();
           setLoginOpen(false);
 
           let token = res.headers.get('Authorization');

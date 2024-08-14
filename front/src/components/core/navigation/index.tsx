@@ -45,10 +45,9 @@ export default function Navigation(props: NavigationProps): JSXElement {
   const userCtx = useContext(UserDetailsContext);
   const notificationsCtx = useContext(NotificationsContext);
   const [bellColor, setBellColor] = createSignal(false);
-
+  let counter = 0;
   const location = useLocation();
-
-  // eh writing the same line every where? sucks
+    // eh writing the same line every where? sucks
   function cpFill(path: string) {
     return location.pathname === path ? 'white' : undefined;
   }
@@ -121,14 +120,14 @@ export default function Navigation(props: NavigationProps): JSXElement {
           {(notification) => (
             <>
             <Show when={!notification.read}>
+              <div class="hidden">{counter = counter+1}</div>
               {setBellColor(true)}
             </Show>
             </>)}</For>
-            <Show when={bellColor()}>
-            <IconBell class='size-5 bg-red-500'/>
-            </Show>
-            <IconBell class='size-5 bg-red-600'/>
+            <IconBell class='size-5 fill-red-500'></IconBell>
             <span class='hidden md:block'>Notifications</span>
+            <Show when={counter>0}><div class="">{(counter)}</div>
+            </Show>
           </Button>
         </Show>
 

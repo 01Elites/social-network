@@ -21,11 +21,14 @@ import IconSettings from '~/components/ui/icons/IconSettings';
 import IconTwoPerson from '~/components/ui/icons/IconTwoPerson';
 import { Separator } from '~/components/ui/separator';
 import config from '~/config';
+import NotificationsContext from '~/contexts/NotificationsContext';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import WebSocketContext from '~/contexts/WebSocketContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { useNotifications } from '~/hooks/NotificationsHook';
+import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 import { cn } from '~/lib/utils';
-import {NotificationsPage, showNotifications} from '~/pages/notifications';
+import { NotificationsPage, showNotifications } from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
 import { SNNotification } from '~/types/Notification';
 
@@ -43,10 +46,12 @@ type NavItem = {
 export default function Navigation(props: NavigationProps): JSXElement {
   const navigate = useNavigate();
   const userCtx = useContext(UserDetailsContext);
-  const notificationsCtx = useNotifications();
+  const notificationsCtx = useContext(NotificationsContext);
+  const wsCtx = useContext(WebSocketContext);
+
   const [bellColor, setBellColor] = createSignal('false');
-  for (let i=0; i < notificationsCtx.store.length; i++) {
-    if (notificationsCtx.store[i].read) {
+  for (let i = 0; i < notificationsCtx!.store.length; i++) {
+    if (notificationsCtx!.store[i].read) {
       setBellColor('true');
       break
     }
@@ -107,7 +112,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
                 buttonVariants({ variant: navItem.variant }),
                 'w-fit justify-start gap-2 md:w-full',
                 navItem.variant === 'default' &&
-                  'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
+                'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
               )}
             >
               {navItem?.icon}
@@ -123,10 +128,10 @@ export default function Navigation(props: NavigationProps): JSXElement {
             color='red'
             onClick={showNotifications}
           >
-            <Show when={bellColor()== "true"}>
-            <IconBell class='size-5 bg-red-500'/>
+            <Show when={bellColor() == "true"}>
+              <IconBell class='size-5 bg-red-500' />
             </Show>
-            <IconBell class='size-5 bg-red-600'/>
+            <IconBell class='size-5 bg-red-600' />
             <span class='hidden md:block'>Notifications</span>
           </Button>
         </Show>
@@ -186,6 +191,8 @@ export default function Navigation(props: NavigationProps): JSXElement {
                   }).finally(() => {
                     localStorage.removeItem('SN_TOKEN');
                     userCtx!.setUserDetails(null);
+                    // .connect() closes open connection
+                    (wsCtx as WebsocketHookPrivate).connect();
                   });
                 }}
               >

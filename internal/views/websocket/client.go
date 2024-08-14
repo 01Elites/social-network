@@ -21,13 +21,17 @@ func GetClient(userName string) (*types.User, bool) {
 	return user, ok
 }
 
-func SetClientOffline(username string) {
+func SetClientOffline(user *types.User) {
 	// Remove the client from the Clients map
-	fmt.Printf("\nSetClientOffline %s\n\n", username)
-	userID := clients[username].ID
+	fmt.Printf("\nSetClientOffline %s\n\n", user.Username)
 	cmutex.Lock()
-	clients[username].Conn.Close()
-	delete(clients, username)
+	if clients[user.Username] == nil {
+		cmutex.Unlock()
+		return
+	}
+	userID := clients[user.Username].ID
+	clients[user.Username].Conn = nil
+	delete(clients, user.Username)
 	cmutex.Unlock()
 	updateFollowersUserList(userID)
 }
@@ -36,8 +40,9 @@ func SetClientOnline(user *types.User) {
 	// Add the client to the Clients map
 	fmt.Printf("\nSetClientOnline %s\n\n", user.Username)
 	cmutex.Lock()
+	defer cmutex.Unlock()
+
 	clients[user.Username] = user
-	cmutex.Unlock()
 	sendUserList(user)
 	dmUserList(user)
 	updateFollowersUserList(user.ID)

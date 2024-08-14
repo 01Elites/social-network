@@ -11,12 +11,22 @@ import (
 )
 
 func ProcessEvents(user *types.User) {
-
+	// Send all the notifications in the database to the user
+	go ProcessNotifications(user)
+	if err := SendUsersNotifications(user.ID); err != nil {
+		log.Printf("Error sending notifications: %v", err)
+		return
+	}
+	defer func() {
+		SetClientOffline(user)
+	}()
 	for {
 		// Read message from WebSocket connection
 		messageType, rawMessage, err := user.Conn.ReadMessage()
+		// fmt.Println(user)
 		if err != nil {
 			log.Println("Error reading message from WebSocket:", err)
+			// fmt.Println("user after", user)
 			return
 		}
 

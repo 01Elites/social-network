@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { IconBell } from '~/components/ui/icons/IconBell';
+import { IconBell, IconBellActive } from '~/components/ui/icons/IconBell';
 import { IconElites, IconElitesSmall } from '~/components/ui/icons/IconElites';
 import IconFlag from '~/components/ui/icons/IconFlag';
 import IconGroup from '~/components/ui/icons/IconGroup';
@@ -49,16 +49,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
   const notificationsCtx = useContext(NotificationsContext);
   const wsCtx = useContext(WebSocketContext);
 
-  const [bellColor, setBellColor] = createSignal('false');
-  for (let i = 0; i < notificationsCtx!.store.length; i++) {
-    if (notificationsCtx!.store[i].read) {
-      setBellColor('true');
-      break
-    }
-  }
-
   const location = useLocation();
-
   // eh writing the same line every where? sucks
   function cpFill(path: string) {
     return location.pathname === path ? 'white' : undefined;
@@ -128,10 +119,10 @@ export default function Navigation(props: NavigationProps): JSXElement {
             color='red'
             onClick={showNotifications}
           >
-            <Show when={bellColor() == "true"}>
-              <IconBell class='size-5 bg-red-500' />
+            <Show when={notificationsCtx?.store.length === 0}
+              fallback={<IconBellActive />}>
+              <IconBell class='size-5' />
             </Show>
-            <IconBell class='size-5 bg-red-600' />
             <span class='hidden md:block'>Notifications</span>
           </Button>
         </Show>

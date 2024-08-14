@@ -13,10 +13,10 @@ import (
 func ProcessEvents(user *types.User) {
 	// Send all the notifications in the database to the user
 	go ProcessNotifications(user)
-	if err := SendUsersNotifications(user.ID); err != nil {
-		log.Printf("Error sending notifications: %v", err)
-		return
-	}
+	// if err := SendUsersNotifications(user.ID); err != nil {
+	// 	log.Printf("Error sending notifications: %v", err)
+	// 	return
+	// }
 	defer func() {
 		SetClientOffline(user)
 	}()
@@ -68,7 +68,13 @@ func ProcessEvents(user *types.User) {
 			} else {
 				Typing(message, user, false)
 			}
-
+		case event.USERLIST:
+			GetUserList(user)
+		case event.GET_NOTIFICATIONS:
+			// Send all the notifications in the database to the user
+			if err := SendUsersNotifications(user.ID); err != nil {
+				log.Printf("Error sending notifications: %v", err)
+			}
 		// case event.GET_MESSAGES:
 		// 	// GetMessages(message, user)
 		case event.NOTIFICATION_READ:

@@ -9,9 +9,21 @@ type NotificationsHook = {
   markRead: (notificationId: string) => void;
 };
 
-function useNotifications(): NotificationsHook {
-  const [store, setStore] = createStore([] as SNNotification[]);
-  const wsCtx = useContext(WebSocketContext) as WebsocketHook;
+type UseNotificationsProps = {
+  wsCtx?: WebsocketHook;
+};
+
+function useNotifications(props?: UseNotificationsProps): NotificationsHook {
+  const [store, setStore] = createStore<SNNotification[]>([]);
+
+  let wsCtx: WebsocketHook = props?.wsCtx as WebsocketHook;
+
+  if (!wsCtx) {
+    wsCtx = useContext(WebSocketContext) as WebsocketHook;
+    if (!wsCtx) {
+      throw new Error('WebSocketContext cannot be initialized');
+    }
+  }
 
   function markRead(notificationId: string): void {
     wsCtx.send({

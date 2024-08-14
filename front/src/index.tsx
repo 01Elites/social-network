@@ -34,12 +34,7 @@ function App() {
   const storageManager = createLocalStorageManager('vite-ui-theme');
   const userDetailsHook = useUserDetails();
   const websocketHook = useWebsocket();
-  const notificationHook = useNotifications();
-
-  const notificationsCtx = useNotifications();
-  // notificationsCtx.markRead('asd')
-
-
+  const notificationHook = useNotifications({ wsCtx: websocketHook });
 
   return (
     <Router
@@ -64,7 +59,6 @@ function App() {
       <Route path='/groups' component={GroupsPage} />
       <Route path='/friends' component={FriendsPage} />
       <Route path='/events' component={EventsPage} />
-      {/* <Route path='/notifications' component={NotificationsPage} /> */}
       <Route path='/profile/:username' component={Profile} />
     </Router>
   );

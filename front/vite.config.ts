@@ -3,7 +3,11 @@ import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+// for github pages
+const isRelativeBuild = process.env.RELATIVE_BUILD === 'true';
+
 export default defineConfig({
+  base: isRelativeBuild ? './' : '/',
   plugins: [
     tsconfigPaths(),
     /* 

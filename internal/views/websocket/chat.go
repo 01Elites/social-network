@@ -77,20 +77,20 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 
 	messageResponse.Messages = []types.Chat{message}
 
-	// Convert the message struct to JSON
-	jsonData, err := json.Marshal(messageResponse)
-	if err != nil {
-		log.Println(err, "failed to marshal JSON data")
-		return
-	}
+	// // Convert the message struct to JSON
+	// jsonData, err := json.Marshal(messageResponse)
+	// if err != nil {
+	// 	log.Println(err, "failed to marshal JSON data")
+	// 	return
+	// }
 
 	// Write JSON data to the WebSocket connection of the user
-	sendMessageToWebSocket(user, event.GET_MESSAGES, jsonData)
+	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 
 	// Send the message to the recipient if they are online and has connection
 	if online && recipient.Conn != nil {
 		// Write JSON data to the WebSocket connection of the recipient
-		sendMessageToWebSocket(recipient, event.GET_MESSAGES, jsonData)
+		sendMessageToWebSocket(recipient, event.GET_MESSAGES, messageResponse)
 
 		// Update the notification field of the recipient in the UserList
 		// if !message.Read {

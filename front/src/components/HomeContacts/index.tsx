@@ -94,7 +94,7 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
               }>
                 <For each={section.users}>{(item) => (
                   // set chat state when a user is clicked
-                  <Card class='bg-primary cursor-pointer' onClick={() => {
+                  <Card class='cursor-pointer' onClick={() => {
                     if (props.setChatState != null) {
                       console.log('Opening chat with', item.user_name);
                       props.setChatState({
@@ -122,7 +122,7 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
                           'bg-red-500': item.state !== 'online',
                         })}></div>
                       </div>
-                      <div class='grow space-y-2 text-accent'>
+                      <div class='grow space-y-2'>
                         <div class='flex flex-col items-center justify-center space-x-1'>
                           <div>{item.first_name} {item.last_name}</div>
                           <div>{item.user_name}</div>

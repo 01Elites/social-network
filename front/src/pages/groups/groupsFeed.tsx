@@ -11,29 +11,33 @@ import { Group } from '~/types/group';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 
-export default function GroupsFeed(props: { targetGroups: () => Groups | undefined }): JSXElement {
+type GroupFeedProps = {
+  targetGroups: () => Groups | undefined;
+};
+
+
+export default function GroupsFeed(props: GroupFeedProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const groups = props.targetGroups();
-  // console.log("groups", groups);
   const [groupPreviewOpen, setGroupPreviewOpen] = createSignal(false);
 
   return (
-    <div >
-    <div class='flex gap-2 rounded border-[1px] p-2'>
-    <Avatar>
-        <AvatarImage src={userDetails()?.avatar} />
-        <AvatarFallback>
-          {userDetails()?.first_name.charAt(0).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+    <div class='flex gap-2 flex-col'>
+      <div class='flex gap-2 rounded border-[1px] p-2'>
+        <Avatar>
+          <AvatarImage src={userDetails()?.avatar} />
+          <AvatarFallback>
+            {userDetails()?.first_name.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
         <NewGroupPreview setOpen={setGroupPreviewOpen} open={groupPreviewOpen()} />
         <Button
-        variant='ghost'
-        class='w-full justify-start text-muted-foreground'
-        onClick={() => setGroupPreviewOpen(true)}
-      >
-        Create New Group
-      </Button>
+          variant='ghost'
+          class='w-full justify-start text-muted-foreground'
+          onClick={() => setGroupPreviewOpen(true)}
+        >
+          Create New Group
+        </Button>
       </div>
       <Tabs aria-label="Main navigation" class="tabs">
         <Tabs.List class="tabs__list">

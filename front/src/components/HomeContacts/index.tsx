@@ -87,8 +87,8 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
         <For each={sections()}>
           {(section) => (
             <>
-              <h1 class='text-xl'>{section.name}</h1>
-              <Show when={section.users.length > 0} fallback={
+              <h1 class='text-md font-semibold text-primary/80'>{section.name}</h1>
+              < Show when={section.users.length > 0} fallback={
                 <Repeat count={4}>
                   <div class='flex items-center gap-3'>
                     <Skeleton height={40} circle animate={false} />
@@ -143,6 +143,6 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
           )}
         </For>
       </section>
-    </section>
+    </section >
   );
 }

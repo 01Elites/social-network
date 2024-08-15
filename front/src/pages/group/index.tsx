@@ -8,6 +8,7 @@ import GroupDetails from './details';
 import GroupFeed from './groupfeed';
 import NewGroupPostCell from "~/components/Feed/NewGroupPostCell";
 import GroupContacts from "./groupcontacts";
+import { showToast } from '~/components/ui/toast';
 
 export type GroupParams = {
   id: string;
@@ -22,15 +23,13 @@ export default function GroupPage(): JSXElement {
 
   createEffect(() => {
     fetchWithAuth(config.API_URL + '/group/' + groupID).then(async (res) => {
-      console.log(config.API_URL + '/group/' + groupID)
       const body = await res.json();
       if (res.status === 200) {
-        console.log('User fetched');
         console.log(body)
         setTargetGroup(body);
         return;
       } else {
-        console.log('Error fetching group');
+        showToast({ title: 'Error', description: 'Failed to fetch group', variant: 'error' });
         return
       }
     })
@@ -45,14 +44,14 @@ export default function GroupPage(): JSXElement {
       <Show when={targetGroup()?.ismember}>
         <div class='col-span-5 overflow-y-auto'>
           <NewGroupPostCell targetGroup={() => targetGroup() as Group} />
-            <GroupFeed groupTitle={targetGroup()?.title}
+          <GroupFeed groupTitle={targetGroup()?.title}
             groupID={groupID as string}
-              creator={targetGroup()?.iscreator as boolean}
-              requesters={targetGroup()?.requesters}
-              explore={targetGroup()?.explore}
-              members={targetGroup()?.members} />
+            creator={targetGroup()?.iscreator as boolean}
+            requesters={targetGroup()?.requesters}
+            explore={targetGroup()?.explore}
+            members={targetGroup()?.members} />
         </div>
       </Show>
-    </div> 
+    </div>
   </Layout></>)
 }

@@ -36,6 +36,13 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
     { name: 'Following', users: [] },
     { name: 'Direct Messages', users: [] }
   ]);
+
+  createEffect(() => {
+    if (wsCtx.state() === 'connected') {
+      wsCtx.send({ event: 'USERLIST', payload: null });
+    }
+  });
+
   if (userDetails != null && wsCtx != null) {
     createEffect(() => {
       wsCtx.bind('USERLIST', (data) => {

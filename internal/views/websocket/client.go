@@ -41,16 +41,11 @@ func SetClientOnline(user *types.User) {
 	fmt.Printf("\nSetClientOnline %s\n\n", user.Username)
 	cmutex.Lock()
 	defer cmutex.Unlock()
-
 	clients[user.Username] = user
-	// sendUserList(user)
-	// dmUserList(user)
-	updateFollowersUserList(user.ID)
+	// updateFollowersUserList(user.ID)
 }
 
 func GetUserList(user *types.User) {
-	cmutex.Lock()
-	defer cmutex.Unlock()
 	sendUserList(user)
 	dmUserList(user)
 }

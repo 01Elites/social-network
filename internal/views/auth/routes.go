@@ -9,4 +9,6 @@ func SetupAuthRoutes() {
 	http.HandleFunc("POST /api/auth/signup", middleware.AllowCORS(SignUp))
 	http.HandleFunc("POST /api/auth/signin", middleware.AllowCORS(SignIn))
 	http.HandleFunc("DELETE /api/auth/logout", middleware.AllowCORS(LogOut))
+	http.HandleFunc("/api/auth/gitea/login", middleware.AllowCORS(GiteaLogin))
+	http.HandleFunc("/api/auth/gitea/callback", middleware.AllowCORS(GiteaCallback))
 }

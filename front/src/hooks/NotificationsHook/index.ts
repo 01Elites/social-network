@@ -1,4 +1,4 @@
-import { onCleanup, useContext } from 'solid-js';
+import { createEffect, onCleanup, useContext } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { SNNotification } from '~/types/Notification';
@@ -25,6 +25,12 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
     }
   }
 
+  createEffect(() => {
+    if (wsCtx.state() === 'connected') {
+      wsCtx.send({ event: 'GET_NOTIFICATIONS', payload: null });
+    }
+  });
+  
   function markRead(notificationId: string, remove = false): void {
     // mark notification as read
     setStore((prev) => {

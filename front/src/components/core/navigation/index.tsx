@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { IconBell } from '~/components/ui/icons/IconBell';
+import { IconBell, IconBellActive } from '~/components/ui/icons/IconBell';
 import { IconElites, IconElitesSmall } from '~/components/ui/icons/IconElites';
 import IconFlag from '~/components/ui/icons/IconFlag';
 import IconGroup from '~/components/ui/icons/IconGroup';
@@ -21,15 +21,16 @@ import IconSettings from '~/components/ui/icons/IconSettings';
 import IconTwoPerson from '~/components/ui/icons/IconTwoPerson';
 import { Separator } from '~/components/ui/separator';
 import config from '~/config';
+import NotificationsContext from '~/contexts/NotificationsContext';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import WebSocketContext from '~/contexts/WebSocketContext';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { useNotifications } from '~/hooks/NotificationsHook';
+import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 import { cn } from '~/lib/utils';
-import {NotificationsPage, showNotifications} from '~/pages/notifications';
+import { NotificationsPage, showNotifications } from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
-import NotificationsContext from '~/contexts/NotificationsContext';
 import { BsCircleFill } from 'solid-icons/bs'
-import { IconBellActive } from '~/components/ui/icons/IconBell';
 
 interface NavigationProps {
   children: JSXElement;
@@ -46,6 +47,8 @@ export default function Navigation(props: NavigationProps): JSXElement {
   const navigate = useNavigate();
   const userCtx = useContext(UserDetailsContext);
   const notificationsCtx = useContext(NotificationsContext);
+  const wsCtx = useContext(WebSocketContext);
+
   const [bellColor, setBellColor] = createSignal(false);
   let counter = 0;
   const location = useLocation();
@@ -131,6 +134,21 @@ export default function Navigation(props: NavigationProps): JSXElement {
             color='red'
             onClick={showNotifications}
           >
+            <Show when={notificationsCtx?.store.length === 0}
+              fallback={<IconBellActive />}>
+              <IconBell class='size-5' />
+            </Show>
+            <span class='hidden md:block'>Notifications</span>
+          </Button>
+        </Show>
+        {/* the old code 
+        <Show when={userCtx!.userDetails()}>
+          <Button
+            variant='ghost'
+            class='mt-auto w-fit justify-start gap-2 md:w-full'
+            color='red'
+            onClick={showNotifications}
+          >
             <For each={notificationsCtx?.store}>
           {(notification) => (
             <>
@@ -145,6 +163,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
             </Show>
           </Button>
         </Show>
+        */}
 
         <Button
           variant='ghost'
@@ -201,6 +220,8 @@ export default function Navigation(props: NavigationProps): JSXElement {
                   }).finally(() => {
                     localStorage.removeItem('SN_TOKEN');
                     userCtx!.setUserDetails(null);
+                    // .connect() closes open connection
+                    (wsCtx as WebsocketHookPrivate).connect();
                   });
                 }}
               >

@@ -16,6 +16,7 @@ import Tooltip from '@corvu/tooltip'
 import { useContext } from 'solid-js';
 import NotificationsContext from '~/contexts/NotificationsContext';
 import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
+import { SetStoreFunction } from 'solid-js/store';
 
 export default function NotificationsFeed(): JSXElement {
   // const [test, setnotification] = createSignal<NotificationsHook>();
@@ -69,14 +70,16 @@ export default function NotificationsFeed(): JSXElement {
                           <Button
                             variant="ghost"
                             class="flex-1 gap-2"
-                            onClick={() => {handleFollowRequest("accepted", notification().metadata.requester.user_name); notifications?.store.splice(i, i + 1) }}
+                            onClick={() => {handleFollowRequest("accepted", notification().metadata.requester.user_name);
+                              notifications?.markRead(notification().notification_id, true)}}
                           >
                             <FaSolidCheck class="text-green-500 size-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             class="flex-1 gap-2"
-                            onClick={() => {handleFollowRequest("rejected", notification().metadata.requester.user_name); notifications?.store.splice(i, i + 1) }}
+                            onClick={() => {handleFollowRequest("rejected", notification().metadata.requester.user_name); 
+                              notifications?.markRead(notification().notification_id, true) }}
                           >
                             <IoClose class="text-red-500 size-4" />
                           </Button>
@@ -114,7 +117,8 @@ export default function NotificationsFeed(): JSXElement {
                           <Button
                             variant='ghost'
                             class='flex-1 gap-2'
-                            onClick={() => { {handleInvite("accepted", notification().metadata.id, notification().metadata.invited_by.user.user_name); notifications?.store.splice(i, i + 1) } }}
+                            onClick={() => { {handleInvite("accepted", notification().metadata.id, notification().metadata.invited_by.user.user_name);
+                              notifications?.markRead(notification().notification_id, true)} }}
                           >
                             <FaSolidCheck
                               class='size-4'
@@ -125,7 +129,8 @@ export default function NotificationsFeed(): JSXElement {
                             variant='ghost'
                             class='flex-1 gap-2'
                             color="red"
-                            onClick={() => { {handleInvite("rejected", notification().metadata.id, notification().metadata.invited_by.user.user_name);; notifications?.store.splice(i, i + 1)  }}}
+                            onClick={() => { {handleInvite("rejected", notification().metadata.id, notification().metadata.invited_by.user.user_name);
+                              notifications?.markRead(notification().notification_id, true)}}}
                           >
                             <IoClose class='size-4' color='red' />
                           </Button>
@@ -171,7 +176,8 @@ export default function NotificationsFeed(): JSXElement {
                           <Button
                             variant='ghost'
                             class='flex-1 gap-2'
-                            onClick={() => {{ handleRequest("accepted", notification().metadata.id, notification().metadata.requester.user.user_name); notifications?.store.splice(i, i + 1) }}}
+                            onClick={() => {{ handleRequest("accepted", notification().metadata.id, notification().metadata.requester.user.user_name);
+                              notifications?.markRead(notification().notification_id, true)}}}
                           >
                             <FaSolidCheck
                               class='size-4'
@@ -182,7 +188,9 @@ export default function NotificationsFeed(): JSXElement {
                             variant='ghost'
                             class='flex-1 gap-2'
                             color="red"
-                            onClick={() => {{ handleRequest("rejected", notification().metadata.id, notification().metadata.requester.user.user_name); notifications?.store.splice(i, i + 1) }}}
+                            onClick={() => {{ handleRequest("rejected", notification().metadata.id, notification().metadata.requester.user.user_name);
+                              notifications?.markRead(notification().notification_id, true)
+                             }}}
                           >
                             <IoClose class='size-4' color='red' />
                           </Button>
@@ -197,7 +205,7 @@ export default function NotificationsFeed(): JSXElement {
               </Show>
 
               <Show when={notification().type == "EVENT"}>
-                <div id={notification().metadata.group.title}>
+                <div id={notification().metadata.event.id}>
                   <Card class="flex flex-col p-3 h-fit">
                     <div class="flex items-center space-x-4 text-base">
                       <div><RiBusinessCalendarEventLine class="w-20 h-20" />
@@ -236,8 +244,8 @@ export default function NotificationsFeed(): JSXElement {
                           variant='ghost'
                           class="p-0"
                           onClick={() => {
-                            let elem = document.getElementById(notification().metadata.group.title); elem?.remove();
-                            ; notifications?.store.splice(i, i + 1);
+                            let elem = document.getElementById(notification().metadata.event.id); elem?.remove();
+                            ;notifications?.markRead(notification().notification_id, true);
                             handleEventOption(notification().metadata.event.options[0].option_id, notification().metadata.event);
                           }}
 
@@ -250,8 +258,8 @@ export default function NotificationsFeed(): JSXElement {
                           class="p-0"
                           color="red"
                           onClick={() => {
-                            let elem = document.getElementById(notification().metadata.group.title); elem?.remove();
-                            ; notifications?.store.splice(i, i + 1);
+                            let elem = document.getElementById(notification().metadata.event.id); elem?.remove();
+                            ; notifications?.markRead(notification().notification_id, true);
                             handleEventOption(notification().metadata.event.options[1].option_id, notification().metadata.event);
                           }}
                         >

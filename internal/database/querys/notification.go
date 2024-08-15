@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"time"
+	"errors"
 
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
@@ -46,13 +47,24 @@ func UpdateNotificationTable(relatedID int, status string, notificationType stri
 }
 
 func GetFollowRequest(requestID int) (*models.Request, error) {
+	var count int
 	request := models.Request{ID: requestID}
-	query := `SELECT sender_id, receiver_id, status, created_at FROM follow_requests WHERE request_id = $1`
-	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.Status, &request.CreatedAt)
+	query := `SELECT sender_id, receiver_id, created_at FROM follow_requests WHERE request_id = $1 AND status = 'pending'`
+	err := DB.QueryRow(context.Background(), query, requestID).Scan(&request.Sender, &request.Receiver, &request.CreatedAt)
+	if err != nil {
+		log.Println("Failed to get follow request, test")
+		return nil, err
+	}
+	query = `SELECT COUNT(*) FROM follower WHERE follower_id = (SELECT user_id FROM "user" WHERE user_name=$1)
+	 AND followed_id = (SELECT user_id FROM "user" WHERE user_name=$2)`
+	err = DB.QueryRow(context.Background(), query, request.Sender, request.Receiver).Scan(&count)
 	if err != nil {
 		log.Print(err)
 		log.Println("Failed to get follow request")
 		return nil, err
+	}
+	if count > 0 {
+		return nil, errors.New("user already following")
 	}
 	return &request, nil
 }
@@ -76,11 +88,13 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 		log.Printf("database: Failed check for request: %v", err)
 		return nil, err
 	}
+	var count int
 	for rows.Next() {
 		var notificationID int
 		var notificationType string
 		var relatedID int
 		var read bool
+		count++
 		err := rows.Scan(&notificationID, &notificationType, &relatedID, &read)
 		if err != nil {
 			log.Printf("database: Failed to scan notification row: %v", err)
@@ -105,23 +119,27 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 				log.Println("Failed to get invitation Data")
 				continue
 			}
+
 		case "join_request":
 			notification, err = GetGroupRequestData(userID, relatedID)
 			if err != nil {
 				log.Println("Failed to get group request Data")
 				continue
 			}
+
 		case "event_notification":
 			notification, err = GetGroupEventData(userID, relatedID)
 			if err != nil {
 				log.Println("Failed to get group event Data")
 				continue
 			}
+			log.Println("Follow request notification")
+
 		default:
 			log.Printf("Unknown notification type: %s", notificationType)
 			continue
 		}
-		if notification != nil && !read{
+		if notification != nil {
 			notification.ID = notificationID
 			notification.Read = read
 			notifications = append(notifications, *notification)
@@ -131,6 +149,7 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 		log.Printf("database: Failed during row iteration: %v", err)
 		return nil, err
 	}
+	log.Print(count)
 	return notifications, err
 }
 

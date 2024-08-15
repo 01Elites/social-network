@@ -1,13 +1,14 @@
-import { onCleanup, useContext } from 'solid-js';
+import { createEffect, onCleanup, useContext } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { SNNotification } from '~/types/Notification';
 import { WebsocketHook } from '../WebsocketHook';
 import { useWebsocket } from '../WebsocketHook';
+import { showToast } from '~/components/ui/toast';
 
 type NotificationsHook = {
   store: SNNotification[];
-  markRead: (notificationId: string) => void;
+  markRead: (notificationId: string, remove?: boolean) => void;
 };
 
 type UseNotificationsProps = {
@@ -26,7 +27,24 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
     }
   }
 
-  function markRead(notificationId: string): void {
+  
+  function markRead(notificationId: string, remove = false): void {
+       // mark notification as read
+     setStore((prev) => {
+      return prev.map((n) => {
+        if (n.notification_id === notificationId) {
+          return { ...n, read: true };
+        }
+        return n;
+      });
+    });
+
+    if (remove) {
+      setStore((prev) => {
+        return prev.filter((n) => n.notification_id !== notificationId);
+      });
+    }
+
     wsCtx.send({
       event: 'NOTIFICATION_READ',
       payload: { notification_id: notificationId },
@@ -37,6 +55,10 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
     setStore((prev) => {
       return [...prev, data];
     });
+    showToast({
+      title: "Notification",
+      description: data.message,
+    })
   });
 
   onCleanup(() => {
@@ -49,5 +71,5 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
   };
 }
 
-export { useNotifications };
+  export { useNotifications };
 export type { NotificationsHook };

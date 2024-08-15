@@ -67,6 +67,15 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 		log.Print("error getting group title", err)
 		return nil, err
 	}
+	ChoiceMade, err := MadeChoice(eventID, userID)
+	if ChoiceMade {
+		return nil, nil
+	}
+	if err != nil {
+		log.Print("error getting event choices", err)
+		return nil, err
+	}
+
 	eventDetails := types.EventDetails{
 		ID:      eventID,
 		Title:   title,
@@ -85,6 +94,16 @@ func GetGroupInvitationData(userID string, invitationID int) (*types.Notificatio
 		log.Print("error getting groupID")
 		return nil, err
 	}
+	ifMember, err := GroupMember(userID, groupID)
+	if err != nil {
+		log.Print("error checking if user is a member")
+		return nil, err
+	}
+	
+	if ifMember {
+		return nil, nil
+	}
+
 	invitedUser, err := GetUserNameByID(invitedUserID)
 	if err != nil {
 		log.Print("error getting user name")

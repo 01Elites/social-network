@@ -213,3 +213,17 @@ func GetEventDetails(eventID int) (string, string,int, time.Time, error) {
 	}
 	return title, description, groupID, eventTime, nil
 }
+
+func MadeChoice(eventID int, userID string) (bool, error) {
+	var count int
+	query := `SELECT COUNT(*) FROM user_choice WHERE event_id = $1 AND user_id = $2`
+	err := DB.QueryRow(context.Background(), query, eventID, userID).Scan(&count)
+	if err != nil {
+		log.Print("error scanning count", err)
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}

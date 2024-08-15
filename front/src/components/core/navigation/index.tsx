@@ -29,6 +29,7 @@ import {NotificationsPage, showNotifications} from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
 import NotificationsContext from '~/contexts/NotificationsContext';
 import { BsCircleFill } from 'solid-icons/bs'
+import { IconBellActive } from '~/components/ui/icons/IconBell';
 
 interface NavigationProps {
   children: JSXElement;
@@ -109,7 +110,20 @@ export default function Navigation(props: NavigationProps): JSXElement {
             </A>
           )}
         </For>
-
+        {/* <Show when={userCtx!.userDetails()}>
+          <Button
+            variant='ghost'
+            class='mt-auto w-fit justify-start gap-2 md:w-full'
+            color='red'
+            onClick={showNotifications}
+          >
+            <Show when={notificationsCtx?.store.length === 0}
+              fallback={<IconBellActive />}>
+              <IconBell class='size-5' />
+            </Show>
+            <span class='hidden md:block'>Notifications</span>
+          </Button>
+        </Show> */}
         <Show when={userCtx!.userDetails()}>
           <Button
             variant='ghost'

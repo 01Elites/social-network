@@ -63,6 +63,7 @@ export function GroupRequests(params: GroupRequestParams): JSXElement {
 }
 
 export function handleRequest(response: string, groupID: string, requester: string) {
+  console.log(response, groupID, requester);
   fetchWithAuth(`${config.API_URL}/join_group_res`, {
     method: 'PATCH',
     body: JSON.stringify({

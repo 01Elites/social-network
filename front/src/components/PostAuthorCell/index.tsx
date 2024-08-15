@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import moment from 'moment';
 import { JSXElement, Show } from 'solid-js';
 import User from '~/types/User';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import config from '~/config';
 
 interface PostAuthorCellProps {

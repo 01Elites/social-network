@@ -6,7 +6,7 @@ function EventsPage(): JSXElement {
   return (
     <Layout>
       <section class='flex h-full gap-4'>
-        <h1>Events</h1>
+        <h1 class='text-xl font-bold'>Events</h1>
       </section>
     </Layout>
   );

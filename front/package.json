@@ -7,11 +7,13 @@
     "start": "vite",
     "dev": "vite --host",
     "build": "vite build",
+    "build:pages": "RELATIVE_BUILD=true vite build",
     "serve": "vite preview",
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^22.2.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "prettier": "^3.3.2",
@@ -27,12 +29,10 @@
   "dependencies": {
     "@corvu/tooltip": "^0.2.0",
     "@kobalte/core": "^0.13.3",
-    "@solid-primitives/websocket": "^1.2.2",
     "@solidjs/router": "^0.13.6",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "moment": "^2.30.1",
-    "socket.io-client": "^4.7.5",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.8.18",
     "tailwind-merge": "^2.4.0",

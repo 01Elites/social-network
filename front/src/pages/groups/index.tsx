@@ -28,8 +28,8 @@ export default function GroupsPage(): JSXElement {
       <section class='flex h-full flex-col gap-4'>
         <h1 class='text-xl font-bold'>Groups</h1>
         <Show when={targetGroups()}>
-          <div class='m-4 grid grid-cols-1'>
-            <GroupsFeed targetGroups={() => targetGroups() as Groups} />
+          <div class='grid grid-cols-1'>
+            <GroupsFeed targetGroups={targetGroups} />
           </div>
         </Show>
       </section>

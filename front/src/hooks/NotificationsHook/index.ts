@@ -27,10 +27,15 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
     }
   }
 
+  createEffect(() => {
+    if (wsCtx.state() === 'connected') {
+      wsCtx.send({ event: 'GET_NOTIFICATIONS', payload: null });
+    }
+  });
   
   function markRead(notificationId: string, remove = false): void {
-       // mark notification as read
-     setStore((prev) => {
+    // mark notification as read
+    setStore((prev) => {
       return prev.map((n) => {
         if (n.notification_id === notificationId) {
           return { ...n, read: true };

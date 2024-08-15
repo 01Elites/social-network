@@ -28,7 +28,7 @@ export default function FriendsPage(): JSXElement {
       <section class='flex h-full flex-col gap-4'>
         <h1 class='text-xl font-bold'>Friends</h1>
         <Show when={targetFriends()}>
-          <div class='m-4 grid grid-cols-1'>
+          <div class='grid grid-cols-1'>
             <FriendsFeed targetFriends={() => targetFriends() as Friends} />
           </div>
         </Show>

@@ -40,36 +40,38 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
   if (userDetails != null && wsCtx != null) {
     createEffect(() => {
       wsCtx.bind('USERLIST', (data) => {
-        if (data != null) {
-          setSections((prevSections) => {
-            const updatedSections = [...prevSections];
-            const sectionIndex = updatedSections.findIndex(section => section.name === data.name);
-
-            if (sectionIndex > -1) {
-              // Create a map for updating users within the section
-              const userMap = new Map(updatedSections[sectionIndex].users.map(user => [user.user_name, user]));
-
-              // Update or add new users
-              data.users.forEach((user: Contact) => {
-                userMap.set(user.user_name, user);
-              });
-
-              // Update the section with the new list of users
-              updatedSections[sectionIndex] = {
-                name: data.name,
-                users: Array.from(userMap.values())
-              };
-            } else {
-              // If the section does not exist, add it
-              updatedSections.push({
-                name: data.name,
-                users: data.users
-              });
-            }
-
-            return updatedSections;
-          });
+        if (!data) {
+          return;
         }
+
+        setSections((prevSections) => {
+          const updatedSections = [...prevSections];
+          const sectionIndex = updatedSections.findIndex(section => section.name === data.name);
+
+          if (sectionIndex > -1) {
+            // Create a map for updating users within the section
+            const userMap = new Map(updatedSections[sectionIndex].users.map(user => [user.user_name, user]));
+
+            // Update or add new users
+            data.users.forEach((user: Contact) => {
+              userMap.set(user.user_name, user);
+            });
+
+            // Update the section with the new list of users
+            updatedSections[sectionIndex] = {
+              name: data.name,
+              users: Array.from(userMap.values())
+            };
+          } else {
+            // If the section does not exist, add it
+            updatedSections.push({
+              name: data.name,
+              users: data.users
+            });
+          }
+
+          return updatedSections;
+        });
       });
     })
   };

@@ -26,6 +26,16 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
   }
 
   function markRead(notificationId: string, remove = false): void {
+    // mark notification as read
+    setStore((prev) => {
+      return prev.map((n) => {
+        if (n.notification_id === notificationId) {
+          return { ...n, read: true };
+        }
+        return n;
+      });
+    });
+
     if (remove) {
       setStore((prev) => {
         return prev.filter((n) => n.notification_id !== notificationId);

@@ -20,6 +20,10 @@ import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
 export default function NotificationsFeed(): JSXElement {
   // const [test, setnotification] = createSignal<NotificationsHook>();
   const notifications = useContext(NotificationsContext);
+  for (let i = 0; i < (notifications?.store.length ?? 0); i++) {
+    notifications?.markRead(notifications?.store[i].notification_id);
+  }
+  
    return (<>
     <div class="flex-row">
       <div class="flex-row">

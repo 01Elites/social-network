@@ -28,6 +28,7 @@ import { cn } from '~/lib/utils';
 import {NotificationsPage, showNotifications} from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
 import NotificationsContext from '~/contexts/NotificationsContext';
+import { BsCircleFill } from 'solid-icons/bs'
 
 interface NavigationProps {
   children: JSXElement;
@@ -124,9 +125,9 @@ export default function Navigation(props: NavigationProps): JSXElement {
               {setBellColor(true)}
             </Show>
             </>)}</For>
-            <IconBell class='size-5 fill-red-500'></IconBell>
+            <IconBell class='size-5'/>
             <span class='hidden md:block'>Notifications</span>
-            <Show when={counter>0}><div class="">{(counter)}</div>
+            <Show when={counter>0}><div class="rounded-full size-6 bg-white text-black">{(counter)}</div>
             </Show>
           </Button>
         </Show>

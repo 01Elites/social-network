@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"social-network/internal/views/websocket/types"
@@ -13,10 +14,6 @@ import (
 func ProcessEvents(user *types.User) {
 	// Send all the notifications in the database to the user
 	go ProcessNotifications(user)
-	// if err := SendUsersNotifications(user.ID); err != nil {
-	// 	log.Printf("Error sending notifications: %v", err)
-	// 	return
-	// }
 	defer func() {
 		SetClientOffline(user)
 	}()
@@ -43,6 +40,7 @@ func ProcessEvents(user *types.User) {
 			return
 		}
 
+		fmt.Printf("Received message: %v\n", message)
 		// Handle the event based on its type
 		switch message.Type {
 
@@ -84,30 +82,3 @@ func ProcessEvents(user *types.User) {
 		}
 	}
 }
-
-/// todo:
-// 1. Implement the Typing function
-// 2. Implement the OpenChat function
-// 3. Implement the CloseChat function
-// 4. Implement the GetMessages function
-// 5. Implement the GetNotifications function
-// 6. get the list of users {online, offline,Dm's } and send it to the client
-// 7. get the list of groups {online, offline, messages} and send it to the client
-
-// to do with the notifications
-// 1. Implement the notification function {send notification to the user by websocket}
-// 2. notifications include:
-// 	- new comment on the my post {post_id, commenter , comment}
-// 	- new like on the my post {post_id, liker}
-// 	- new friend request "follow request" {follower} to be [accepted or rejected]
-// 	- new message in DM {sender, message}
-// 	- new message in the group chat {sender, message , group_id}
-//  - invitation to the group
-//  - new reuest to join the group {which the user is the admin}
-//  - new event in the group {which the user is the admin} MAYBE !!!
-
-// required notification types:
-// follow request
-// group invitation
-// request to join group
-// event in the group

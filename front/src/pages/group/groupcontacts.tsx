@@ -13,7 +13,7 @@ interface HomeContactsProps {
 
 export default function GroupContacts(props: HomeContactsProps): JSXElement {
   return (
-    <section class={cn('flex flex-wrap ', props.class)}>
+    <section class={cn('flex flex-wrap', props.class)}>
       <For each={props.members ?? []}>
         {(member) => (
           <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>

@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import moment from 'moment';
 import { JSXElement, Show } from 'solid-js';
 import User from '~/types/User';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import config from '~/config';
 
 interface PostAuthorCellProps {
@@ -13,7 +13,7 @@ interface PostAuthorCellProps {
 export default function PostAuthorCell(props: PostAuthorCellProps): JSXElement {
   return (
     <div class='flex items-center gap-2'>
-      <Avatar class='w-[5rem] h-[5rem] mb-2'>
+      <Avatar>
         <AvatarFallback>
           <Show when={props.author.avatar} fallback={
             props.author.first_name.charAt(0).toUpperCase()

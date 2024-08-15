@@ -1,4 +1,4 @@
-import { onCleanup, useContext } from 'solid-js';
+import { createEffect, onCleanup, useContext } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { SNNotification } from '~/types/Notification';
@@ -6,7 +6,7 @@ import { WebsocketHook } from '../WebsocketHook';
 
 type NotificationsHook = {
   store: SNNotification[];
-  markRead: (notificationId: string) => void;
+  markRead: (notificationId: string, remove?: boolean) => void;
 };
 
 type UseNotificationsProps = {
@@ -25,7 +25,29 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
     }
   }
 
-  function markRead(notificationId: string): void {
+  createEffect(() => {
+    if (wsCtx.state() === 'connected') {
+      wsCtx.send({ event: 'GET_NOTIFICATIONS', payload: null });
+    }
+  });
+  
+  function markRead(notificationId: string, remove = false): void {
+    // mark notification as read
+    setStore((prev) => {
+      return prev.map((n) => {
+        if (n.notification_id === notificationId) {
+          return { ...n, read: true };
+        }
+        return n;
+      });
+    });
+
+    if (remove) {
+      setStore((prev) => {
+        return prev.filter((n) => n.notification_id !== notificationId);
+      });
+    }
+
     wsCtx.send({
       event: 'NOTIFICATION_READ',
       payload: { notification_id: notificationId },

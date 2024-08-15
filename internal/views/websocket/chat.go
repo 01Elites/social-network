@@ -372,17 +372,17 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 			Messages []types.Chat `json:"messages"`
 		}
 
-		messageResponse.Messages = messages
+		// messageResponse.Messages = messages
 
-		// Convert the messages slice to JSON
-		messagesJSON, err := json.Marshal(messageResponse)
-		if err != nil {
-			log.Println("Error marshalling messages to JSON:", err)
-			return
-		}
-
+		// if len(messages) != 0 {
+		// 	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
+		// }
+		
 		if len(messages) != 0 {
-			sendMessageToWebSocket(user, event.GET_MESSAGES, messagesJSON)
+			for i := range messages {
+				messageResponse.Messages = messages[i : i+1]
+				sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
+			}
 		}
 		// updateNotification(clients[user.ID], recipientID, false)
 	}

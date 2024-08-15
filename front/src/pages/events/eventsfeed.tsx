@@ -62,8 +62,9 @@ export function EventsFeed(props: eventProps): JSXElement{
             <Tooltip.Content class="rounded-lg bg-corvu-100 px-3 py-2 font-medium corvu-open:animate-in corvu-open:fade-in-50 corvu-open:slide-in-from-bottom-1 corvu-closed:animate-out corvu-closed:fade-out-50 corvu-closed:slide-out-to-bottom-1">
               <Card class='flex flex-col break-after-page justify-center items-center space-y-4 p-3'><p class="block flex flex-col gap-2 place-items-right">
                 {event.description}</p>
-                {moment(event.event_time).calendar()}
-                </Card>
+                <p>{moment(event.event_time).calendar()}</p>
+                <p>created by {event.creator.first_name} {event.creator.last_name}
+                </p></Card>
               <Tooltip.Arrow class="text-corvu-100" />
             </Tooltip.Content>
           </Tooltip.Portal>

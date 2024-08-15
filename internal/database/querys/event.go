@@ -10,7 +10,8 @@ import (
 
 func GetGroupEvents(groupID int) ([]models.Event, error) {
 	var events []models.Event
-	query := `SELECT event_id, title, description, event_date FROM event WHERE group_id = $1`
+	query := `SELECT event_id, title, description, event_date, first_name, last_name FROM event 
+	INNER JOIN profile ON (event.creator_id = profile.user_id) WHERE group_id = $1`
 	rows, err := DB.Query(context.Background(), query, groupID)
 	if err != nil {
 		log.Printf("database failed to query group events: %v\n", err)
@@ -20,7 +21,7 @@ func GetGroupEvents(groupID int) ([]models.Event, error) {
 
 	for rows.Next() {
 		var event models.Event
-		if err = rows.Scan(&event.ID, &event.Title, &event.Description, &event.EventTime); err != nil {
+		if err = rows.Scan(&event.ID, &event.Title, &event.Description, &event.EventTime, &event.Creator.FirstName, &event.Creator.LastName); err != nil {
 			log.Printf("database failed to scan event: %v\n", err)
 			return nil, err
 		}
@@ -211,4 +212,18 @@ func GetEventDetails(eventID int) (string, string,int, time.Time, error) {
 		return "", "", 0, time.Time{} ,err
 	}
 	return title, description, groupID, eventTime, nil
+}
+
+func MadeChoice(eventID int, userID string) (bool, error) {
+	var count int
+	query := `SELECT COUNT(*) FROM user_choice WHERE event_id = $1 AND user_id = $2`
+	err := DB.QueryRow(context.Background(), query, eventID, userID).Scan(&count)
+	if err != nil {
+		log.Print("error scanning count", err)
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
 }

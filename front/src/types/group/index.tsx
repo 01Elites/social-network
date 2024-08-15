@@ -33,7 +33,8 @@ type GroupEvent = {
   title: string;
   description: string;
   options: option[];
-  event_time: number
+  event_time: number;
+  creator: creator;
 };
 
 type option = {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"social-network/internal/views/websocket/types"
+	"time"
 )
 
 func GetPrivateChatUsernames(userID string) ([]string, error) {
@@ -118,33 +119,6 @@ func HasPrivateChat(userID, recipientID string) (int, error) {
 	return 0, fmt.Errorf("no private chat found between users %s and %s", userID, recipientID)
 }
 
-// CREATE TABLE public.chat (
-// 	chat_id       SERIAL PRIMARY KEY,
-// 	chat_type     public.chat_type NOT NULL,
-// 	group_id      INTEGER,
-// 	created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-// 	FOREIGN KEY (group_id) REFERENCES public.group (group_id) ON DELETE SET NULL
-// );
-
-// CREATE TABLE public.group (
-// 	group_id     SERIAL PRIMARY KEY,
-// 	title        VARCHAR(255),
-// 	description  TEXT,
-// 	creator_id   UUID NOT NULL,
-// 	created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-// 	FOREIGN KEY (creator_id) REFERENCES public.user (user_id)
-// );
-
-// CREATE TABLE public.group_member (
-//
-//	user_id        UUID NOT NULL,
-//	group_id       INTEGER  NOT NULL  ,
-//	joined_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//	FOREIGN KEY (user_id) REFERENCES public.user (user_id),
-//	FOREIGN KEY (group_id) REFERENCES public.group (group_id)
-//
-// );
-
 // GetChatIDByGroupID retrieves the chat ID for the group chat
 func GetChatIDByGroupID(userID string, groupID int) (int, error) {
 	// Query to retrieve the chat ID where the chat type is 'group', and the user is a member of the group
@@ -154,9 +128,6 @@ func GetChatIDByGroupID(userID string, groupID int) (int, error) {
 	JOIN group_member gm ON gm.group_id = c.group_id
 	WHERE c.chat_type = 'group' AND c.group_id = $1 AND gm.user_id = $2;
 	`
-
-	// Log the query and parameters for debugging
-	// log.Printf("Executing query: %s with parameters groupID: %d, userID: %s", query, groupID, userID)
 
 	// Execute the query
 	var chatID int
@@ -217,34 +188,22 @@ func UpdateChatInDB(chatID int, message types.Chat, senderID string) error {
 	return nil
 }
 
-// func OpenChatInDB(userID, recipientID int) error {
-// 	// Open the chat in the database
-// 	query := `
-// 		UPDATE chat
-// 		SET read = TRUE
-// 		WHERE (dm_from = ? AND dm_to = ?) AND read = FALSE
-// 	`
-
-// 	_, err := DB.Exec(query, recipientID, userID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
 // GetChatMessages retrieves the last 10 messages from the database
 func GetChatMessages(chatID int) ([]types.Chat, error) {
 	// Get the all messages from the messages table
 	query := `
-	SELECT m.content, m.user_id, m.created_at
-	FROM messages m
-	WHERE m.chat_id = $1
-	ORDER BY m.created_at DESC;
+	SELECT m.content, u.user_name, m.created_at
+	FROM 
+			messages m
+	JOIN 
+    public.user u 
+	ON 
+			m.user_id = u.user_id
+	WHERE 
+			m.chat_id = $1
+	ORDER BY 
+			m.created_at ASC;
 	`
-
-	// Log the query and parameters for debugging
-	// log.Printf("Executing query: %s with parameters chatID: %d", query, chatID)
 
 	// Execute the query
 	rows, err := DB.Query(context.Background(), query, chatID)
@@ -257,10 +216,12 @@ func GetChatMessages(chatID int) ([]types.Chat, error) {
 	var messages []types.Chat
 	for rows.Next() {
 		var message types.Chat
-		if err := rows.Scan(&message.Message, &message.Sender, &message.Date); err != nil {
+		var created_at time.Time
+		if err := rows.Scan(&message.Message, &message.Sender, &created_at); err != nil {
 			log.Printf("database: Failed to scan message: %v", err)
 			return nil, err
 		}
+		message.Date = created_at.String()
 		messages = append(messages, message)
 	}
 

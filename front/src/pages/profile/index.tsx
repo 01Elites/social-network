@@ -55,8 +55,6 @@ export default function Profile(): JSXElement {
   return (
     <Layout>
       <div class='m-4 grid grid-cols-1 md:grid-cols-6'>
-        {' '}
-        {/* Main grid */}
         <div class='col-span-2'>
           <Show when={targetUser()}>
             <ProfileDetails targetUser={() => targetUser() as User} />

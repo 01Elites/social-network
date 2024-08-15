@@ -46,6 +46,11 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "title or description cannot be empty", http.StatusBadRequest)
 		return
 	}
+	if len(group.Title) >13 || len(group.Description) > 200 {
+		helpers.HTTPError(w, "title or description is too long", http.StatusBadRequest)
+		return
+	}
+
 	groupID, err := database.CreateGroup(userID, group)
 	if err != nil {
 		helpers.HTTPError(w, "failed to create group", http.StatusBadRequest)

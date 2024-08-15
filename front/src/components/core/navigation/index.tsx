@@ -30,7 +30,7 @@ import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 import { cn } from '~/lib/utils';
 import { NotificationsPage, showNotifications } from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
-import { SNNotification } from '~/types/Notification';
+import { BsCircleFill } from 'solid-icons/bs'
 
 interface NavigationProps {
   children: JSXElement;
@@ -49,8 +49,10 @@ export default function Navigation(props: NavigationProps): JSXElement {
   const notificationsCtx = useContext(NotificationsContext);
   const wsCtx = useContext(WebSocketContext);
 
+  const [bellColor, setBellColor] = createSignal(false);
+  let counter = 0;
   const location = useLocation();
-  // eh writing the same line every where? sucks
+    // eh writing the same line every where? sucks
   function cpFill(path: string) {
     return location.pathname === path ? 'white' : undefined;
   }
@@ -103,7 +105,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
                 buttonVariants({ variant: navItem.variant }),
                 'w-fit justify-start gap-2 md:w-full',
                 navItem.variant === 'default' &&
-                'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
+                  'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
               )}
             >
               {navItem?.icon}
@@ -111,7 +113,20 @@ export default function Navigation(props: NavigationProps): JSXElement {
             </A>
           )}
         </For>
-
+        {/* <Show when={userCtx!.userDetails()}>
+          <Button
+            variant='ghost'
+            class='mt-auto w-fit justify-start gap-2 md:w-full'
+            color='red'
+            onClick={showNotifications}
+          >
+            <Show when={notificationsCtx?.store.length === 0}
+              fallback={<IconBellActive />}>
+              <IconBell class='size-5' />
+            </Show>
+            <span class='hidden md:block'>Notifications</span>
+          </Button>
+        </Show> */}
         <Show when={userCtx!.userDetails()}>
           <Button
             variant='ghost'
@@ -126,6 +141,29 @@ export default function Navigation(props: NavigationProps): JSXElement {
             <span class='hidden md:block'>Notifications</span>
           </Button>
         </Show>
+        {/* the old code 
+        <Show when={userCtx!.userDetails()}>
+          <Button
+            variant='ghost'
+            class='mt-auto w-fit justify-start gap-2 md:w-full'
+            color='red'
+            onClick={showNotifications}
+          >
+            <For each={notificationsCtx?.store}>
+          {(notification) => (
+            <>
+            <Show when={!notification.read}>
+              <div class="hidden">{counter = counter+1}</div>
+              {setBellColor(true)}
+            </Show>
+            </>)}</For>
+            <IconBell class='size-5'/>
+            <span class='hidden md:block'>Notifications</span>
+            <Show when={counter>0}><div class="rounded-full size-6 bg-white text-black">{(counter)}</div>
+            </Show>
+          </Button>
+        </Show>
+        */}
 
         <Button
           variant='ghost'

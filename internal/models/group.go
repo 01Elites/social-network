@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type GroupFeed struct {
 	Title       string            `json:"title,omitempty"`
@@ -24,11 +26,11 @@ type CreateGroup struct {
 
 type Requester struct {
 	User         PostFeedProfile `json:"user,omitempty"`
-	CreationDate string       `json:"creation_date"`
+	CreationDate string          `json:"creation_date"`
 }
 
 type GroupAction struct {
-	ID         int    `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// GroupIDstr string `json:"group_id,omitempty"`
 	GroupID    int    `json:"group_id,omitempty"`
 	Username   string `json:"receiver,omitempty"`
@@ -56,18 +58,19 @@ type EventResp struct {
 }
 
 type Event struct {
-	ID          int       `json:"id,omitempty"`
-	Title       string    `json:"title,omitempty"`
-	Description string    `json:"description,omitempty"`
-	Options     []Options `json:"options,omitempty"`
-	EventTime   time.Time `json:"event_time,omitempty"`
+	ID          int                    `json:"id,omitempty"`
+	Title       string                 `json:"title,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	Creator     PostFeedProfile `json:"creator,omitempty"`
+	Options     []Options              `json:"options,omitempty"`
+	EventTime   time.Time              `json:"event_time,omitempty"`
 }
 
 type Options struct {
-	ID        int               `json:"option_id,omitempty"`
-	Name      string            `json:"option_name,omitempty"`
-	Usernames []string					`json:"usernames"`
-	FullNames []string					`json:"fullnames"`
+	ID        int      `json:"option_id,omitempty"`
+	Name      string   `json:"option_name,omitempty"`
+	Usernames []string `json:"usernames"`
+	FullNames []string `json:"fullnames"`
 }
 
 type CancelEvent struct {

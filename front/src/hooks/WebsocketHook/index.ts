@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { Accessor, createSignal } from 'solid-js';
 import config from '~/config';
 
 type WSMessage = {
@@ -9,8 +9,8 @@ type WSMessage = {
 type WebSocketState = 'disconnected' | 'connected' | 'connecting';
 
 type WebsocketHook = {
-  state: WebSocketState;
-  error: string | null;
+  state: Accessor<WebSocketState>;
+  error: Accessor<string | null>;
   /**
    *
    * @param event the event to listen to
@@ -98,8 +98,8 @@ function useWebsocket(): WebsocketHook {
   }
   connect();
   return {
-    state: socketState(),
-    error: socketError(),
+    state: socketState,
+    error: socketError,
     bind: bind,
     send: send,
     connect: connect,

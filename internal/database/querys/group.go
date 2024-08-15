@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"time"
+	"errors"
 
 	"social-network/internal/models"
 )
@@ -154,6 +155,7 @@ func LeaveGroup(userID string, groupID int) error {
 
 func getGroupFromRequest(requestID int) (int, string, string, string, string, error) {
 	var groupID int
+	var count int
 	var groupTitle string
 	var creator_id string
 	var requested_at time.Time
@@ -169,13 +171,24 @@ func getGroupFromRequest(requestID int) (int, string, string, string, string, er
 						INNER JOIN
 						"group"	USING	(group_id)
 						WHERE
-						request_id = $1
+						request_id = $1 AND status = 'pending'
 						`
 	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID, &groupTitle, &creator_id,&requesterID, &requested_at)
 	if err != nil {
 		log.Printf("database failed to scan group user3: %v\n", err)
 		return 0, "", "", "", "", err
 	}
+	query = `SELECT COUNT(*) FROM group_member WHERE group_id = $1 AND user_id = $2`
+	err = DB.QueryRow(context.Background(), query, groupID, requesterID).Scan(&count)
+	if err != nil {
+		log.Printf("database failed to scan group member")
+		return 0, "", "", "", "", err
+	}
+	if count != 0 {
+		log.Print("user is already a member of the group")
+		return 0, "", "", "", "", errors.New("UserAlreadyMember")
+	}
+
 	return groupID, groupTitle, creator_id, requesterID, requested_at.String(),  nil
 }
 
@@ -196,7 +209,7 @@ func getGroupFromInvitation(invitationID int) (string, int, string, models.Reque
 						INNER JOIN
 						"group"	USING	(group_id)
 						WHERE
-						invitation_id = $1
+						invitation_id = $1 AND status = 'pending'
 						`
 	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser, &groupID, &groupTitle, &senderID, &sentAt)
 	if err != nil {

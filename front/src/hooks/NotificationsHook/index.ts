@@ -6,7 +6,7 @@ import { WebsocketHook } from '../WebsocketHook';
 
 type NotificationsHook = {
   store: SNNotification[];
-  markRead: (notificationId: string) => void;
+  markRead: (notificationId: string, remove?: boolean) => void;
 };
 
 type UseNotificationsProps = {
@@ -25,7 +25,13 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
     }
   }
 
-  function markRead(notificationId: string): void {
+  function markRead(notificationId: string, remove = false): void {
+    if (remove) {
+      setStore((prev) => {
+        return prev.filter((n) => n.notification_id !== notificationId);
+      });
+    }
+
     wsCtx.send({
       event: 'NOTIFICATION_READ',
       payload: { notification_id: notificationId },

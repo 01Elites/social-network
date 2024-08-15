@@ -10,19 +10,13 @@ import config from '../../config';
 import { Card } from '../../components/ui/card';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import { ChatState } from '~/pages/home';
+import Contact from '~/types/Contact';
 
 interface HomeContactsProps {
   class?: string;
   setChatState?: Setter<ChatState>
 }
 
-interface Contact {
-  first_name: string;
-  last_name: string;
-  user_name: string;
-  state: string;
-  avatar: string;
-}
 
 interface Section {
   name: string;

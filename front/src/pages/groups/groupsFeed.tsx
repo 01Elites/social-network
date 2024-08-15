@@ -54,7 +54,7 @@ export default function GroupsFeed(props: GroupFeedProps): JSXElement {
           <Tabs.Indicator class="tabs__indicator" />
         </Tabs.List>
 
-        <Tabs.Content class="tabs__content  m-6 flex flex-wrap gap-4" value="owned">
+        <Tabs.Content class="tabs__content m-6 flex flex-wrap gap-4" value="owned">
           <For each={groups?.owned ?? []}>
             {(group) => (
               <Card class="flex w-44 flex-col items-center space-y-4 p-3">

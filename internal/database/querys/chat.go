@@ -202,7 +202,7 @@ func GetChatMessages(chatID int) ([]types.Chat, error) {
 	WHERE 
 			m.chat_id = $1
 	ORDER BY 
-			m.created_at DESC;
+			m.created_at ASC;
 	`
 
 	// Execute the query

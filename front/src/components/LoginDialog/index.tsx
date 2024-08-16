@@ -10,6 +10,7 @@ import {
 import logo from '~/assets/logo.svg';
 import rebootLogo from '~/assets/reboot_01_logo.png';
 import githubLogo from '~/assets/github_logo.png';
+import googleLogo from '~/assets/google_logo.png';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import moment from 'moment';
@@ -112,6 +113,10 @@ function LoginDialog(): JSXElement {
 
   function handleLoginWithReboot() {
     window.location.href = config.API_URL + "/auth/gitea/login";
+  }
+
+  function handleLoginWithGoogle() {
+    window.location.href = config.API_URL + "/auth/google/login";
   }
 
   function handleLoginRedirect() {
@@ -457,7 +462,6 @@ function LoginDialog(): JSXElement {
               variant='outline'
               class='gap-4'
               onClick={handleLoginWithReboot}
-              // disabled={formProcessing()}
               disabled={false}
             >
               <img alt='' src={rebootLogo} class='h-5'></img>
@@ -472,7 +476,15 @@ function LoginDialog(): JSXElement {
               <img alt='' src={githubLogo} class='h-5'></img>
               Login with GitHub
             </Button>
-
+            <Button
+              variant='outline'
+              class='gap-4'
+              onClick={handleLoginWithGoogle}
+              disabled={false}
+            >
+              <img alt='' src={googleLogo} class='h-5'></img>
+              Login with Google
+            </Button>
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginEmail}

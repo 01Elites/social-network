@@ -459,20 +459,18 @@ func GenerateUniqueUsername(firstName, lastName string) (string, error) {
 	return username, nil
 }
 
-func GetUserIDByGiteaID(giteaID string) (bool, string) {
-	fmt.Println("GetUserIDByGiteaID", giteaID)
-	// Define a query to check if a user with the given Gitea ID exists and get the user_id
+func GetUserIDByProvider(ProviderId string) (bool, string) {
+	fmt.Println("Provider ID:", ProviderId)
 	query := `SELECT user_id FROM public.user WHERE user_name = $1`
 
 	// Execute the query
 	var userID string
-	err := DB.QueryRow(context.Background(), query, giteaID).Scan(&userID)
+	err := DB.QueryRow(context.Background(), query, ProviderId).Scan(&userID)
 	if err != nil {
-		log.Printf("Failed to check if user exists by Gitea ID: %v\n", err)
+		log.Printf("Failed to check if user exists by Provider ID: %v\n", err)
 		return false, ""
 	}
 
 	// User exists
 	return true, userID
 }
-

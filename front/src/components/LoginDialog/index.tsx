@@ -9,6 +9,7 @@ import {
 
 import logo from '~/assets/logo.svg';
 import rebootLogo from '~/assets/reboot_01_logo.png';
+import githubLogo from '~/assets/github_logo.png';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import moment from 'moment';
@@ -50,6 +51,8 @@ const [loginOpen, setLoginOpen] = createSignal(false);
 function showLogin() {
   setLoginOpen(true);
 }
+
+let ReadingSessionId = 0;
 
 function LoginDialog(): JSXElement {
   const { fetchUserDetails } = useContext(
@@ -103,9 +106,31 @@ function LoginDialog(): JSXElement {
       });
   }
 
+  function handleLoginWithGithub() {
+    window.location.href = config.API_URL + "/auth/github/login";
+  }
+
   function handleLoginWithReboot() {
     window.location.href = config.API_URL + "/auth/gitea/login";
   }
+
+  function handleLoginRedirect() {
+    if (ReadingSessionId === 0) {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+      if (sessionId) {
+        localStorage.setItem('SN_TOKEN', sessionId);
+        // You can also fetch user details or redirect to the dashboard here
+        fetchUserDetails();
+        window.location.href = '/'; // Or wherever you want to redirect after login
+        ReadingSessionId = 1;
+      }
+    }
+  }
+
+  // Call this function when the page loads
+  handleLoginRedirect();
+
 
   // -------- Signup Dialog --------
   const [signupFirstName, setSignupFirstName] = createSignal('');
@@ -427,6 +452,16 @@ function LoginDialog(): JSXElement {
               <img alt='' src={rebootLogo} class='h-5'></img>
               Login with Reboot01
             </Button>
+            <Button
+              variant='outline'
+              class='gap-4'
+              onClick={handleLoginWithGithub}
+              disabled={false}
+            >
+              <img alt='' src={githubLogo} class='h-5'></img>
+              Login with GitHub
+            </Button>
+
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginEmail}

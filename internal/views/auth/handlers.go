@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -261,7 +263,6 @@ var oauth2Config = &oauth2.Config{
 }
 
 func GiteaLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("GiteaLogin")
 	url := oauth2Config.AuthCodeURL("state", oauth2.AccessTypeOnline)
 	http.Redirect(w, r, url, http.StatusFound)
 }
@@ -310,7 +311,7 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 		Following: make(map[string]bool),
 	}
 	// Check if the user exists in the database
-	exists, userId := database.GetUserIDByGiteaID(user.UserName)
+	exists, userId := database.GetUserIDByProvider(user.UserName)
 	if !exists {
 		// Add the user to the database
 		if err := database.SignUpUser(user, userProfile); err != nil {
@@ -330,17 +331,155 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 			helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-
-		// Set the session token as a cookie
-		http.SetCookie(w, &http.Cookie{
-			Name:     "session_token",
-			Value:    sessionUUID.String(),
-			Path:     "/",
-			HttpOnly: true,
-			Secure:   true, // Set to true if you're using HTTPS
-		})
+		// Set a cookie with a session token that can be used to authenticate access without logging in
 		session.SetAutherizationHeader(w, sessionUUID.String())
-		// Redirect to the home page on the frontend
-		http.Redirect(w, r, "http://localhost:3000/", http.StatusSeeOther)
+		redirectURL := fmt.Sprintf("http://localhost:3000/?session_id=%s", sessionUUID.String())
+		http.Redirect(w, r, redirectURL, http.StatusFound)
 	}
+}
+
+//gihtub login handler
+
+const (
+	githubClientID     = "1e7aa20b6eaf1123d2ab"
+	githubClientSecret = "8b4215e898cbb5f6fab983bcd7e23f88cba46db6"
+	githubRedirectURI  = "http://localhost:8081/api/auth/github/login"
+)
+
+func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.URL)
+	models.Code = r.URL.Query().Get("code")
+	fmt.Println(models.Code)
+	if models.Code == "" {
+		params := url.Values{}
+		params.Add("client_id", githubClientID)
+		params.Add("redirect_uri", githubRedirectURI)
+		params.Add("scope", "user:email") // Include user:email scope
+		params.Add("state", "github")
+		redirectURL := "https://github.com/login/oauth/authorize?client_id=1e7aa20b6eaf1123d2ab"
+		Testing(w, r, redirectURL)
+	} else {
+		HandleGithubCallback(w, r)
+	}
+}
+
+func Testing(w http.ResponseWriter, r *http.Request, redirect string) {
+	http.Redirect(w, r, redirect, http.StatusSeeOther)
+}
+
+func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println(models.Code)
+
+	tokenURL := "https://github.com/login/oauth/access_token"
+	data := url.Values{}
+	data.Set("code", models.Code)
+	data.Set("client_id", githubClientID)
+	data.Set("client_secret", githubClientSecret)
+	data.Set("redirect_uri", githubRedirectURI)
+	data.Set("grant_type", "authorization_code")
+
+	resp, err := http.PostForm(tokenURL, data)
+	if err != nil {
+		log.Fatal("Error getting token:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading response body:", err)
+		return
+	}
+
+	log.Println("Token response:", string(body)) // Log token response for debugging
+
+	// Extract access token from token response
+	accessToken := ExtractAccessToken(string(body))
+	if accessToken == "" {
+		log.Fatal("Access token not found in token response")
+		return
+	}
+
+	// Use the access token for further requests
+	userInfoURL := "https://api.github.com/user"
+	req, err := http.NewRequest("GET", userInfoURL, nil)
+	if err != nil {
+		log.Fatal("Error creating request:", err)
+		return
+	}
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+
+	client := &http.Client{}
+	resp, err = client.Do(req)
+	if err != nil {
+		log.Fatal("Error getting user info:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	userInfoBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading user info response:", err)
+		return
+	}
+
+	var userInfo map[string]interface{}
+	if err := json.Unmarshal(userInfoBody, &userInfo); err != nil {
+		log.Fatal("Error parsing user info:", err)
+		return
+	}
+	fmt.Println(userInfo)
+	Fullname := strings.Split(userInfo["name"].(string), " ")
+	userProfile := models.UserProfile{
+		NickName:       userInfo["login"].(string),
+		ProfilePrivacy: "public",
+		Avatar:         userInfo["avatar_url"].(string),
+		Gender:         "male",
+		FirstName:      Fullname[0],
+		LastName:       Fullname[1],
+	}
+
+	user := models.User{
+		UserName:  userInfo["login"].(string),
+		Email:     userInfo["email"].(string),
+		Password:  "",
+		Provider:  models.Provider.Github,
+		Following: make(map[string]bool),
+	}
+	// Check if the user exists in the database
+	exists, userId := database.GetUserIDByProvider(user.UserName)
+	if !exists {
+		// Add the user to the database
+		if err := database.SignUpUser(user, userProfile); err != nil {
+			log.Printf("Error signing up user: %v", err)
+			helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		sessionUUID, err := uuid.NewV4()
+		if err != nil {
+			log.Printf("Error creating session UUID: %v", err)
+			helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
+			return
+		}
+		if err := database.AddUserSession(userId, sessionUUID.String()); err != nil {
+			log.Printf("Error adding session: %v", err)
+			helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		// Set a cookie with a session token that can be used to authenticate access without logging in
+		session.SetAutherizationHeader(w, sessionUUID.String())
+		redirectURL := fmt.Sprintf("http://localhost:3000/?session_id=%s", sessionUUID.String())
+		http.Redirect(w, r, redirectURL, http.StatusFound)
+	}
+}
+
+func ExtractAccessToken(body string) string {
+	params, err := url.ParseQuery(body)
+	if err != nil {
+		log.Println("Error parsing token response:", err)
+		return ""
+	}
+	return params.Get("access_token")
 }

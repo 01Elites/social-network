@@ -470,8 +470,10 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		}
 		// Set a cookie with a session token that can be used to authenticate access without logging in
 		session.SetAutherizationHeader(w, sessionUUID.String())
-		redirectURL := fmt.Sprintf("http://localhost:3000/?session_id=%s", sessionUUID.String())
-		http.Redirect(w, r, redirectURL, http.StatusFound)
+		session.SetSessionCookie(w, sessionUUID.String())
+
+		// redirectURL := fmt.Sprintf("http://localhost:3000/?session_id=%s", sessionUUID.String())
+		http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
 	}
 }
 

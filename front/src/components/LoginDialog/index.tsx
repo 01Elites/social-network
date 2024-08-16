@@ -116,17 +116,28 @@ function LoginDialog(): JSXElement {
 
   function handleLoginRedirect() {
     if (ReadingSessionId === 0) {
-      const params = new URLSearchParams(window.location.search);
-      const sessionId = params.get('session_id');
-      if (sessionId) {
-        localStorage.setItem('SN_TOKEN', sessionId);
-        // You can also fetch user details or redirect to the dashboard here
+      const token = getCookieValue('SN_SESSION');
+      console.log(token);
+      if (token) {
+        localStorage.setItem('SN_TOKEN', token);
+        deleteCookie('SN_SESSION');
         fetchUserDetails();
-        window.location.href = '/'; // Or wherever you want to redirect after login
         ReadingSessionId = 1;
       }
     }
   }
+
+  function getCookieValue(name: string) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() as string;
+    return null;
+  }
+
+  function deleteCookie(name:string) {
+    // Set the cookie's expiration date to a past date to delete it
+    document.cookie = `${name}=; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Path=/; SameSite=Strict; Secure`;
+}
 
   // Call this function when the page loads
   handleLoginRedirect();

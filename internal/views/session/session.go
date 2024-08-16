@@ -48,7 +48,7 @@ func SetSessionCookie(w http.ResponseWriter, sessionToken string) {
 		Path:     "/",
 		SameSite: http.SameSiteStrictMode,
 		Secure:   true,
-		HttpOnly: true,
+		HttpOnly: false,
 	}
 	http.SetCookie(w, &updatedCookie)
 }

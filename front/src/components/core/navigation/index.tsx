@@ -113,35 +113,6 @@ export default function Navigation(props: NavigationProps): JSXElement {
             </A>
           )}
         </For>
-        {/* <Show when={userCtx!.userDetails()}>
-          <Button
-            variant='ghost'
-            class='mt-auto w-fit justify-start gap-2 md:w-full'
-            color='red'
-            onClick={showNotifications}
-          >
-            <Show when={notificationsCtx?.store.length === 0}
-              fallback={<IconBellActive />}>
-              <IconBell class='size-5' />
-            </Show>
-            <span class='hidden md:block'>Notifications</span>
-          </Button>
-        </Show> */}
-        <Show when={userCtx!.userDetails()}>
-          <Button
-            variant='ghost'
-            class='mt-auto w-fit justify-start gap-2 md:w-full'
-            color='red'
-            onClick={showNotifications}
-          >
-            <Show when={notificationsCtx?.store.length === 0}
-              fallback={<IconBellActive />}>
-              <IconBell class='size-5' />
-            </Show>
-            <span class='hidden md:block'>Notifications</span>
-          </Button>
-        </Show>
-        {/* the old code 
         <Show when={userCtx!.userDetails()}>
           <Button
             variant='ghost'
@@ -157,14 +128,15 @@ export default function Navigation(props: NavigationProps): JSXElement {
               {setBellColor(true)}
             </Show>
             </>)}</For>
-            <IconBell class='size-5'/>
+            <Show when={bellColor() ===false}
+              fallback={<IconBellActive />}>
+              <IconBell class='size-5' />
+            </Show>
             <span class='hidden md:block'>Notifications</span>
             <Show when={counter>0}><div class="rounded-full size-6 bg-white text-black">{(counter)}</div>
             </Show>
           </Button>
         </Show>
-        */}
-
         <Button
           variant='ghost'
           class={cn(

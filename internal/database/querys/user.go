@@ -459,14 +459,13 @@ func GenerateUniqueUsername(firstName, lastName string) (string, error) {
 	return username, nil
 }
 
-func GetUserIDByProvider(ProviderId string) (bool, string) {
-	query := `SELECT user_id FROM public.user WHERE user_name = $1`
+func GetUserIDByProvider(ProviderId,Provider string) (bool, string) {
+	query := `SELECT user_id FROM public.user WHERE email = $1 and provider = $2`
 
 	// Execute the query
 	var userID string
-	err := DB.QueryRow(context.Background(), query, ProviderId).Scan(&userID)
+	err := DB.QueryRow(context.Background(), query, ProviderId,Provider).Scan(&userID)
 	if err != nil {
-		log.Printf("Failed to check if user exists by Provider ID: %v\n", err)
 		return false, ""
 	}
 

@@ -312,7 +312,7 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 		Following: make(map[string]bool),
 	}
 	// Check if the user exists in the database
-	exists, userId := database.GetUserIDByProvider(user.UserName)
+	exists, userId := database.GetUserIDByProvider(user.Email,user.Provider)
 	if !exists {
 		// Add the user to the database
 		if err := database.SignUpUser(user, userProfile); err != nil {
@@ -334,8 +334,8 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 		}
 		// Set a cookie with a session token that can be used to authenticate access without logging in
 		session.SetAutherizationHeader(w, sessionUUID.String())
-		redirectURL := fmt.Sprintf("http://localhost:3000/?session_id=%s", sessionUUID.String())
-		http.Redirect(w, r, redirectURL, http.StatusFound)
+		session.SetSessionCookie(w, sessionUUID.String())
+		http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
 	}
 }
 
@@ -424,7 +424,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Error parsing user info:", err)
 		return
 	}
-	fmt.Println(userInfo)
+
 	Fullname := strings.Split(userInfo["name"].(string), " ")
 	userProfile := models.UserProfile{
 		NickName:       userInfo["login"].(string),
@@ -443,7 +443,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		Following: make(map[string]bool),
 	}
 	// Check if the user exists in the database
-	exists, userId := database.GetUserIDByProvider(user.UserName)
+	exists, userId := database.GetUserIDByProvider(user.Email,user.Provider)
 	if !exists {
 		// Add the user to the database
 		if err := database.SignUpUser(user, userProfile); err != nil {
@@ -466,8 +466,6 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		// Set a cookie with a session token that can be used to authenticate access without logging in
 		session.SetAutherizationHeader(w, sessionUUID.String())
 		session.SetSessionCookie(w, sessionUUID.String())
-
-		// redirectURL := fmt.Sprintf("http://localhost:3000/?session_id=%s", sessionUUID.String())
 		http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
 	}
 }
@@ -485,7 +483,6 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	helpers.LoadEnv("internal/database/.env")
 	models.Code = r.URL.Query().Get("code")
 	if models.Code == "" {
-		fmt.Println("Code not found")
 		authURL := "https://accounts.google.com/o/oauth2/auth"
 		params := url.Values{}
 		params.Add("client_id", os.Getenv("GOOGLE_CLIENT_ID"))
@@ -496,16 +493,13 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		params.Add("state", "google")
 		http.Redirect(w, r, authURL+"?"+params.Encode(), http.StatusSeeOther)
 	} else {
-		fmt.Println("Code found")
 		HandleGoogleCallback(w, r)
 	}
 }
 
 func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
-	fmt.Println("code value is",code	)
-	// codes := strings.Split(code,"/")
-	// code = codes[1]
+
 	tokenURL := "https://accounts.google.com/o/oauth2/token"
 	data := url.Values{}
 	data.Set("code", code)
@@ -527,14 +521,13 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading response body", http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("Token response:", string(body)) // Log token response for debugging
+
 	var tokenData map[string]interface{}
 	if err := json.Unmarshal(body, &tokenData); err != nil {
 		log.Fatal("Error parsing token response:", err)
 		http.Error(w, "Error parsing token response", http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(tokenData)
 
 	accessToken := tokenData["access_token"].(string)
 	userInfoURL := "https://www.googleapis.com/oauth2/v2/userinfo"
@@ -567,6 +560,55 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Error parsing user info:", err)
 		http.Error(w, "Error parsing user info", http.StatusInternalServerError)
 		return
+	}
+
+	username, err := database.GenerateUniqueUsername(userInfo["given_name"].(string), userInfo["family_name"].(string))
+	if err != nil {
+		log.Fatalf("Failed to generate unique username: %v", err)
+	}
+
+	userProfile := models.UserProfile{
+		NickName:       userInfo["given_name"].(string),
+		ProfilePrivacy: "public",
+		Avatar:         userInfo["picture"].(string),
+		Gender:         "male",
+		FirstName:      userInfo["given_name"].(string),
+		LastName:       userInfo["family_name"].(string),
+	}
+
+	user := models.User{
+		UserName:  username,
+		Email:     userInfo["email"].(string),
+		Password:  "",
+		Provider:  models.Provider.Google,
+		Following: make(map[string]bool),
+	}
+
+	// Check if the user exists in the database
+	exists, userId := database.GetUserIDByProvider(user.Email,user.Provider)
+	if !exists {
+		// Add the user to the database
+		if err := database.SignUpUser(user, userProfile); err != nil {
+			log.Printf("Error signing up user: %v", err)
+			helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		sessionUUID, err := uuid.NewV4()
+		if err != nil {
+			log.Printf("Error creating session UUID: %v", err)
+			helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
+			return
+		}
+		if err := database.AddUserSession(userId, sessionUUID.String()); err != nil {
+			log.Printf("Error adding session: %v", err)
+			helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		// Set a cookie with a session token that can be used to authenticate access without logging in
+		session.SetAutherizationHeader(w, sessionUUID.String())
+		session.SetSessionCookie(w, sessionUUID.String())
+		http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
 	}
 
 }

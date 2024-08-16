@@ -84,11 +84,6 @@ func CreateInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Something Went Wrong with the group invite!!", http.StatusBadRequest)
 		return
 	}
-	
-	if notification == nil {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
 
 	notification.ID = notificationID
 	websocket.SendNotificationToChannel(*notification, websocket.GroupInviteChan)

@@ -200,18 +200,21 @@ func GetEventOptions(eventID int) ([]models.Options, error) {
 	return options, nil
 }
 
-func GetEventDetails(eventID int) (string, string,int, time.Time, error) {
+func GetEventDetails(eventID int) (string, string,int, time.Time, string, string, error) {
 	var title string
 	var groupID int
 	var eventTime time.Time
 	var description string
-	query := `SELECT title, description, group_id, event_date FROM event WHERE event_id = $1`
-	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &description, &groupID, &eventTime)
+	var firstname string
+	var lastname string
+	query := `SELECT title, description, group_id, event_date, first_name, last_name
+	 FROM event INNER JOIN profile ON (event.creator_id = profile.user_id) WHERE event_id = $1`
+	err := DB.QueryRow(context.Background(), query, eventID).Scan(&title, &description, &groupID, &eventTime, &firstname, &lastname)
 	if err != nil {
 		log.Print("error scanning title", err)
-		return "", "", 0, time.Time{} ,err
+		return "", "", 0, time.Time{} , "", "", err
 	}
-	return title, description, groupID, eventTime, nil
+	return title, description, groupID, eventTime, firstname,lastname, nil
 }
 
 func MadeChoice(eventID int, userID string) (bool, error) {

@@ -236,6 +236,7 @@ export default function NotificationsFeed(): JSXElement {
                               <p class="z-100 max-w-15 block flex flex-wrap gap-2 place-items-center break-all"> {notification().metadata.event.description}
                               </p>
                               {moment(notification().metadata.event.event_time).calendar()}
+                              <p>created by {notification().metadata.event.creator}</p>
                           </PopoverContent>
                         </Popover>
                       </div>

@@ -24,6 +24,7 @@ type GroupRequestNotification struct {
 type EventDetails struct {
 	ID          int              `json:"id"`
 	Title       string           `json:"title"`
+	Creator			string						`json:"creator"`
 	Description string           `json:"description,omitempty"`
 	EventTime   time.Time        `json:"event_time"`
 	Options     []models.Options `json:"options"`

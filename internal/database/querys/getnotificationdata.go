@@ -5,7 +5,7 @@ import (
 	"log"
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
-	"time"
+	"errors"
 )
 
 func GetFollowRequestNotification(request models.Request) (*types.Notification, error) {
@@ -60,7 +60,7 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 		log.Print("error getting event options")
 		return nil, err
 	}
-	title, description, groupID, eventTime, err := GetEventDetails(eventID)
+	title, description, groupID, eventTime, firstname, lastname, err := GetEventDetails(eventID)
 	if err != nil {
 		log.Print("error getting event title", err)
 		return nil, err
@@ -72,7 +72,7 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 	}
 	ChoiceMade, err := MadeChoice(eventID, userID)
 	if ChoiceMade {
-		return nil, nil
+		return nil, errors.New("user already made a choice")
 	}
 	if err != nil {
 		log.Print("error getting event choices", err)
@@ -85,6 +85,7 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 		Options:     options,
 		EventTime:   eventTime,
 		Description: description,
+		Creator: firstname + " " + lastname,
 	}
 	notification := OrganizeGroupEventRequest(username, groupTitle, groupID, eventDetails)
 	return &notification, nil
@@ -104,7 +105,7 @@ func GetGroupInvitationData(userID string, invitationID int) (*types.Notificatio
 		return nil, err
 	}
 	if ifMember {
-		return nil, nil
+		return nil, errors.New("user is already a member")
 	}
 
 	invitedUser, err := GetUserNameByID(invitedUserID)

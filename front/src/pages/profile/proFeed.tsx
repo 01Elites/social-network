@@ -25,7 +25,7 @@ export default function ProfileFeed(props: {
 
   createEffect(() => {
     // Fetch user Friends
-    fetchWithAuth(config.API_URL + '/myfriends').then(async (res) => {
+    fetchWithAuth(config.API_URL + '/friends/' + params.username).then(async (res) => {
       const body = await res.json();
       if (res.ok) {
         setTargetFriends(body);

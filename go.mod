@@ -22,5 +22,6 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/crypto v0.20.0
+	golang.org/x/oauth2 v0.22.0
 	golang.org/x/text v0.14.0 // indirect
 )

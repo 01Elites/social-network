@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,6 +16,7 @@ import (
 	"social-network/internal/views/session"
 
 	"github.com/gofrs/uuid"
+	"golang.org/x/oauth2"
 )
 
 type SignUpRequst struct {
@@ -128,6 +130,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := database.SignUpUser(user, userProfile); err != nil {
+		fmt.Println(user, userProfile)
 		if strings.Contains(err.Error(), "SQLSTATE 23505") {
 			if strings.Contains(err.Error(), "user_user_name_key") {
 				log.Printf("Username already exists: %v", err)
@@ -244,4 +247,100 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 	session.ClearAutherizationHeader(w)
 	// AddClient(data.UserName)
 	io.WriteString(w, "LogOut success")
+}
+
+var oauth2Config = &oauth2.Config{
+	ClientID:     "09f2da37-9d1c-414e-bee5-6a58942c8e17",
+	ClientSecret: "IbjBSXycBHFCltksPvW2XhrAJJa9VS2MRlR30vQ8ufEI",
+	Endpoint: oauth2.Endpoint{
+		AuthURL:  "https://learn.reboot01.com/git/login/oauth/authorize",
+		TokenURL: "https://learn.reboot01.com/git/login/oauth/access_token",
+	},
+	RedirectURL: "http://localhost:8081/api/auth/gitea/callback",
+	Scopes:      []string{"read:user"},
+}
+
+func GiteaLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("GiteaLogin")
+	url := oauth2Config.AuthCodeURL("state", oauth2.AccessTypeOnline)
+	http.Redirect(w, r, url, http.StatusFound)
+}
+
+func GiteaCallback(w http.ResponseWriter, r *http.Request) {
+	code := r.URL.Query().Get("code")
+	token, err := oauth2Config.Exchange(context.Background(), code)
+	if err != nil {
+		log.Printf("Error exchanging token: %v", err)
+		helpers.HTTPError(w, "Failed to authenticate", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the user info from Gitea
+	client := oauth2Config.Client(context.Background(), token)
+	resp, err := client.Get("https://learn.reboot01.com/git/api/v1/user")
+	if err != nil {
+		log.Printf("Error getting user info: %v", err)
+		helpers.HTTPError(w, "Failed to retrieve user info", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	gitea_user := models.GiteaUser{}
+
+	if err := json.NewDecoder(resp.Body).Decode(&gitea_user); err != nil {
+		log.Printf("Error decoding user info: %v", err)
+		helpers.HTTPError(w, "Failed to retrieve user info", http.StatusInternalServerError)
+		return
+	}
+
+	userProfile := models.UserProfile{
+		NickName:       gitea_user.Login,
+		ProfilePrivacy: "public",
+		Avatar:         gitea_user.AvatarURL,
+		Gender:         "male",
+		FirstName:      strings.Split(gitea_user.FullName, " ")[0],
+		LastName:       strings.Split(gitea_user.FullName, " ")[1],
+	}
+
+	user := models.User{
+		UserName:  gitea_user.Login,
+		Email:     gitea_user.Email,
+		Password:  "",
+		Provider:  models.Provider.Reboot,
+		Following: make(map[string]bool),
+	}
+	// Check if the user exists in the database
+	exists, userId := database.GetUserIDByGiteaID(user.UserName)
+	if !exists {
+		// Add the user to the database
+		if err := database.SignUpUser(user, userProfile); err != nil {
+			log.Printf("Error signing up user: %v", err)
+			helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		sessionUUID, err := uuid.NewV4()
+		if err != nil {
+			log.Printf("Error creating session UUID: %v", err)
+			helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
+			return
+		}
+		if err := database.AddUserSession(userId, sessionUUID.String()); err != nil {
+			log.Printf("Error adding session: %v", err)
+			helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Set the session token as a cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session_token",
+			Value:    sessionUUID.String(),
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   true, // Set to true if you're using HTTPS
+		})
+		session.SetAutherizationHeader(w, sessionUUID.String())
+		// Redirect to the home page on the frontend
+		http.Redirect(w, r, "http://localhost:3000/", http.StatusSeeOther)
+	}
 }

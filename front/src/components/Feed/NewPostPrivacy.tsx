@@ -23,29 +23,6 @@ interface NewPostPrivacyProps {
   onlySelectedCallback: (selectedUsers: String[]) => void;
 }
 
-const fakeUsers = [
-  'John Doe',
-  'Jane Smith',
-  'Michael Johnson',
-  'Emily Brown',
-  'William Davis',
-  'Sophia Miller',
-  'James Wilson',
-  'Olivia Moore',
-  'Benjamin Taylor',
-  'Ava Anderson',
-  'Daniel Thomas',
-  'Mia Jackson',
-  'Matthew White',
-  'Isabella Harris',
-  'David Martin',
-  'Emma Thompson',
-  'Andrew Garcia',
-  'Charlotte Martinez',
-  'Joseph Robinson',
-  'Madison Clark',
-];
-
 export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
   const [selectedUsers, setSelectedUsers] = createSignal<String[]>([]);
   const [targetFriends, setTargetFriends] = createSignal<Friends | undefined>();

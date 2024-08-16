@@ -18,14 +18,15 @@ func SignUpUser(user models.User, userProfile models.UserProfile) error {
 		if user.Password == "" {
 			return errors.New("password is required for manual registration")
 		}
-		uuid, err := uuid.NewV4()
-		if err != nil {
-			log.Printf("Failed to generate UUID: %v\n", err)
-			return err
-		}
-		user.UserID = uuid.String()
-		userProfile.UserID = user.UserID // Assuming UserProfile also needs the same UserID
+		// Assuming UserProfile also needs the same UserID
 	}
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		log.Printf("Failed to generate UUID: %v\n", err)
+		return err
+	}
+	user.UserID = uuid.String()
+	userProfile.UserID = user.UserID
 	// Add user to database
 	if err := CreateUser(user); err != nil {
 		return err
@@ -49,24 +50,23 @@ func CreateUser(user models.User) error {
 	return nil
 }
 
-
 func GetUserPostFeedProfile(userID string) (*models.PostFeedProfile, error) {
 	// Fetch user profile from database
 	var userProfile models.PostFeedProfile
 	query := `
-	SELECT 
-		public.profile.first_name, 
-		public.profile.last_name, 
-		public.profile.image, 
-		public.profile.privacy, 
+	SELECT
+		public.profile.first_name,
+		public.profile.last_name,
+		public.profile.image,
+		public.profile.privacy,
 		public."user".user_name
-	FROM 
-		public.profile 
-	INNER JOIN 
-		public."user" 
-	ON 
-		public.profile.user_id = public."user".user_id 
-	WHERE 
+	FROM
+		public.profile
+	INNER JOIN
+		public."user"
+	ON
+		public.profile.user_id = public."user".user_id
+	WHERE
 		public.profile.user_id = $1`
 	err := DB.QueryRow(context.Background(), query, userID).Scan(
 		&userProfile.FirstName,
@@ -79,32 +79,31 @@ func GetUserPostFeedProfile(userID string) (*models.PostFeedProfile, error) {
 		log.Printf("Failed to fetch user profile: %v\n", err)
 		return nil, err
 	}
-	
+
 	return &userProfile, nil
 }
-
 
 func GetUserProfile(userID string) (*models.UserProfile, error) {
 	// Fetch user profile from database
 	var userProfile models.UserProfile
 	query := `
-	SELECT 
-		public.profile.first_name, 
-		public.profile.last_name, 
-		public.profile.gender, 
-		public.profile.date_of_birth, 
-		public.profile.image, 
-		public.profile.privacy, 
-		public.profile.nick_name, 
-		public.profile.about, 
+	SELECT
+		public.profile.first_name,
+		public.profile.last_name,
+		public.profile.gender,
+		public.profile.date_of_birth,
+		public.profile.image,
+		public.profile.privacy,
+		public.profile.nick_name,
+		public.profile.about,
 		public."user".user_name
-	FROM 
-		public.profile 
-	INNER JOIN 
-		public."user" 
-	ON 
-		public.profile.user_id = public."user".user_id 
-	WHERE 
+	FROM
+		public.profile
+	INNER JOIN
+		public."user"
+	ON
+		public.profile.user_id = public."user".user_id
+	WHERE
 		public.profile.user_id = $1`
 	err := DB.QueryRow(context.Background(), query, userID).Scan(
 		&userProfile.FirstName,
@@ -141,24 +140,24 @@ func GetUserProfileByUserName(username string) (*models.UserProfile, error) {
 	// Fetch user profile by username from database
 	var userProfile models.UserProfile
 	query := `
-	SELECT 
-		public.profile.first_name, 
-		public.profile.last_name, 
-		public.profile.gender, 
-		public.profile.date_of_birth, 
-		public.profile.image, 
-		public.profile.privacy, 
-		public.profile.nick_name, 
-		public.profile.about, 
+	SELECT
+		public.profile.first_name,
+		public.profile.last_name,
+		public.profile.gender,
+		public.profile.date_of_birth,
+		public.profile.image,
+		public.profile.privacy,
+		public.profile.nick_name,
+		public.profile.about,
 		public.profile.user_id,
 		public."user".user_name
-	FROM 
-		public.profile 
-	INNER JOIN 
-		public."user" 
-	ON 
-		public.profile.user_id = public."user".user_id 
-	WHERE 
+	FROM
+		public.profile
+	INNER JOIN
+		public."user"
+	ON
+		public.profile.user_id = public."user".user_id
+	WHERE
 		public."user".user_name = $1`
 	err := DB.QueryRow(context.Background(), query, username).Scan(
 		&userProfile.FirstName,
@@ -459,3 +458,21 @@ func GenerateUniqueUsername(firstName, lastName string) (string, error) {
 
 	return username, nil
 }
+
+func GetUserIDByGiteaID(giteaID string) (bool, string) {
+	fmt.Println("GetUserIDByGiteaID", giteaID)
+	// Define a query to check if a user with the given Gitea ID exists and get the user_id
+	query := `SELECT user_id FROM public.user WHERE user_name = $1`
+
+	// Execute the query
+	var userID string
+	err := DB.QueryRow(context.Background(), query, giteaID).Scan(&userID)
+	if err != nil {
+		log.Printf("Failed to check if user exists by Gitea ID: %v\n", err)
+		return false, ""
+	}
+
+	// User exists
+	return true, userID
+}
+

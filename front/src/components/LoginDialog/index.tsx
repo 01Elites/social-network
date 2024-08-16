@@ -38,13 +38,13 @@ import WebSocketContext from '~/contexts/WebSocketContext';
 import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 
 const loginMessages = [
-  'Waste your time here ✨',
-  "Guess it's time to complain about your life 🤔",
+  'Welcome back! 🌟',
+  "We've missed you! 🤩",
 ];
 
 const signUpMessages = [
-  'Join the Bullies Community 🌟',
-  'You are just one step away from being a bully 🤩',
+  'Join the Elite community today! 🌟',
+  'Sign up and start sharing your thoughts! 🤩',
 ];
 
 const [loginOpen, setLoginOpen] = createSignal(false);
@@ -109,7 +109,7 @@ function LoginDialog(): JSXElement {
   }
 
   function handleLoginWithReboot() {
-    console.error('Login with Reboot01 is not implemented yet');
+    window.location.href = config.API_URL + "/auth/gitea/login";
   }
 
   // -------- Signup Dialog --------
@@ -220,7 +220,7 @@ function LoginDialog(): JSXElement {
                 : 'text-center text-3xl xs:text-left'
             }
           >
-            {loginFormOpen() ? 'Oh, no life?' : 'Sign Up'}
+            {loginFormOpen() ? 'Login' : 'Sign Up'}
           </DialogTitle>
           <DialogDescription
             class={loginFormOpen() ? 'text-center' : 'text-center xs:text-left'}
@@ -374,7 +374,7 @@ function LoginDialog(): JSXElement {
                 <TextFieldLabel>About me</TextFieldLabel>
                 <TextFieldTextArea
                   class='resize-none'
-                  placeholder='i am a big clown'
+                  placeholder='Tell us about yourself'
                 />
               </TextField>
 
@@ -387,7 +387,7 @@ function LoginDialog(): JSXElement {
                 <div class='grid gap-1.5 leading-none'>
                   <Label for='terms1-input'>Make my profile private</Label>
                   <p class='text-sm text-muted-foreground'>
-                    I am a big looser and I don't want anyone to know about me
+                    Only your followers can see your posts
                   </p>
                 </div>
               </div>
@@ -408,7 +408,7 @@ function LoginDialog(): JSXElement {
                 {formProcessing() && (
                   <img alt='' src={tailspin} class='h-full' />
                 )}
-                Become a Looser
+                {formProcessing() ? 'Creating Account...' : 'Sign Up'}
               </Button>
               <Button
                 variant='link'
@@ -416,7 +416,7 @@ function LoginDialog(): JSXElement {
                 onClick={() => setLoginFormOpen(true)}
                 disabled={formProcessing()}
               >
-                I am already a looser
+                Already have an account? Login
               </Button>
             </form>
           }
@@ -427,7 +427,7 @@ function LoginDialog(): JSXElement {
               class='gap-4'
               onClick={handleLoginWithReboot}
               // disabled={formProcessing()}
-              disabled={true}
+              disabled={false}
             >
               <img alt='' src={rebootLogo} class='h-5'></img>
               Login with Reboot01

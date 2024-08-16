@@ -253,13 +253,13 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 }
 
 var oauth2Config = &oauth2.Config{
-	ClientID:     "09f2da37-9d1c-414e-bee5-6a58942c8e17",
-	ClientSecret: "IbjBSXycBHFCltksPvW2XhrAJJa9VS2MRlR30vQ8ufEI",
+	ClientID:     os.Getenv("GITEA_CLIENT_ID"),
+	ClientSecret: os.Getenv("GITEA_CLIENT_SECRET"),
 	Endpoint: oauth2.Endpoint{
 		AuthURL:  "https://learn.reboot01.com/git/login/oauth/authorize",
 		TokenURL: "https://learn.reboot01.com/git/login/oauth/access_token",
 	},
-	RedirectURL: "http://localhost:8081/api/auth/gitea/callback",
+	RedirectURL: os.Getenv("GITEA_REDIRECT_URI"),
 	Scopes:      []string{"read:user"},
 }
 
@@ -342,18 +342,22 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 //gihtub login handler
 
 func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
+	// Ensure environment variables are loaded
 	helpers.LoadEnv("internal/database/.env")
+
 	models.Code = r.URL.Query().Get("code")
 	if models.Code == "" {
-		params := url.Values{}
-		params.Add("client_id", os.Getenv("GITHUB_CLIENT_ID"))
-		params.Add("redirect_uri", os.Getenv("GITHUB_REDIRECT_URI"))
-		params.Add("scope", "user:email") // Include user:email scope
-		params.Add("state", "github")
-		redirectURL := "https://github.com/login/oauth/authorize?client_id=1e7aa20b6eaf1123d2ab"
-		Testing(w, r, redirectURL)
+			params := url.Values{}
+			params.Add("client_id", os.Getenv("GITHUB_CLIENT_ID"))
+			params.Add("redirect_uri", os.Getenv("GITHUB_REDIRECT_URI"))
+			params.Add("scope", "user:email")
+			params.Add("state", "github")
+
+			// Build the redirect URL with query parameters
+			redirectURL := "https://github.com/login/oauth/authorize?" + params.Encode()
+			Testing(w, r, redirectURL)
 	} else {
-		HandleGithubCallback(w, r)
+			HandleGithubCallback(w, r)
 	}
 }
 

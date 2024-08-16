@@ -60,10 +60,12 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
     setStore((prev) => {
       return [...prev, data];
     });
+    if (data.read === false) {
     showToast({
       title: "Notification",
       description: data.message,
     })
+  }
   });
 
   onCleanup(() => {

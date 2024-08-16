@@ -124,7 +124,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
           {(notification) => (
             <>
             <Show when={!notification.read}>
-              <div class="hidden">{counter = counter+1}</div>
+              {/* <div class="hidden">{counter = counter+1}</div> */}
               {setBellColor(true)}
             </Show>
             </>)}</For>
@@ -133,8 +133,8 @@ export default function Navigation(props: NavigationProps): JSXElement {
               <IconBell class='size-5' />
             </Show>
             <span class='hidden md:block'>Notifications</span>
-            <Show when={counter>0}><div class="rounded-full size-6 bg-white text-black">{(counter)}</div>
-            </Show>
+            {/* <Show when={counter>0}><div class="rounded-full size-6 bg-white text-black">{(counter)}</div>
+            </Show> */}
           </Button>
         </Show>
         <Button

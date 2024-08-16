@@ -244,29 +244,6 @@ export default function NotificationsFeed(): JSXElement {
                           class="text-base font-bold hover:underline">
                           {notification().metadata.group.title}
                         </A>
-                        {/* <Tooltip
-                      placement="left"
-                      openDelay={200}
-                      // strategy='absolute'
-                      floatingOptions={{
-                        offset: 1,
-                        flip: true,
-                        shift: false,
-                      }}
-                    >
-                      <Tooltip.Trigger>
-                        Event Details
-                      </Tooltip.Trigger>
-                      <Tooltip.Portal>
-                        <Tooltip.Content class="rounded-lg px-3 py-2 font-medium">
-                          <Card class='z-100 flex flex-col justify-center items-center space-y-4 p-3'>
-                            <p class="z-100 block flex flex-col gap-2 place-items-right"> {notification().metadata.event.description}
-                            </p>
-                        {moment(notification().metadata.event.event_time).calendar()}
-                          </Card>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    </Tooltip> */}
                         <div class="flex flex-wrap gap-6">
                           <Button
                             id={"option1" + String(notification().metadata.event.id)}

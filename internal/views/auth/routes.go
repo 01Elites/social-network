@@ -13,4 +13,6 @@ func SetupAuthRoutes() {
 	http.HandleFunc("/api/auth/gitea/callback", middleware.AllowCORS(GiteaCallback))
 	http.HandleFunc("/api/auth/github/login", middleware.AllowCORS(HandleGithubLogin))
 	http.HandleFunc("/api/auth/github/callback", middleware.AllowCORS(HandleGithubCallback))
+	http.HandleFunc("/api/auth/google/login", middleware.AllowCORS(HandleGoogleLogin))
+	http.HandleFunc("/api/auth/google/callback", middleware.AllowCORS(HandleGoogleCallback))
 }

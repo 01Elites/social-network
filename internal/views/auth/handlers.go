@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -340,20 +341,13 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 
 //gihtub login handler
 
-const (
-	githubClientID     = "1e7aa20b6eaf1123d2ab"
-	githubClientSecret = "8b4215e898cbb5f6fab983bcd7e23f88cba46db6"
-	githubRedirectURI  = "http://localhost:8081/api/auth/github/login"
-)
-
 func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL)
+	helpers.LoadEnv("internal/database/.env")
 	models.Code = r.URL.Query().Get("code")
-	fmt.Println(models.Code)
 	if models.Code == "" {
 		params := url.Values{}
-		params.Add("client_id", githubClientID)
-		params.Add("redirect_uri", githubRedirectURI)
+		params.Add("client_id", os.Getenv("GITHUB_CLIENT_ID"))
+		params.Add("redirect_uri", os.Getenv("GITHUB_REDIRECT_URI"))
 		params.Add("scope", "user:email") // Include user:email scope
 		params.Add("state", "github")
 		redirectURL := "https://github.com/login/oauth/authorize?client_id=1e7aa20b6eaf1123d2ab"
@@ -368,15 +362,12 @@ func Testing(w http.ResponseWriter, r *http.Request, redirect string) {
 }
 
 func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println(models.Code)
-
 	tokenURL := "https://github.com/login/oauth/access_token"
 	data := url.Values{}
 	data.Set("code", models.Code)
-	data.Set("client_id", githubClientID)
-	data.Set("client_secret", githubClientSecret)
-	data.Set("redirect_uri", githubRedirectURI)
+	data.Set("client_id", os.Getenv("GITHUB_CLIENT_ID"))
+	data.Set("client_secret", os.Getenv("GITHUB_CLIENT_SECRET"))
+	data.Set("redirect_uri", os.Getenv("GITHUB_REDIRECT_URI"))
 	data.Set("grant_type", "authorization_code")
 
 	resp, err := http.PostForm(tokenURL, data)
@@ -485,3 +476,6 @@ func ExtractAccessToken(body string) string {
 	}
 	return params.Get("access_token")
 }
+
+func HandleGoogleLogin(w http.ResponseWriter, r *http.Request)    {}
+func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {}

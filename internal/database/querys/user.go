@@ -460,7 +460,6 @@ func GenerateUniqueUsername(firstName, lastName string) (string, error) {
 }
 
 func GetUserIDByProvider(ProviderId string) (bool, string) {
-	fmt.Println("Provider ID:", ProviderId)
 	query := `SELECT user_id FROM public.user WHERE user_name = $1`
 
 	// Execute the query

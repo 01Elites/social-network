@@ -2,7 +2,6 @@ package follow
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -109,9 +108,7 @@ func FollowHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		notification.ID = notificationID
-		fmt.Println("hello before")
 		websocket.SendNotificationToChannel(*notification, websocket.FollowRequestChan)
-		fmt.Println("hello after")
 	}
 
 	w.WriteHeader(http.StatusOK)

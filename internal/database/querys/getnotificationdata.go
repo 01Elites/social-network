@@ -1,10 +1,11 @@
 package querys
 
 import (
+	"errors"
 	"log"
-	"time"
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
+	"time"
 )
 
 func GetFollowRequestNotification(request models.Request) (*types.Notification, error) {
@@ -27,9 +28,11 @@ func GetFollowRequestNotification(request models.Request) (*types.Notification, 
 }
 
 func GetGroupRequestData(userID string, requestID int) (*types.Notification, error) {
-	groupID, groupTitle,groupCreatorID, requesterID, createdAt,  err := getGroupFromRequest(requestID)
+	groupID, groupTitle, groupCreatorID, requesterID, createdAt, err := getGroupFromRequest(requestID)
 	if err != nil {
-		log.Print("error getting groupID")
+		if err == errors.New("no rows in result set") {
+			log.Print("error getting groupID")
+		}
 		return nil, err
 	}
 	groupCreator, err := GetUserNameByID(groupCreatorID)
@@ -77,21 +80,22 @@ func GetGroupEventData(userID string, eventID int) (*types.Notification, error) 
 	}
 
 	eventDetails := types.EventDetails{
-		ID:      eventID,
-		Title:   title,
-		Options: options,
-		EventTime: eventTime,
+		ID:          eventID,
+		Title:       title,
+		Options:     options,
+		EventTime:   eventTime,
 		Description: description,
 	}
 	notification := OrganizeGroupEventRequest(username, groupTitle, groupID, eventDetails)
 	return &notification, nil
 }
 
-
 func GetGroupInvitationData(userID string, invitationID int) (*types.Notification, error) {
-	invitedUserID,groupID, groupTitle, inviter, err := getGroupFromInvitation(invitationID)
+	invitedUserID, groupID, groupTitle, inviter, err := getGroupFromInvitation(invitationID)
 	if err != nil {
-		log.Print("error getting groupID")
+		if err == errors.New("no rows in result set") {
+			log.Print("error getting groupID")
+		}
 		return nil, err
 	}
 	ifMember, err := GroupMember(invitedUserID, groupID)

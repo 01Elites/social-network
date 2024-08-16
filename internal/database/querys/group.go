@@ -2,9 +2,9 @@ package querys
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
-	"errors"
 
 	"social-network/internal/models"
 )
@@ -175,7 +175,9 @@ func getGroupFromRequest(requestID int) (int, string, string, string, string, er
 						`
 	err := DB.QueryRow(context.Background(), query, requestID).Scan(&groupID, &groupTitle, &creator_id,&requesterID, &requested_at)
 	if err != nil {
+		if err == errors.New("no rows in result set") {
 		log.Printf("database failed to scan group user3: %v\n", err)
+		}
 		return 0, "", "", "", "", err
 	}
 	query = `SELECT COUNT(*) FROM group_member WHERE group_id = $1 AND user_id = $2`
@@ -213,7 +215,9 @@ func getGroupFromInvitation(invitationID int) (string, int, string, models.Reque
 						`
 	err := DB.QueryRow(context.Background(), query, invitationID).Scan(&invitedUser, &groupID, &groupTitle, &senderID, &sentAt)
 	if err != nil {
-		log.Printf("database failed to scan group user4: %v\n", err)
+		if err == errors.New("no rows in result set") {
+			log.Printf("database failed to scan group user4: %v\n", err)
+		}
 		return "", 0, "", models.Requester{}, err
 	}
 	inviter, err := GetUserPostFeedProfile(senderID)

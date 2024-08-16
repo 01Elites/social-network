@@ -2,9 +2,9 @@ package querys
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
-	"errors"
 
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
@@ -104,32 +104,32 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 		switch notificationType {
 		case "follow_request":
 			request, err := GetFollowRequest(relatedID)
-			if err != nil {
+			if err != nil && err.Error() != "no rows in result set" {
 				log.Println("Failed to get follow request")
 				continue
 			}
 			notification, err = GetFollowRequestNotification(*request)
-			if err != nil {
+			if err != nil && err.Error() != "no rows in result set" {
 				log.Println("Failed to get follow request")
 				continue
 			}
 		case "group_invite":
 			notification, err = GetGroupInvitationData(userID, relatedID)
-			if err != nil {
+			if err != nil && err.Error() != "no rows in result set" {
 				log.Println("Failed to get invitation Data")
 				continue
 			}
 
 		case "join_request":
 			notification, err = GetGroupRequestData(userID, relatedID)
-			if err != nil {
+			if err != nil && err.Error() != "no rows in result set" {
 				log.Println("Failed to get group request Data")
 				continue
 			}
 
 		case "event_notification":
 			notification, err = GetGroupEventData(userID, relatedID)
-			if err != nil {
+			if err != nil && err.Error() != "no rows in result set" {
 				log.Println("Failed to get group event Data")
 				continue
 			}
@@ -163,7 +163,7 @@ func OrganizeFollowRequest(recieverUsername string, sender models.UserProfile, c
 				Username:  sender.Username,
 				FirstName: sender.FirstName,
 				LastName:  sender.LastName,
-				Avatar:    sender.Avatar,		
+				Avatar:    sender.Avatar,
 			},
 			CreationDate: createdAt,
 		},
@@ -182,13 +182,13 @@ func OrganizeGroupRequest(groupCreator string, GroupTitle string, groupID int, r
 					UserName:  requester.Username,
 					FirstName: requester.FirstName,
 					LastName:  requester.LastName,
-					Avatar: 	requester.Avatar,
+					Avatar:    requester.Avatar,
 				},
 				CreationDate: createdAt,
 			},
-				ID:    groupID,
-				Title: GroupTitle,
-			},
+			ID:    groupID,
+			Title: GroupTitle,
+		},
 	}
 	return notification
 }
@@ -215,8 +215,8 @@ func OrganizeGroupInvitation(recieverUsername string, groupID int, groupTitle st
 		Message: "You have a new group invitation",
 		ToUser:  recieverUsername,
 		Metadata: types.GroupNotification{
-			ID:    groupID,
-			Title: groupTitle,
+			ID:        groupID,
+			Title:     groupTitle,
 			InvitedBy: invitedBy,
 		},
 	}

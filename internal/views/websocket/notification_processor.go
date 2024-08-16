@@ -51,7 +51,7 @@ func SendNotificationToChannel(notification types.Notification, notificationChan
 		return
 	}
 	if clients[notification.ToUser] == nil {
-		log.Println("User not online")
+		log.Println("User not online", notification.ToUser)
 		return
 	}
 	notificationChan <- notification

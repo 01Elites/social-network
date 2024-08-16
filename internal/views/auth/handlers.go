@@ -347,17 +347,17 @@ func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
 
 	models.Code = r.URL.Query().Get("code")
 	if models.Code == "" {
-			params := url.Values{}
-			params.Add("client_id", os.Getenv("GITHUB_CLIENT_ID"))
-			params.Add("redirect_uri", os.Getenv("GITHUB_REDIRECT_URI"))
-			params.Add("scope", "user:email")
-			params.Add("state", "github")
+		params := url.Values{}
+		params.Add("client_id", os.Getenv("GITHUB_CLIENT_ID"))
+		params.Add("redirect_uri", os.Getenv("GITHUB_REDIRECT_URI"))
+		params.Add("scope", "user:email")
+		params.Add("state", "github")
 
-			// Build the redirect URL with query parameters
-			redirectURL := "https://github.com/login/oauth/authorize?" + params.Encode()
-			Testing(w, r, redirectURL)
+		// Build the redirect URL with query parameters
+		redirectURL := "https://github.com/login/oauth/authorize?" + params.Encode()
+		Testing(w, r, redirectURL)
 	} else {
-			HandleGithubCallback(w, r)
+		HandleGithubCallback(w, r)
 	}
 }
 
@@ -481,5 +481,92 @@ func ExtractAccessToken(body string) string {
 	return params.Get("access_token")
 }
 
-func HandleGoogleLogin(w http.ResponseWriter, r *http.Request)    {}
-func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {}
+func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+	helpers.LoadEnv("internal/database/.env")
+	models.Code = r.URL.Query().Get("code")
+	if models.Code == "" {
+		fmt.Println("Code not found")
+		authURL := "https://accounts.google.com/o/oauth2/auth"
+		params := url.Values{}
+		params.Add("client_id", os.Getenv("GOOGLE_CLIENT_ID"))
+		params.Add("redirect_uri", os.Getenv("GOOGLE_REDIRECT_URI"))
+		params.Add("response_type", "code")
+		params.Add("scope", "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile")
+		params.Add("access_type", "offline")
+		params.Add("state", "google")
+		http.Redirect(w, r, authURL+"?"+params.Encode(), http.StatusSeeOther)
+	} else {
+		fmt.Println("Code found")
+		HandleGoogleCallback(w, r)
+	}
+}
+
+func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+	code := r.URL.Query().Get("code")
+	fmt.Println("code value is",code	)
+	// codes := strings.Split(code,"/")
+	// code = codes[1]
+	tokenURL := "https://accounts.google.com/o/oauth2/token"
+	data := url.Values{}
+	data.Set("code", code)
+	data.Set("client_id", os.Getenv("GOOGLE_CLIENT_ID"))
+	data.Set("client_secret", os.Getenv("GOOGLE_CLIENT_SECRET"))
+	data.Set("redirect_uri", os.Getenv("GOOGLE_REDIRECT_URI"))
+	data.Set("grant_type", "authorization_code")
+	resp, err := http.PostForm(tokenURL, data)
+	if err != nil {
+		log.Fatal("Error getting token:", err)
+		http.Error(w, "Error getting token", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading response body:", err)
+		http.Error(w, "Error reading response body", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("Token response:", string(body)) // Log token response for debugging
+	var tokenData map[string]interface{}
+	if err := json.Unmarshal(body, &tokenData); err != nil {
+		log.Fatal("Error parsing token response:", err)
+		http.Error(w, "Error parsing token response", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(tokenData)
+
+	accessToken := tokenData["access_token"].(string)
+	userInfoURL := "https://www.googleapis.com/oauth2/v2/userinfo"
+	req, err := http.NewRequest("GET", userInfoURL, nil)
+	if err != nil {
+		log.Fatal("Error creating request:", err)
+		http.Error(w, "Error creating request", http.StatusInternalServerError)
+		return
+	}
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+
+	client := &http.Client{}
+	resp, err = client.Do(req)
+	if err != nil {
+		log.Fatal("Error getting user info:", err)
+		http.Error(w, "Error getting user info", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	userInfoBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading user info response:", err)
+		http.Error(w, "Error reading user info response", http.StatusInternalServerError)
+		return
+	}
+
+	var userInfo map[string]interface{}
+	if err := json.Unmarshal(userInfoBody, &userInfo); err != nil {
+		log.Fatal("Error parsing user info:", err)
+		http.Error(w, "Error parsing user info", http.StatusInternalServerError)
+		return
+	}
+
+}

@@ -5,7 +5,7 @@ import (
 	"log"
 	"social-network/internal/models"
 	"social-network/internal/views/websocket/types"
-	"errors"
+	"time"
 )
 
 func GetFollowRequestNotification(request models.Request) (*types.Notification, error) {

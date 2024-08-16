@@ -459,16 +459,31 @@ func GenerateUniqueUsername(firstName, lastName string) (string, error) {
 	return username, nil
 }
 
-func GetUserIDByProvider(ProviderId,Provider string) (bool, string) {
+func GetUserIDByProvider(user models.User, UserProfile models.UserProfile) (string, error) {
 	query := `SELECT user_id FROM public.user WHERE email = $1 and provider = $2`
-
 	// Execute the query
 	var userID string
-	err := DB.QueryRow(context.Background(), query, ProviderId,Provider).Scan(&userID)
-	if err != nil {
-		return false, ""
+	DB.QueryRow(context.Background(), query, user.Email, user.Provider).Scan(&userID)
+	if userID == "" {
+		// Add the user to the database
+		if err := SignUpUser(user, UserProfile); err != nil {
+			log.Printf("Error signing up user: %v", err)
+		}
+		DB.QueryRow(context.Background(), query, user.Email, user.Provider).Scan(&userID)
 	}
+	sessionID, err := CreateLoginSession(userID)
+	return sessionID, err
+}
 
-	// User exists
-	return true, userID
+func CreateLoginSession(userID string) (string, error) {
+	sessionUUID, err := uuid.NewV4()
+	if err != nil {
+		log.Printf("Error creating session UUID: %v", err)
+		return "", err
+	}
+	if err := AddUserSession(userID, sessionUUID.String()); err != nil {
+		log.Printf("Error adding session: %v", err)
+		return "", err
+	}
+	return sessionUUID.String(), nil
 }

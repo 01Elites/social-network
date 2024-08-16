@@ -311,32 +311,18 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 		Provider:  models.Provider.Reboot,
 		Following: make(map[string]bool),
 	}
-	// Check if the user exists in the database
-	exists, userId := database.GetUserIDByProvider(user.Email,user.Provider)
-	if !exists {
-		// Add the user to the database
-		if err := database.SignUpUser(user, userProfile); err != nil {
-			log.Printf("Error signing up user: %v", err)
-			helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
-			return
-		}
-	} else {
-		sessionUUID, err := uuid.NewV4()
-		if err != nil {
-			log.Printf("Error creating session UUID: %v", err)
-			helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
-			return
-		}
-		if err := database.AddUserSession(userId, sessionUUID.String()); err != nil {
-			log.Printf("Error adding session: %v", err)
-			helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		// Set a cookie with a session token that can be used to authenticate access without logging in
-		session.SetAutherizationHeader(w, sessionUUID.String())
-		session.SetSessionCookie(w, sessionUUID.String())
-		http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+
+	sessionUUID,error := database.GetUserIDByProvider(user, userProfile)
+	if error != nil {
+		log.Printf("Error signing up user: %v", err)
+		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
+		return
 	}
+
+	session.SetAutherizationHeader(w, sessionUUID)
+	session.SetSessionCookie(w, sessionUUID)
+	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+
 }
 
 //gihtub login handler
@@ -443,31 +429,17 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		Following: make(map[string]bool),
 	}
 	// Check if the user exists in the database
-	exists, userId := database.GetUserIDByProvider(user.Email,user.Provider)
-	if !exists {
-		// Add the user to the database
-		if err := database.SignUpUser(user, userProfile); err != nil {
-			log.Printf("Error signing up user: %v", err)
-			helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
-			return
-		}
-	} else {
-		sessionUUID, err := uuid.NewV4()
-		if err != nil {
-			log.Printf("Error creating session UUID: %v", err)
-			helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
-			return
-		}
-		if err := database.AddUserSession(userId, sessionUUID.String()); err != nil {
-			log.Printf("Error adding session: %v", err)
-			helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		// Set a cookie with a session token that can be used to authenticate access without logging in
-		session.SetAutherizationHeader(w, sessionUUID.String())
-		session.SetSessionCookie(w, sessionUUID.String())
-		http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+	sessionUUID,error := database.GetUserIDByProvider(user, userProfile)
+	if error != nil {
+		log.Printf("Error signing up user: %v", err)
+		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
+		return
 	}
+
+	session.SetAutherizationHeader(w, sessionUUID)
+	session.SetSessionCookie(w, sessionUUID)
+	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+
 }
 
 func ExtractAccessToken(body string) string {
@@ -585,30 +557,15 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the user exists in the database
-	exists, userId := database.GetUserIDByProvider(user.Email,user.Provider)
-	if !exists {
-		// Add the user to the database
-		if err := database.SignUpUser(user, userProfile); err != nil {
-			log.Printf("Error signing up user: %v", err)
-			helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
-			return
-		}
-	} else {
-		sessionUUID, err := uuid.NewV4()
-		if err != nil {
-			log.Printf("Error creating session UUID: %v", err)
-			helpers.HTTPError(w, "Something Went Wrong!!", http.StatusInternalServerError)
-			return
-		}
-		if err := database.AddUserSession(userId, sessionUUID.String()); err != nil {
-			log.Printf("Error adding session: %v", err)
-			helpers.HTTPError(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		// Set a cookie with a session token that can be used to authenticate access without logging in
-		session.SetAutherizationHeader(w, sessionUUID.String())
-		session.SetSessionCookie(w, sessionUUID.String())
-		http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+	sessionUUID,error := database.GetUserIDByProvider(user, userProfile)
+	if error != nil {
+		log.Printf("Error signing up user: %v", err)
+		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
+		return
 	}
+
+	session.SetAutherizationHeader(w, sessionUUID)
+	session.SetSessionCookie(w, sessionUUID)
+	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
 
 }

@@ -94,12 +94,11 @@ func GetGroupInvitationData(userID string, invitationID int) (*types.Notificatio
 		log.Print("error getting groupID")
 		return nil, err
 	}
-	ifMember, err := GroupMember(userID, groupID)
+	ifMember, err := GroupMember(invitedUserID, groupID)
 	if err != nil {
 		log.Print("error checking if user is a member")
 		return nil, err
 	}
-	
 	if ifMember {
 		return nil, nil
 	}

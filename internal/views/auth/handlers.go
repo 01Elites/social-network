@@ -425,6 +425,15 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if userInfo["email"] == nil || userInfo["name"] == nil || userInfo["login"] == nil || userInfo["avatar_url"] == nil {
+		// Construct the redirect URL with a message or status
+		redirectURL := fmt.Sprintf("http://localhost:3000?error=%s", url.QueryEscape("private_data"))
+
+		// Redirect to the frontend with the error message
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+		return
+	}
+
 	Fullname := strings.Split(userInfo["name"].(string), " ")
 	userProfile := models.UserProfile{
 		NickName:       userInfo["login"].(string),
@@ -545,6 +554,15 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(userInfoBody, &userInfo); err != nil {
 		log.Fatal("Error parsing user info:", err)
 		http.Error(w, "Error parsing user info", http.StatusInternalServerError)
+		return
+	}
+
+	if userInfo["email"] == nil || userInfo["given_name"] == nil || userInfo["family_name"] == nil || userInfo["picture"] == nil {
+		// Construct the redirect URL with a message or status
+		redirectURL := fmt.Sprintf("http://localhost:3000?error=%s", url.QueryEscape("private_data"))
+
+		// Redirect to the frontend with the error message
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 		return
 	}
 

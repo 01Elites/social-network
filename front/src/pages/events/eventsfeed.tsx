@@ -17,6 +17,7 @@ import moment from 'moment';
 import { Card } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
 import Tooltip from '@corvu/tooltip'
+import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
 
 type eventProps = {
   events: GroupEvent[] | undefined
@@ -37,9 +38,9 @@ export function EventsFeed(props: eventProps): JSXElement{
 <For each={props.events}>
   {(event) => (
     <div>
-      <div class='flex flex-col' id={event.title}>
-      <Card class='flex h-80 w-60 flex-col text-wrap items-center space-y-5 p-3'>
-        <Tooltip
+      <div class='flex flex-col mr-4 mb-4' id={event.title}>
+      <Card class="flex flex-col p-3 w-96 h-36">
+      <Tooltip
           placement="bottom"
           openDelay={200}
           floatingOptions={{
@@ -47,14 +48,17 @@ export function EventsFeed(props: eventProps): JSXElement{
             flip: true,
             shift: true,
           }}
-        >
-          <p class='block text-xl border= "white" gap-4 font-bold flex flex-col place-items-center'>{event.title}</p>
+        ><div class="grid grid-cols-10 mb-3">
+          <RiBusinessCalendarEventLine class="w-10 h-6 mt-1" />
+          <p class='block text-xl border= "white" gap-1 font-bold col-span-7 ml-1'>
+          {event.title}</p> 
           <Tooltip.Trigger
-            class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
+            class="my-auto rounded-full bg-corvu-100 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
           >
-            Event Details
+                  <div class="mr-2">Details</div> 
           </Tooltip.Trigger>
-          <p class="text-lg font-light text-muted-foreground flex place-items-center">
+         </div>
+          <p class="text-lg font-light text-muted-foreground ml-10">
                   <Show when={moment(event.event_time).isAfter(moment())} fallback={<p>Event Done</p>}>
                   event&nbsp<time>{moment(event.event_time).fromNow()}</time></Show>
                 </p>
@@ -76,10 +80,11 @@ export function EventsFeed(props: eventProps): JSXElement{
              (!event.options[0].usernames && event.options[1].usernames?.includes(userDetails().user_name))}
           fallback={
             <>
+            <div class="flex flex-row ml-6">
               <Button
                 id={"option1" + String(event.id)}
                 variant='ghost'
-                class='flex-1 gap-2'
+                class='flex-col w-22'
                 onClick={() => {
                   handleEventOption(event.options[0].option_id, event);
                 }}
@@ -90,7 +95,7 @@ export function EventsFeed(props: eventProps): JSXElement{
               <Button
                 id={"option2" + String(event.id)}
                 variant='ghost'
-                class='flex-1 gap-2'
+                class='flex-col w-22'
                 color="red"
                 onClick={() => {
                   handleEventOption(event.options[1].option_id, event);
@@ -98,11 +103,13 @@ export function EventsFeed(props: eventProps): JSXElement{
               >
                 {event.options[1].option_name}
               </Button>
+              </div>
             </>
           }
         >
+          <div class="flex flex-row ml-7">
           <Tooltip
-            placement="right"
+            placement="bottom"
             openDelay={200}
             floatingOptions={{
               offset: 1,
@@ -113,6 +120,7 @@ export function EventsFeed(props: eventProps): JSXElement{
             <Tooltip.Trigger
               class="my-auto rounded-full bg-corvu-100 p-3 transition-all duration-100 hover:bg-corvu-200 active:translate-y-2"
             >
+
               {event.options[0].option_name} (<Show when={event.options[0].usernames == undefined}>0</Show>{event.options[0].usernames?.length})
             </Tooltip.Trigger>
             <Tooltip.Portal>
@@ -132,7 +140,7 @@ export function EventsFeed(props: eventProps): JSXElement{
             </Tooltip.Portal>
           </Tooltip>
           <Tooltip
-            placement="right"
+            placement="bottom"
             openDelay={200}
             floatingOptions={{
               offset: 1,
@@ -160,7 +168,8 @@ export function EventsFeed(props: eventProps): JSXElement{
                 <Tooltip.Arrow class="text-corvu-100" />
               </Tooltip.Content>
             </Tooltip.Portal>
-          </Tooltip>
+          </Tooltip>                                               
+          </div>                                                                            
         </Show>
       </Card>
       </div>

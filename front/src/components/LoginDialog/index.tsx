@@ -124,6 +124,13 @@ function LoginDialog(): JSXElement {
     window.location.href = config.API_URL + "/auth/google/login";
   }
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const error = urlParams.get('error');
+
+  if (error === 'private_data') {
+    alert("Your profile data is private. Please make it public or choose another provider.");
+  }
+
   function handleLoginRedirect() {
     if (ReadingSessionId === 0) {
       const token = getCookieValue('SN_SESSION');
@@ -144,10 +151,10 @@ function LoginDialog(): JSXElement {
     return null;
   }
 
-  function deleteCookie(name:string) {
+  function deleteCookie(name: string) {
     // Set the cookie's expiration date to a past date to delete it
     document.cookie = `${name}=; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Path=/; SameSite=Strict; Secure`;
-}
+  }
 
   // Call this function when the page loads
   handleLoginRedirect();

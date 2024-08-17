@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -324,10 +325,34 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Download the avatar image
+	avatarURL := gitea_user.AvatarURL
+	resp, err = http.Get(avatarURL)
+	if err != nil {
+		log.Fatal("Error downloading avatar image:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read the image data
+	imageData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading avatar image:", err)
+		return
+	}
+
+	// Save the image locally
+	base64Image := base64.StdEncoding.EncodeToString(imageData) // Encode image to Base64
+	fileName, err := helpers.SaveBase64Image(base64Image)
+	if err != nil {
+		log.Fatal("Error saving image:", err)
+		return
+	}
+
 	userProfile := models.UserProfile{
 		NickName:       gitea_user.Login,
 		ProfilePrivacy: "public",
-		Avatar:         gitea_user.AvatarURL,
+		Avatar:         fileName,
 		Gender:         "male",
 		FirstName:      strings.Split(gitea_user.FullName, " ")[0],
 		LastName:       strings.Split(gitea_user.FullName, " ")[1],
@@ -440,11 +465,45 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if userInfo["email"] == nil || userInfo["name"] == nil || userInfo["login"] == nil || userInfo["avatar_url"] == nil {
+		// Construct the redirect URL with a message or status
+		redirectURL := fmt.Sprintf("http://localhost:3000?error=%s", url.QueryEscape("private_data"))
+
+		// Redirect to the frontend with the error message
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+		return
+	}
+
+	// Download the avatar image
+	avatarURL := userInfo["avatar_url"].(string)
+	resp, err = http.Get(avatarURL)
+	if err != nil {
+		log.Fatal("Error downloading avatar image:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read the image data
+	imageData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading avatar image:", err)
+		return
+	}
+
+	// Save the image locally
+	base64Image := base64.StdEncoding.EncodeToString(imageData) // Encode image to Base64
+	fileName, err := helpers.SaveBase64Image(base64Image)
+	if err != nil {
+		log.Fatal("Error saving image:", err)
+		return
+	}
+
+	// Prepare user profile
 	Fullname := strings.Split(userInfo["name"].(string), " ")
 	userProfile := models.UserProfile{
 		NickName:       userInfo["login"].(string),
 		ProfilePrivacy: "public",
-		Avatar:         userInfo["avatar_url"].(string),
+		Avatar:         fileName, // Use the generated filename
 		Gender:         "male",
 		FirstName:      Fullname[0],
 		LastName:       Fullname[1],
@@ -468,7 +527,6 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
 	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
-
 }
 
 func ExtractAccessToken(body string) string {
@@ -563,15 +621,48 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if userInfo["email"] == nil || userInfo["given_name"] == nil || userInfo["family_name"] == nil || userInfo["picture"] == nil {
+		// Construct the redirect URL with a message or status
+		redirectURL := fmt.Sprintf("http://localhost:3000?error=%s", url.QueryEscape("private_data"))
+
+		// Redirect to the frontend with the error message
+		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+		return
+	}
+
 	username, err := database.GenerateUniqueUsername(userInfo["given_name"].(string), userInfo["family_name"].(string))
 	if err != nil {
 		log.Fatalf("Failed to generate unique username: %v", err)
 	}
 
+	// Download the avatar image
+	avatarURL := userInfo["picture"].(string)
+	resp, err = http.Get(avatarURL)
+	if err != nil {
+		log.Fatal("Error downloading avatar image:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read the image data
+	imageData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading avatar image:", err)
+		return
+	}
+
+	// Save the image locally
+	base64Image := base64.StdEncoding.EncodeToString(imageData) // Encode image to Base64
+	fileName, err := helpers.SaveBase64Image(base64Image)
+	if err != nil {
+		log.Fatal("Error saving image:", err)
+		return
+	}
+
 	userProfile := models.UserProfile{
 		NickName:       userInfo["given_name"].(string),
 		ProfilePrivacy: "public",
-		Avatar:         userInfo["picture"].(string),
+		Avatar:         fileName,
 		Gender:         "male",
 		FirstName:      userInfo["given_name"].(string),
 		LastName:       userInfo["family_name"].(string),

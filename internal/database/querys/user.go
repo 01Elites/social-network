@@ -278,15 +278,45 @@ func AddUserSession(userID string, sessionID string) error {
 		return nil
 	}
 
-func DeleteUserSession(sessionID string) error {
-	// Delete user session from database
-	query := `DELETE FROM public.session WHERE session_uuid = $1`
-	_, err := DB.Exec(context.Background(), query, sessionID)
+// func DeleteUserSession(sessionID string) error {
+// 	// Delete user session from database
+// 	query := `DELETE FROM public.session WHERE session_uuid = $1`
+// 	_, err := DB.Exec(context.Background(), query, sessionID)
+// 	if err != nil {
+// 		log.Printf("Failed to delete user session: %v\n", err)
+// 		return err
+// 	}
+// 	return nil
+// }
+
+func DeleteUserSession(sessionID string) (string, error) {
+	var username string
+
+	// First, get the username based on the session ID
+	queryGetUsername := `
+		SELECT u.user_name
+		FROM public.session s
+		JOIN public.user u ON s.user_id = u.user_id
+		WHERE s.session_uuid = $1;
+	`
+	err := DB.QueryRow(context.Background(), queryGetUsername, sessionID).Scan(&username)
+	if err != nil {
+		log.Printf("Failed to get username: %v\n", err)
+		return "", err
+	}
+
+	// Then, delete the session
+	queryDelete := `
+		DELETE FROM public.session
+		WHERE session_uuid = $1;
+	`
+	_, err = DB.Exec(context.Background(), queryDelete, sessionID)
 	if err != nil {
 		log.Printf("Failed to delete user session: %v\n", err)
-		return err
+		return "", err
 	}
-	return nil
+
+	return username, nil
 }
 
 func ValidateSessionToken(sessionID string) (string, error) {

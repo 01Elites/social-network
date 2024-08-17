@@ -20,7 +20,7 @@ var (
 			return true
 		},
 	}
-	clients = make(map[string]*types.User)
+	Clients = make(map[string]*types.User)
 	cmutex  sync.Mutex
 )
 

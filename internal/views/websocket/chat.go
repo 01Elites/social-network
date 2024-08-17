@@ -306,8 +306,8 @@ func OpenChat(RevEvent types.Event, user *types.User) {
 
 func CloseChat(user *types.User) {
 	cmutex.Lock()
-	clients[user.Username].ChatOpened = ""
-	clients[user.Username].ChatOpenedIsGroup = false
+	Clients[user.Username].ChatOpened = ""
+	Clients[user.Username].ChatOpenedIsGroup = false
 	cmutex.Unlock()
 }
 
@@ -339,8 +339,8 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		}
 
 		cmutex.Lock()
-		clients[user.Username].ChatOpened = payload.Recipient
-		clients[user.Username].ChatOpenedIsGroup = false
+		Clients[user.Username].ChatOpened = payload.Recipient
+		Clients[user.Username].ChatOpenedIsGroup = false
 		cmutex.Unlock()
 
 		// Check if the chat exists
@@ -356,8 +356,8 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		}
 
 		cmutex.Lock()
-		clients[user.Username].ChatOpened = payload.Recipient
-		clients[user.Username].ChatOpenedIsGroup = true
+		Clients[user.Username].ChatOpened = payload.Recipient
+		Clients[user.Username].ChatOpenedIsGroup = true
 		cmutex.Unlock()
 	}
 	if chatID != 0 {
@@ -377,13 +377,13 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		// if len(messages) != 0 {
 		// 	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 		// }
-		
+
 		if len(messages) != 0 {
 			for i := range messages {
 				messageResponse.Messages = messages[i : i+1]
 				sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 			}
 		}
-		// updateNotification(clients[user.ID], recipientID, false)
+		// updateNotification(Clients[user.ID], recipientID, false)
 	}
 }

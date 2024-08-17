@@ -10,14 +10,14 @@ import (
 )
 
 func IsUserConnected(username string) bool {
-	_, ok := clients[username]
+	_, ok := Clients[username]
 	return ok
 }
 
 func GetClient(userName string) (*types.User, bool) {
 	cmutex.Lock()
 	defer cmutex.Unlock()
-	user, ok := clients[userName]
+	user, ok := Clients[userName]
 	return user, ok
 }
 
@@ -25,13 +25,13 @@ func SetClientOffline(user *types.User) {
 	// Remove the client from the Clients map
 	fmt.Printf("\nSetClientOffline %s\n\n", user.Username)
 	cmutex.Lock()
-	if clients[user.Username] == nil {
+	if Clients[user.Username] == nil {
 		cmutex.Unlock()
 		return
 	}
-	userID := clients[user.Username].ID
-	clients[user.Username].Conn = nil
-	delete(clients, user.Username)
+	userID := Clients[user.Username].ID
+	Clients[user.Username].Conn = nil
+	delete(Clients, user.Username)
 	cmutex.Unlock()
 	updateFollowersUserList(userID)
 }
@@ -41,8 +41,8 @@ func SetClientOnline(user *types.User) {
 	fmt.Printf("\nSetClientOnline %s\n\n", user.Username)
 	cmutex.Lock()
 	defer cmutex.Unlock()
-	clients[user.Username] = user
-	// updateFollowersUserList(user.ID)
+	Clients[user.Username] = user
+	updateFollowersUserList(user.ID)
 }
 
 func GetUserList(user *types.User) {
@@ -86,7 +86,7 @@ func buildUserListSection(sectionName string, usernames []string) types.Section 
 			LastName:  userProfile.LastName,
 			Avatar:    userProfile.Avatar,
 		}
-		if _, ok := clients[username]; ok {
+		if _, ok := Clients[username]; ok {
 			userDetails.State = "online"
 		} else {
 			userDetails.State = "offline"
@@ -102,9 +102,20 @@ func updateFollowersUserList(userid string) {
 		log.Print("error getting followers:", err)
 		return
 	}
+	dms, err := database.GetPrivateChatUsernames(userid)
+	if err != nil {
+		log.Print("error getting dms:", err)
+		return
+	}
 	for _, followerUsername := range followers {
-		if clients[followerUsername] != nil {
-			sendUserList(clients[followerUsername])
+		if Clients[followerUsername] != nil {
+			sendUserList(Clients[followerUsername])
 		}
 	}
+	for _, dmUsername := range dms {
+		if Clients[dmUsername] != nil {
+			dmUserList(Clients[dmUsername])
+		}
+	}
+
 }

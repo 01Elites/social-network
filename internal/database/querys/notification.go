@@ -105,32 +105,32 @@ func GetUserNotifications(userID string) ([]types.Notification, error) {
 		case "follow_request":
 			request, err := GetFollowRequest(relatedID)
 			if err != nil && err.Error() != "no rows in result set" {
-				log.Println("Failed to get follow request")
+				log.Println("Failed to get follow request", err)
 				continue
 			}
 			notification, err = GetFollowRequestNotification(*request)
 			if err != nil && err.Error() != "no rows in result set" {
-				log.Println("Failed to get follow request")
+				log.Println("Failed to get follow request", err)
 				continue
 			}
 		case "group_invite":
 			notification, err = GetGroupInvitationData(userID, relatedID)
 			if err != nil && err.Error() != "no rows in result set" {
-				log.Println("Failed to get invitation Data")
+				log.Println("Failed to get invitation Data", err)
 				continue
 			}
 
 		case "join_request":
 			notification, err = GetGroupRequestData(userID, relatedID)
 			if err != nil && err.Error() != "no rows in result set" {
-				log.Println("Failed to get group request Data")
+				log.Println("Failed to get group request Data ", err)
 				continue
 			}
 
 		case "event_notification":
 			notification, err = GetGroupEventData(userID, relatedID)
 			if err != nil && err.Error() != "no rows in result set" {
-				log.Println("Failed to get group event Data")
+				log.Println("Failed to get group event Data ", err)
 				continue
 			}
 			log.Println("Follow request notification")

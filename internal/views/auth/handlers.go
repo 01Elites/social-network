@@ -267,18 +267,32 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 	io.WriteString(w, "LogOut success")
 }
 
-var oauth2Config = &oauth2.Config{
-	ClientID:     os.Getenv("GITEA_CLIENT_ID"),
-	ClientSecret: os.Getenv("GITEA_CLIENT_SECRET"),
-	Endpoint: oauth2.Endpoint{
-		AuthURL:  "https://learn.reboot01.com/git/login/oauth/authorize",
-		TokenURL: "https://learn.reboot01.com/git/login/oauth/access_token",
-	},
-	RedirectURL: os.Getenv("GITEA_REDIRECT_URI"),
-	Scopes:      []string{"read:user"},
+var oauth2Config *oauth2.Config
+
+func getOAuth2Config() *oauth2.Config {
+	if oauth2Config == nil {
+		helpers.LoadEnv("internal/database/.env")
+
+		oauth2Config = &oauth2.Config{
+			ClientID:     os.Getenv("GITIEA_CLIENT_ID"),
+			ClientSecret: os.Getenv("GITIEA_CLIENT_SECRET"),
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  "https://learn.reboot01.com/git/login/oauth/authorize",
+				TokenURL: "https://learn.reboot01.com/git/login/oauth/access_token",
+			},
+			RedirectURL: os.Getenv("GITIEA_REDIRECT_URI"),
+			Scopes:      []string{"read:user"},
+		}
+
+		if oauth2Config.ClientID == "" {
+			log.Fatal("GITEA_CLIENT_ID is not set or could not be loaded")
+		}
+	}
+	return oauth2Config
 }
 
 func GiteaLogin(w http.ResponseWriter, r *http.Request) {
+	getOAuth2Config()
 	url := oauth2Config.AuthCodeURL("state", oauth2.AccessTypeOnline)
 	http.Redirect(w, r, url, http.StatusFound)
 }
@@ -327,7 +341,7 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 		Following: make(map[string]bool),
 	}
 
-	sessionUUID,error := database.GetUserIDByProvider(user, userProfile)
+	sessionUUID, error := database.GetUserIDByProvider(user, userProfile)
 	if error != nil {
 		log.Printf("Error signing up user: %v", err)
 		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
@@ -444,7 +458,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		Following: make(map[string]bool),
 	}
 	// Check if the user exists in the database
-	sessionUUID,error := database.GetUserIDByProvider(user, userProfile)
+	sessionUUID, error := database.GetUserIDByProvider(user, userProfile)
 	if error != nil {
 		log.Printf("Error signing up user: %v", err)
 		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
@@ -572,7 +586,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the user exists in the database
-	sessionUUID,error := database.GetUserIDByProvider(user, userProfile)
+	sessionUUID, error := database.GetUserIDByProvider(user, userProfile)
 	if error != nil {
 		log.Printf("Error signing up user: %v", err)
 		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)

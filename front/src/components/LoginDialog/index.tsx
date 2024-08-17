@@ -138,7 +138,6 @@ function LoginDialog(): JSXElement {
       if (token) {
         localStorage.setItem('SN_TOKEN', token);
         deleteCookie('SN_SESSION');
-        fetchUserDetails();
         ReadingSessionId = 1;
       }
     }

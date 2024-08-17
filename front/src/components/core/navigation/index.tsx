@@ -31,6 +31,7 @@ import { cn } from '~/lib/utils';
 import { NotificationsPage, showNotifications } from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
 import { BsCircleFill } from 'solid-icons/bs'
+import { useUserDetails } from '~/hooks/userDetails';
 
 interface NavigationProps {
   children: JSXElement;
@@ -165,7 +166,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
           <DropdownMenu>
             <DropdownMenuTrigger class='flex w-full flex-row items-center justify-center gap-2 px-2 md:justify-start'>
               <Avatar>
-                <AvatarImage src={userCtx!.userDetails()?.avatar}></AvatarImage>
+                <AvatarImage src={`${config.API_URL}/image/${userCtx!.userDetails()?.avatar}`}></AvatarImage>
                 <AvatarFallback>
                   {userCtx!.userDetails()?.first_name.charAt(0).toUpperCase()}
                 </AvatarFallback>

@@ -5,17 +5,17 @@ import { UserDetailsHook } from '~/hooks/userDetails';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import NewPostPreview from './NewPostPreview';
+import config from '~/config';
 
 export default function NewPostCell(): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   const [postPreviewOpen, setPostPreviewOpen] = createSignal(false);
-
   return (
     <div class='flex gap-2 rounded border-[1px] p-2'>
       <NewPostPreview setOpen={setPostPreviewOpen} open={postPreviewOpen()} />
       <Avatar>
-        <AvatarImage src={userDetails()?.avatar} />
+        <AvatarImage src={`${config.API_URL}/image/${userDetails()?.avatar}`} />
         <AvatarFallback>
           {userDetails()?.first_name.charAt(0).toUpperCase()}
         </AvatarFallback>

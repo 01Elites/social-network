@@ -5,7 +5,7 @@ import Repeat from '../core/repeat';
 import { Skeleton } from '../ui/skeleton';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { WebsocketHook } from '~/hooks/WebsocketHook';
-import { Avatar, AvatarFallback } from '../../components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import config from '../../config';
 import { Card } from '../../components/ui/card';
 import { UserDetailsHook } from '~/hooks/userDetails';
@@ -95,40 +95,29 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
                   </div>
                 </Repeat>
               }>
-                <For each={section.users}>{(item) => (
+                <For each={section.users}>{(user) => (
                   // set chat state when a user is clicked
                   <Card class='cursor-pointer' onClick={() => {
                     if (props.setChatState != null) {
-                      console.log('Opening chat with', item.user_name);
+                      console.log('Opening chat with', user.user_name);
                       props.setChatState({
                         isOpen: true,
-                        chatWith: item.user_name
+                        chatWith: user.user_name
                       });
                     }
                   }}>
                     <div class='flex items-center gap-3 relative'>
                       <div class='relative'>
                         <Avatar>
-                          <AvatarFallback>
-                            <Show when={item.avatar} fallback={item.first_name.charAt(0).toUpperCase()}>
-                              <img
-                                alt='avatar'
-                                class='size-full rounded-md rounded-b-none object-cover'
-                                loading='lazy'
-                                src={`${config.API_URL}/image/${item.avatar}`}
-                              />
-                            </Show>
-                          </AvatarFallback>
+                          <AvatarImage src={`${config.API_URL}/image/${user.avatar}`} />
+                          <AvatarFallback>{user.first_name.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
-                        <div class={cn('absolute top-0 right-0 w-3 h-3 rounded-full z-10', {
-                          'bg-green-500': item.state === 'online',
-                          'bg-red-500': item.state !== 'online',
-                        })}></div>
+                        <div class={cn('absolute top-0 right-0 w-3 h-3 rounded-full z-10', user.state ? 'bg-green-500' : 'bg-red-500')}></div>
                       </div>
                       <div class='grow space-y-2'>
                         <div class='flex flex-col items-center justify-center space-x-1'>
-                          <div>{item.first_name} {item.last_name}</div>
-                          <div>{item.user_name}</div>
+                          <div>{user.first_name} {user.last_name}</div>
+                          <div>{user.user_name}</div>
                         </div>
                       </div>
                     </div>

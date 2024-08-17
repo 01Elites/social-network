@@ -27,8 +27,8 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const wsCtx = useContext(WebSocketContext) as WebsocketHook;
   const [sections, setSections] = createSignal<Section[]>([
-    { name: 'Following', users: [] },
-    { name: 'Direct Messages', users: [] }
+    { name: 'Direct Messages', users: [] },
+    { name: 'Following', users: [] }
   ]);
 
   createEffect(() => {

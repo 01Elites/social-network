@@ -34,7 +34,11 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
     setPosts(updatedPosts);
   }
   createEffect(() => {
-    if (!userDetails()) return;
+    if (!userDetails()) {
+      setPosts(null as any);
+      return;
+    };
+
     fetchWithAuth(config.API_URL + props.path)
       .then(async (res) => {
         const body = await res.json();

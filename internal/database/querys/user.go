@@ -267,6 +267,17 @@ func AddUserSession(userID string, sessionID string) error {
 	return nil
 }
 
+	// delete the previous session of the user if exists
+	func DeleteUserSessions(userID string) error {
+		query := `DELETE FROM public.session WHERE user_id = $1`
+		_, err := DB.Exec(context.Background(), query, userID)
+		if err != nil {
+			log.Printf("Failed to delete user session: %v\n", err)
+			return err
+		}
+		return nil
+	}
+
 func DeleteUserSession(sessionID string) error {
 	// Delete user session from database
 	query := `DELETE FROM public.session WHERE session_uuid = $1`

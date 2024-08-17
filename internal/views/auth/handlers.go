@@ -213,6 +213,13 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// delete the previous sessions
+	if err := database.DeleteUserSessions(user.UserID); err != nil {
+		log.Printf("Error deleting session: %v", err)
+		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
+		return
+	}
+
 	// Add session to database
 	if err := database.AddUserSession(user.UserID, sessionUUID.String()); err != nil {
 		log.Printf("Error adding session: %v", err)

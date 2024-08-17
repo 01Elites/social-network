@@ -9,6 +9,8 @@ import {
 
 import logo from '~/assets/logo.svg';
 import rebootLogo from '~/assets/reboot_01_logo.png';
+import githubLogo from '~/assets/github_logo.png';
+import googleLogo from '~/assets/google_logo.png';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import moment from 'moment';
@@ -52,6 +54,8 @@ const [loginOpen, setLoginOpen] = createSignal(false);
 function showLogin() {
   setLoginOpen(true);
 }
+
+let ReadingSessionId = 0;
 
 function LoginDialog(): JSXElement {
   const userDetailsCtx = useContext(
@@ -108,9 +112,46 @@ function LoginDialog(): JSXElement {
       });
   }
 
+  function handleLoginWithGithub() {
+    window.location.href = config.API_URL + "/auth/github/login";
+  }
+
   function handleLoginWithReboot() {
     window.location.href = config.API_URL + "/auth/gitea/login";
   }
+
+  function handleLoginWithGoogle() {
+    window.location.href = config.API_URL + "/auth/google/login";
+  }
+
+  function handleLoginRedirect() {
+    if (ReadingSessionId === 0) {
+      const token = getCookieValue('SN_SESSION');
+      console.log(token);
+      if (token) {
+        localStorage.setItem('SN_TOKEN', token);
+        deleteCookie('SN_SESSION');
+        fetchUserDetails();
+        ReadingSessionId = 1;
+      }
+    }
+  }
+
+  function getCookieValue(name: string) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() as string;
+    return null;
+  }
+
+  function deleteCookie(name:string) {
+    // Set the cookie's expiration date to a past date to delete it
+    document.cookie = `${name}=; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Path=/; SameSite=Strict; Secure`;
+}
+
+  // Call this function when the page loads
+  handleLoginRedirect();
+
 
   // -------- Signup Dialog --------
   const [signupFirstName, setSignupFirstName] = createSignal('');
@@ -426,11 +467,28 @@ function LoginDialog(): JSXElement {
               variant='outline'
               class='gap-4'
               onClick={handleLoginWithReboot}
-              // disabled={formProcessing()}
               disabled={false}
             >
               <img alt='' src={rebootLogo} class='h-5'></img>
               Login with Reboot01
+            </Button>
+            <Button
+              variant='outline'
+              class='gap-4'
+              onClick={handleLoginWithGithub}
+              disabled={false}
+            >
+              <img alt='' src={githubLogo} class='h-5'></img>
+              Login with GitHub
+            </Button>
+            <Button
+              variant='outline'
+              class='gap-4'
+              onClick={handleLoginWithGoogle}
+              disabled={false}
+            >
+              <img alt='' src={googleLogo} class='h-5'></img>
+              Login with Google
             </Button>
             <TextField
               class='grid w-full items-center gap-1.5'

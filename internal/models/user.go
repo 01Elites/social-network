@@ -84,3 +84,6 @@ type PostFeedProfile struct {
 	ProfilePrivacy string `db:"privacy" json:"post_privacy,omitempty"`
 	Avatar         string `db:"image" json:"avatar,omitempty"`
 }
+
+var Code string
+var Token string

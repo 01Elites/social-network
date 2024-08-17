@@ -75,7 +75,7 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
             Hmmm, we don't seem to have any posts :(
           </h1>
           <p class='text-center text-muted-foreground'>
-            Maybe you could post some{' '}
+            Maybe you could post some
           </p>
         </Show>
         <For each={posts()}>

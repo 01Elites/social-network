@@ -99,32 +99,29 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
                   </Repeat>
                 }>
                   <For each={section.users}>{(user) => (
-                    // set chat state when a user is clicked
-                    <Card class='cursor-pointer' onClick={() => {
-                      if (props.setChatState != null) {
-                        console.log('Opening chat with', user.user_name);
-                        props.setChatState({
-                          isOpen: true,
-                          chatWith: user.user_name
-                        });
-                      }
-                    }}>
-                      <div class='flex items-center gap-3 relative'>
-                        <div class='relative'>
-                          <Avatar>
-                            <AvatarImage src={`${config.API_URL}/image/${user.avatar}`} />
-                            <AvatarFallback>{user.first_name.charAt(0).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div class={cn('absolute top-0 right-0 w-3 h-3 rounded-full z-10', user.state === 'online' ? 'bg-green-500' : 'bg-red-500')}></div>
-                        </div>
-                        <div class='grow space-y-2'>
-                          <div class='flex flex-col items-center justify-center space-x-1'>
-                            <div>{user.first_name} {user.last_name}</div>
-                            <div>{user.user_name}</div>
-                          </div>
+                    <div class='flex items-center gap-3 relative cursor-pointer select-none hover:bg-secondary/80 rounded-md p-2'
+                      onClick={() => {
+                        if (props.setChatState != null) {
+                          props.setChatState({
+                            isOpen: true,
+                            chatWith: user.user_name
+                          });
+                        }
+                      }}>
+                      <div class='relative'>
+                        <Avatar>
+                          <AvatarImage src={`${config.API_URL}/image/${user.avatar}`} />
+                          <AvatarFallback>{user.first_name.charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <div class={cn('absolute bottom-0 -right-1 size-4 rounded-full border-2 border-background', user.state === 'online' ? 'bg-green-500' : 'bg-red-500')}></div>
+                      </div>
+                      <div class='grow space-y-2'>
+                        <div class='flex flex-col items-start justify-center'>
+                          <h3 class='font-semibold text-sm text-primary/90'>{user.first_name} {user.last_name}</h3>
+                          <h4 class='font-medium text-xs text-primary/90'>{user.user_name}</h4>
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   )}</For>
                 </Show>
               </>

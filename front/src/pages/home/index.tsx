@@ -20,7 +20,7 @@ export default function HomePage(): JSXElement {
   return (
     <Layout>
       <section class='flex h-full gap-4'>
-        <HomeEvents class='hidden w-5/12 max-w-60 overflow-hidden md:flex' />
+        {/* <HomeEvents class='hidden w-5/12 max-w-60 overflow-hidden md:flex' /> */}
         <Show when={chatState().isOpen} fallback={<Feed class='grow overflow-hidden' />}>
           <ChatPage class='grow place-content-end overflow-hidden' chatState={chatState()} setChatState={setChatState} />
         </Show>

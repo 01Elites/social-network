@@ -1,4 +1,4 @@
-import { createEffect, createSignal, JSXElement, useContext } from 'solid-js';
+import { createEffect, createSignal, JSXElement, Setter, useContext } from 'solid-js';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -22,9 +22,11 @@ import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import { showToast } from '../ui/toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { Post } from '~/types/Post';
 
 interface NewPostPreviewProps {
   open: boolean;
+  setPosts: Setter<Post[] | undefined>;
   setOpen: (open: boolean) => void;
 }
 
@@ -41,6 +43,27 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
   const [selectedUsers, setSelectedUsers] = createSignal<String[]>([]);
 
   const [formProcessing, setFormProcessing] = createSignal(false);
+
+  async function addNewPost(id: string) {
+    fetchWithAuth(`${config.API_URL}/post/${id}`, {
+      method: 'GET',
+    }).then(async (response) => {
+      const resp_json = await response.json();
+      props.setPosts?.((prev) => {
+        if (prev) {
+          return [resp_json, ...prev];
+        }
+        return [resp_json];
+      });
+    }).catch(async (error) => {
+      showToast({
+        title: 'Could not get post',
+        description: 'An error occurred while getting posting your content',
+        variant: 'error',
+      });
+      console.error('Error fetching post:', error);
+    });
+  }
 
   async function makePost() {
     setFormProcessing(true);
@@ -68,18 +91,21 @@ export default function NewPostPreview(props: NewPostPreviewProps): JSXElement {
     })
       .then(async (response) => {
         setFormProcessing(false);
+        const resp_json = await response.json();
         if (!response.ok) {
-          const errMsg = await response.json();
           showToast({
             title: 'Could not post',
-            description: errMsg.reason
-              ? errMsg.reason
+            description: resp_json.reason
+              ? resp_json.reason
               : 'An error occurred while posting your content',
             variant: 'error',
           });
         } else {
           props.setOpen(false);
+          addNewPost(resp_json.id);
         }
+
+        fetchWithAuth
       })
       .catch((error) => {
         setFormProcessing(false);

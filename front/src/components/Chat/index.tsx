@@ -36,6 +36,8 @@ export default function ChatPage(props: FeedProps): JSXElement {
     setMessages(prevMessages => [...prevMessages, data]);
   });
 
+  
+
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
       <div class="overflow-y-scroll grow">
@@ -49,18 +51,17 @@ export default function ChatPage(props: FeedProps): JSXElement {
           })
         }
       </div>
-      {/* <ChatMessage message='Hello' type='sent' />
-      <ChatMessage message='Hiiiii' type='received' />
-      <ChatMessage
-        message='How is it gdsg goooooinnnngg!!!fdsfjsdjfOJOfnsdjjfsd,klkojojfsd,f mdsknGDSifhiudshughIS!'
-        type='received'
-      /> */}
+
       <TextField class='flex flex-row w-full content-end items-end self-end align-bottom'>
         <Button onClick={() => {
           console.log('Close chat');
           props.setChatState!({
             isOpen: false,
             chatWith: '',
+          });
+          useWebsocket.send({
+            event: 'CHAT_CLOSED',
+            payload: {},
           });
         }}>Close</Button>
         <TextFieldInput

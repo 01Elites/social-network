@@ -144,6 +144,15 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
                     <div class='flex items-center gap-3 relative cursor-pointer select-none hover:bg-secondary/80 rounded-md p-2'
                       onClick={() => {
                         if (props.setChatState != null) {
+                          props.setChatState!({
+                            isOpen: false,
+                            chatWith: '',
+                          });
+                          wsCtx.send({
+                            event: "CHAT_CLOSED",
+                            payload: {}
+                          });
+
                           props.setChatState({
                             isOpen: true,
                             chatWith: user.user_name

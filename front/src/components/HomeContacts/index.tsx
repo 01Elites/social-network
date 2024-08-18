@@ -128,8 +128,6 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
             )}
           </For>
         </Show>
-
-
       </section>
     </section >
   );

@@ -193,7 +193,7 @@ function ProfileEditDialog(): JSXElement {
             onChange={setNickName}
             value={userNickName()}
           >
-            <TextFieldLabel for='nickname'>NickName</TextFieldLabel>
+            <TextFieldLabel for='nickname'>Nickname</TextFieldLabel>
             <TextFieldInput
               type='text'
               id='nickname'

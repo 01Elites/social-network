@@ -12,6 +12,7 @@ import { Button } from '~/components/ui/button';
 import NewEventCell from './neweventcell';
 import GroupContacts from "./groupcontacts";
 import GroupChatPage from '~/components/GroupChat';
+import { Post } from '~/types/Post';
 
 type GroupPostFeedProps = {
   groupID: string;
@@ -35,6 +36,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
     isOpen: true,
     chatWith: props.groupID
   });
+  const [posts, setPosts] = createSignal<Post[]>();
 
   function sendRequestApi(username: string) {
     if (buttonData() === null) {
@@ -98,14 +100,15 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
       >
         <div class={cn('flex flex-col gap-4 p-2')}>
           <div class={cn('flex flex-col gap-4 p-2')}>
-            <FeedPosts path={`/group/${props.groupID}/posts`} />
+
+            <FeedPosts path={`/group/${props.groupID}/posts`} posts={posts} setPosts={setPosts} />
           </div>
         </div>
       </Tabs.Content>
 
 
       <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="chat">
-      <GroupChatPage class='grow place-content-end overflow-hidden' chatState={groupChatState()} setChatState={setGroupChatState} />
+        <GroupChatPage class='grow place-content-end overflow-hidden' chatState={groupChatState()} setChatState={setGroupChatState} />
       </Tabs.Content>
 
       <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="events">

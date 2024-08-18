@@ -12,6 +12,7 @@ import Friends from '~/types/friends';
 import User from '~/types/User';
 import FollowRequest from './followRequest';
 import './style.css';
+import { Post } from '~/types/Post';
 
 type ProfileParams = {
   username: string;
@@ -22,7 +23,7 @@ export default function ProfileFeed(props: {
 }): JSXElement {
   const params: ProfileParams = useParams();
   const [targetFriends, setTargetFriends] = createSignal<Friends | undefined>();
-
+  const [posts, setPosts] = createSignal<Post[]>();
   createEffect(() => {
     // Fetch user Friends
     fetchWithAuth(config.API_URL + '/friends/' + params.username).then(async (res) => {
@@ -69,9 +70,10 @@ export default function ProfileFeed(props: {
             }
           >
             <Show when={props.targetUser().email != undefined}>
-              <NewPostCell />
+              <NewPostCell setPosts={setPosts} />
             </Show>
-            <FeedPosts path={`/profile/${params.username}/posts`} />
+
+            <FeedPosts path={`/profile/${params.username}/posts`} posts={posts} setPosts={setPosts} />
           </Show>
         </div>
       </Tabs.Content>

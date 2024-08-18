@@ -36,10 +36,14 @@ export default function ChatPage(props: FeedProps): JSXElement {
     setMessages(prevMessages => [...prevMessages, data]);
   });
 
-  
-
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
+      <div class="flex justify-center items-center h-12 bg-primary-foreground text-primary-background">
+        <a href={`/profile/${props.chatState?.chatWith}`}
+          class='items-center text-base font-bold '
+        >{props.chatState?.chatWith}
+        </a>
+      </div>
       <div class="overflow-y-scroll grow">
         {messages().length > 0 &&
           messages().map((message, index) => {

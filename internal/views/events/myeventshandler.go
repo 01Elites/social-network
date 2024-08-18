@@ -69,9 +69,16 @@ func MyEventsHandler(w http.ResponseWriter, r *http.Request) {
 						}
 					}
 				}
+				if optionChoosen{
+					continue
+				} else {
 				myEvents.PendingEvents = append(myEvents.PendingEvents, event)
 				}
+				}
 	}
+	myEvents.PastEvents = helpers.ArrangeEvents(myEvents.PastEvents)
+	myEvents.PendingEvents = helpers.ArrangeEvents(myEvents.PendingEvents)
+	myEvents.UpcomingEvents = helpers.ArrangeEvents(myEvents.UpcomingEvents)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(myEvents)
 }

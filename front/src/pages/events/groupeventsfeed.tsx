@@ -28,7 +28,7 @@ export function EventsFeed(props: eventProps): JSXElement{
   return (<>
   <Show when={props.events?.length === 0}>
   <h1 class='text-center font-bold text-muted-foreground'>
-    Hmmm, we don't seem to have any props.events :(
+    Hmmm, we don't seem to have any events :(
   </h1>
   <p class='text-center text-muted-foreground'>
     Maybe you could post some{' '}

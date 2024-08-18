@@ -20,7 +20,7 @@ var (
 			return true
 		},
 	}
-	Clients = make(map[string]*types.User)
+	clients = make(map[string]*types.User)
 	cmutex  sync.Mutex
 )
 
@@ -41,31 +41,22 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Retrieve the username from the database
-	username, err := database.GetUserNameByID(userID)
+	user, err := SetClientOnline(userID, conn)
 	if err != nil {
-		log.Println("Error getting user name:", err)
-		helpers.HTTPError(w, "Could not get user name", http.StatusInternalServerError)
+		log.Println("Error setting client online:", err)
+		helpers.HTTPError(w, "Could not set client online", http.StatusInternalServerError)
 		return
 	}
+	updateUserInUserList(user, types.State.Online)
 
-	// Create the user object and mark the user as online
-	user := types.User{
-		ID:       userID,
-		Username: username,
-		Conn:     conn,
-		Mutex:    &sync.Mutex{},
-	}
-	SetClientOnline(&user)
-
-	go ProcessEvents(&user)
+	go ProcessEvents(conn, user)
 }
 
 // Function to send JSON data to a WebSocket connection
 func sendMessageToWebSocket(user *types.User, eventType string, data interface{}) error {
 	// Check if the WebSocket connection is nil
-	if user.Conn == nil {
-		log.Println("Connection is nil")
+	if user != nil && len(user.Conns) == 0 {
+		log.Println("NO Connection")
 		return nil
 	}
 	// Format the message payload according to the given event type and data
@@ -84,9 +75,11 @@ func sendMessageToWebSocket(user *types.User, eventType string, data interface{}
 	user.Mutex.Lock()
 	defer user.Mutex.Unlock()
 	// Write the payload to the WebSocket connection as a text message
-	if err := user.Conn.WriteMessage(websocket.TextMessage, []byte(messagesJSON)); err != nil {
-		log.Println("Error writing message to WebSocket:", err)
-		return err
+	// Iterate over all connections and send the message
+	for conn := range user.Conns {
+		if err := conn.WriteMessage(websocket.TextMessage, messagesJSON); err != nil {
+			log.Printf("Error writing message to WebSocket connection: %v\n", err)
+		}
 	}
 	return nil
 }

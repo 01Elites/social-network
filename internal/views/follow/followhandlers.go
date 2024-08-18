@@ -169,6 +169,6 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
-
+	websocket.AddUserToUserList(response.Follower, response.Followee, "Following")
 	w.WriteHeader(http.StatusOK)
 }

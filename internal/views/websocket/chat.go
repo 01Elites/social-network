@@ -147,15 +147,9 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 
 	messageResponse.Messages = []types.Chat{message}
 
-	// Convert the message struct to JSON
-	jsonData, err := json.Marshal(messageResponse)
-	if err != nil {
-		log.Println(err, "failed to marshal JSON data")
-		return
-	}
 
 	// Write JSON data to the WebSocket connection of the user
-	sendMessageToWebSocket(user, event.GET_MESSAGES, jsonData)
+	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 
 	// Send the message to the group members if they are online and has
 	// connection
@@ -166,11 +160,14 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 	}
 
 	for _, member := range members {
+		if member.UserName == user.Username {
+			continue
+		}
 		// Get the recipient's client from the Clients map
 		recipient, online := GetClient(member.UserName)
 		if online && len(recipient.Conns) != 0 {
 			// Write JSON data to the WebSocket connection of the recipient
-			sendMessageToWebSocket(recipient, event.GET_MESSAGES, jsonData)
+			sendMessageToWebSocket(recipient, event.GET_MESSAGES, messageResponse)
 
 			// Update the notification field of the recipient in the UserList
 			// if !message.Read {

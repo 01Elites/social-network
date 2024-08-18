@@ -3,12 +3,13 @@ package websocket
 import (
 	"encoding/json"
 	"log"
-	database "social-network/internal/database/querys"
-	"social-network/internal/views/websocket/types"
-	"social-network/internal/views/websocket/types/event"
 	"strconv"
 	"strings"
 	"time"
+
+	database "social-network/internal/database/querys"
+	"social-network/internal/views/websocket/types"
+	"social-network/internal/views/websocket/types/event"
 )
 
 // SendMessage sends a message to a recipient and updates the chat in the database
@@ -50,6 +51,8 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 			log.Println("Error creating chat:", err)
 			return
 		}
+		AddUserToUserList(user.ID, recipientID, types.List.DirectMessages)
+		AddUserToUserList(recipientID, user.ID, types.List.DirectMessages)
 	}
 
 	// Get the recipient's client from the Clients map and check if it is online
@@ -96,9 +99,7 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 		// if !message.Read {
 		// 	updateNotification(events.Clients[recipientdb.ID], user.ID, true)
 		// }
-
 	}
-
 }
 
 // SendMessageToGroup sends a message to a group and updates the chat in the database
@@ -188,7 +189,6 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 			// if !message.Read {
 			// 	updateNotification(events.Clients[recipientdb.ID], user.ID, true)
 			// }
-
 		}
 	}
 }

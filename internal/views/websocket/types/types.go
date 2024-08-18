@@ -7,3 +7,12 @@ var State = struct {
     Online:  "online",
     Offline: "offline",
 }
+
+
+var List = struct {
+    Following string
+    DirectMessages string
+}{
+    Following: "Following",
+    DirectMessages: "Direct Messages",
+}

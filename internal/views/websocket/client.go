@@ -70,8 +70,8 @@ func SetClientOnline(userID string, conn *websocket.Conn) (*types.User, error) {
 }
 
 func GetUserList(user *types.User) {
-	sendUserList(user)
 	dmUserList(user)
+	sendUserList(user)
 }
 
 func dmUserList(user *types.User) {
@@ -80,7 +80,7 @@ func dmUserList(user *types.User) {
 		log.Println("Error getting direct message users:", err)
 		return
 	}
-	listSection := buildUserListSection("Direct Messages", usernames)
+	listSection := buildUserListSection(types.List.DirectMessages, usernames)
 	payload := types.UserList{
 		Type:     "init",
 		Metadata: listSection,
@@ -94,7 +94,7 @@ func sendUserList(user *types.User) {
 		log.Println("Error getting following users:", err)
 		return
 	}
-	listSection := buildUserListSection("Following", usernames)
+	listSection := buildUserListSection(types.List.Following, usernames)
 	payload := types.UserList{
 		Type:     "init",
 		Metadata: listSection,
@@ -129,11 +129,6 @@ func buildUserListSection(sectionName string, usernames []string) types.Section 
 }
 
 func updateUserInUserList(user *types.User, state string) {
-	followers, err := database.GetUserFollowerUserNames(user.ID)
-	if err != nil {
-		log.Print("error getting followers:", err)
-		return
-	}
 	Payload := types.UserList{
 		Type: "update",
 		Metadata: types.UserDetails{
@@ -141,9 +136,29 @@ func updateUserInUserList(user *types.User, state string) {
 			State:    state,
 		},
 	}
-	for _, followerUsername := range followers {
-		if clients[followerUsername] != nil {
-			sendMessageToWebSocket(clients[followerUsername], event.USERLIST, Payload)
+	followers, err := database.GetUserFollowerUserNames(user.ID)
+	if err != nil {
+		log.Print("error getting followers:", err)
+		return
+	}
+	dms, err := database.GetPrivateChatUsernames(user.ID)
+	if err != nil {
+		log.Print("error getting dms:", err)
+		return
+	}
+	// Combine arrays and filter duplicates
+	uniqueUsernames := make(map[string]struct{})
+	for _, username := range followers {
+		uniqueUsernames[username] = struct{}{}
+	}
+	for _, username := range dms {
+		uniqueUsernames[username] = struct{}{}
+	}
+
+	// Send messages to all unique clients
+	for username := range uniqueUsernames {
+		if clients[username] != nil {
+			sendMessageToWebSocket(clients[username], event.USERLIST, Payload)
 		}
 	}
 }

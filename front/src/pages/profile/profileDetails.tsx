@@ -62,9 +62,9 @@ export default function ProfileDetails(props: {
               <div class='flex gap-2 w-full '>
                 {/* Follow button */}
                 <FollowRequest username={props.targetUser().user_name} status={props.targetUser().follow_status} privacy={props.targetUser().profile_privacy} />
-                <Button variant='default'>
+                {/* <Button variant='default'>
                   <Globe_Icon class='w-5 justify-center' />
-                </Button>
+                </Button> */}
                 <Button variant='default'>
                   <Message_Icon darkBack={true} class='w-5 justify-center' />
                 </Button>

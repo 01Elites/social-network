@@ -153,17 +153,9 @@ export function PostCommentsDialog(): JSXElement {
                   <FeedPostCellSkeleton />
                 </Repeat>
               </Show>
-
-              <Show
-                when={post()!.comments_count > 0}
-                fallback={
-                  <h1 class='text-center text-primary/60'>No comments yet</h1>
-                }
-              >
                 <For each={postComments()}>
                   {(comment) => <PostCommentCell comment={comment} />}
                 </For>
-              </Show>
             </div>
 
             <DialogFooter class='flex !flex-col gap-4'>

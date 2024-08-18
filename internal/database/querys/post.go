@@ -332,7 +332,9 @@ func GetGroupPosts(groupID int) ([]models.Post, error) {
 	INNER JOIN
 	 		"user" USING (user_id)
 	WHERE
-			group_id = $1`
+			group_id = $1
+			ORDER BY
+			created_at DESC`
 	rows, err := DB.Query(context.Background(), query, groupID)
 	if err != nil {
 		log.Printf("database failed to scan post: %v\n", err)
@@ -394,6 +396,8 @@ func GetUserPosts(loggeduser string, userid string, followed bool) ([]models.Pos
         post 
     WHERE 
         user_id = $1
+		ORDER BY
+		created_at DESC
 `
 
 	// Execute the query and retrieve the row

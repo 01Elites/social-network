@@ -3,46 +3,70 @@ package websocket
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/views/websocket/types"
 	"social-network/internal/views/websocket/types/event"
+
+	"github.com/gorilla/websocket"
 )
 
 func IsUserConnected(username string) bool {
-	_, ok := Clients[username]
+	_, ok := clients[username]
 	return ok
 }
 
 func GetClient(userName string) (*types.User, bool) {
 	cmutex.Lock()
 	defer cmutex.Unlock()
-	user, ok := Clients[userName]
+	user, ok := clients[userName]
 	return user, ok
 }
 
-func SetClientOffline(user *types.User) {
+func SetClientOffline(user *types.User, conn *websocket.Conn) {
 	// Remove the client from the Clients map
 	fmt.Printf("\nSetClientOffline %s\n\n", user.Username)
-	cmutex.Lock()
-	if Clients[user.Username] == nil {
-		cmutex.Unlock()
-		return
+	user.Mutex.Lock()
+	defer user.Mutex.Unlock()
+	if _, exists := user.Conns[conn]; exists {
+		delete(user.Conns, conn)
 	}
-	userID := Clients[user.Username].ID
-	Clients[user.Username].Conn = nil
-	delete(Clients, user.Username)
-	cmutex.Unlock()
-	updateFollowersUserList(userID)
+
+	if len(user.Conns) == 0 {
+		cmutex.Lock()
+		defer cmutex.Unlock()
+		if _, ok := clients[user.Username]; ok {
+			delete(clients, user.Username)
+		}
+	}
 }
 
-func SetClientOnline(user *types.User) {
-	// Add the client to the Clients map
-	fmt.Printf("\nSetClientOnline %s\n\n", user.Username)
+func SetClientOnline(userID string, conn *websocket.Conn) (*types.User, error) {
+	// Retrieve the username from the database
+	username, err := database.GetUserNameByID(userID)
+	if err != nil {
+		log.Println("Error getting user name:", err)
+		return nil, err
+	}
+	fmt.Printf("\nSetClientOnline %s\n\n", username)
 	cmutex.Lock()
 	defer cmutex.Unlock()
-	Clients[user.Username] = user
-	updateFollowersUserList(user.ID)
+
+	user, ok := clients[username]
+	if !ok {
+		user = &types.User{
+			ID:       userID,
+			Username: username,
+			Conns:    make(map[*websocket.Conn]bool),
+			Mutex:    &sync.Mutex{},
+		}
+		clients[username] = user
+	}
+	user.Mutex.Lock()
+	defer user.Mutex.Unlock()
+	user.Conns[conn] = true
+	return user, nil
 }
 
 func GetUserList(user *types.User) {
@@ -57,7 +81,11 @@ func dmUserList(user *types.User) {
 		return
 	}
 	listSection := buildUserListSection("Direct Messages", usernames)
-	sendMessageToWebSocket(user, event.USERLIST, listSection)
+	payload := types.UserList{
+		Type:     "init",
+		Metadata: listSection,
+	}
+	sendMessageToWebSocket(user, event.USERLIST, payload)
 }
 
 func sendUserList(user *types.User) {
@@ -67,7 +95,11 @@ func sendUserList(user *types.User) {
 		return
 	}
 	listSection := buildUserListSection("Following", usernames)
-	sendMessageToWebSocket(user, event.USERLIST, listSection)
+	payload := types.UserList{
+		Type:     "init",
+		Metadata: listSection,
+	}
+	sendMessageToWebSocket(user, event.USERLIST, payload)
 }
 
 func buildUserListSection(sectionName string, usernames []string) types.Section {
@@ -86,36 +118,66 @@ func buildUserListSection(sectionName string, usernames []string) types.Section 
 			LastName:  userProfile.LastName,
 			Avatar:    userProfile.Avatar,
 		}
-		if _, ok := Clients[username]; ok {
-			userDetails.State = "online"
+		if _, ok := clients[username]; ok {
+			userDetails.State = types.State.Online
 		} else {
-			userDetails.State = "offline"
+			userDetails.State = types.State.Offline
 		}
 		listSection.Users = append(listSection.Users, userDetails)
 	}
 	return listSection
 }
 
-func updateFollowersUserList(userid string) {
-	followers, err := database.GetUserFollowerUserNames(userid)
+func updateUserInUserList(user *types.User, state string) {
+	followers, err := database.GetUserFollowerUserNames(user.ID)
 	if err != nil {
 		log.Print("error getting followers:", err)
 		return
 	}
-	dms, err := database.GetPrivateChatUsernames(userid)
-	if err != nil {
-		log.Print("error getting dms:", err)
-		return
+	Payload := types.UserList{
+		Type: "update",
+		Metadata: types.UserDetails{
+			Username: user.Username,
+			State:    state,
+		},
 	}
 	for _, followerUsername := range followers {
-		if Clients[followerUsername] != nil {
-			sendUserList(Clients[followerUsername])
+		if clients[followerUsername] != nil {
+			sendMessageToWebSocket(clients[followerUsername], event.USERLIST, Payload)
 		}
 	}
-	for _, dmUsername := range dms {
-		if Clients[dmUsername] != nil {
-			dmUserList(Clients[dmUsername])
-		}
-	}
+}
 
+func AddUserToUserList(toUserID string, userID string, listName string) {
+	toUser, err := database.GetUserNameByID(toUserID)
+	if err != nil {
+		log.Println("Error getting user name:", err)
+		return
+	}
+	user, err := database.GetUserProfile(userID)
+	if err != nil {
+		log.Println("Error getting user profile:", err)
+		return
+	}
+	userDetails := types.UserDetails{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Username:  user.Username,
+		State:     types.State.Offline,
+		Avatar:    user.Avatar,
+	}
+	if clients[user.Username] != nil {
+		userDetails.State = types.State.Online
+	}
+	metadata := map[string]interface{}{
+		"name": listName,
+		"user": userDetails,
+	}
+	Payload := types.UserList{
+		Type:     "add",
+		Metadata: metadata,
+	}
+	if clients[toUser] != nil {
+		sendMessageToWebSocket(clients[toUser], event.USERLIST, Payload)
+	}
 }

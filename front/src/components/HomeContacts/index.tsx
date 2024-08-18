@@ -1,4 +1,4 @@
-import { JSXElement, useContext, createEffect, createSignal, For, Show, Setter } from 'solid-js';
+import { JSXElement, useContext, createEffect, createSignal, For, Show, Setter, onCleanup } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { cn } from '~/lib/utils';
 import Repeat from '../core/repeat';
@@ -7,7 +7,6 @@ import WebSocketContext from '~/contexts/WebSocketContext';
 import { WebsocketHook } from '~/hooks/WebsocketHook';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import config from '../../config';
-import { Card } from '../../components/ui/card';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import { ChatState } from '~/pages/home';
 import Contact from '~/types/Contact';
@@ -28,6 +27,61 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
   const wsCtx = useContext(WebSocketContext) as WebsocketHook;
   const [sections, setSections] = createSignal<Section[]>([]);
 
+  const handleUserListEvent = (data: { type: string; metadata: any; }) => {
+    if (!data) return;
+
+    switch (data.type) {
+      case 'init':
+        handleUserListInit(data.metadata);
+        break;
+      case 'update':
+        handleUserListUpdate(data.metadata);
+        break;
+      case 'add':
+        handleUserListAdd(data.metadata);
+        break;
+      default:
+        console.warn('Unknown data type:', data.type);
+    }
+  };
+  // Function to handle 'init' event
+  function handleUserListInit(section: { name: string; users: Contact[]; }) {
+    if (!section) return;
+    if (section.users == null || section.users.length === 0) return;
+    setSections(prev => {
+      const newSections = prev.filter(s => s.name !== section.name);
+      newSections.push(section);
+      return newSections;
+    })
+  }
+
+  // Function to handle 'update' event
+  function handleUserListUpdate(metadata: { user_name: string; state: 'online' | 'offline' }) {
+    if (!metadata || !metadata.user_name || !metadata.state) return;
+    setSections(prevSections =>
+      prevSections.map(section => ({
+        ...section,
+        users: section.users.map(user =>
+          user.user_name === metadata.user_name
+            ? { ...user, state: metadata.state }
+            : user
+        )
+      }))
+    );
+  }
+
+  // Function to handle 'add' event
+  function handleUserListAdd(metadata: { name: string; user: Contact }) {
+    if (!metadata || !metadata.name || !metadata.user) return;
+    setSections(prevSections => {
+      return prevSections.map(section =>
+        section.name === metadata.name
+          ? { ...section, users: [...section.users, metadata.user] }
+          : section
+      );
+    });
+  }
+
   createEffect(() => {
     if (wsCtx.state() === 'connected') {
       wsCtx.send({ event: 'USERLIST', payload: null });
@@ -35,23 +89,11 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
   });
 
   createEffect(() => {
-    wsCtx.bind('USERLIST', (section: Section) => {
-      console.log('Received userlist', section);
-      if (!section) {
-        return;
-      }
-      if (section.users === null || section.users.length === 0) {
-        return;
-      }
+    if (userDetails == null || wsCtx == null) return;
+    const unbindUserList = wsCtx.bind('USERLIST', handleUserListEvent);
 
-      setSections(prev => {
-        const newSections = prev.filter(s => s.name !== section.name);
-        newSections.push(section);
-        return newSections;
-      })
-    });
-  })
-
+    onCleanup(unbindUserList);
+  });
 
   return (
     <section class={cn('flex flex-col gap-3', props.class)}>

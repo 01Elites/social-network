@@ -18,7 +18,6 @@ import (
 	"social-network/internal/helpers"
 	"social-network/internal/models"
 	"social-network/internal/views/session"
-	ws "social-network/internal/views/websocket"
 
 	"github.com/gofrs/uuid"
 	"golang.org/x/oauth2"
@@ -249,18 +248,12 @@ func LogOut(w http.ResponseWriter, r *http.Request) { // Get the session token f
 	}
 
 	// Delete the session from the database
-	username, err := database.DeleteUserSession(token)
+	_, err = database.DeleteUserSession(token)
 	if err != nil {
 		log.Printf("Error deleting session: %v", err)
 		helpers.HTTPError(w, "Internal Server error", http.StatusInternalServerError)
 		return
 	}
-
-	// get client from the map and delete it
-	user := ws.Clients[username]
-
-	// Set the client offline
-	ws.SetClientOffline(user)
 
 	// Clear the session cookie
 	session.ClearAutherizationHeader(w)
@@ -376,11 +369,9 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
 	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
-
 }
 
-//gihtub login handler
-
+// gihtub login handler
 func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
 	// Ensure environment variables are loaded
 	helpers.LoadEnv("internal/database/.env")
@@ -687,5 +678,4 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
 	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
-
 }

@@ -56,7 +56,7 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 	recipient, online := GetClient(message.Recipient)
 	if online {
 		// Check if the recipient's chat is opened
-		if recipient.ChatOpened == user.Username && recipient.Conn != nil {
+		if recipient.ChatOpened == user.Username && len(recipient.Conns) != 0 {
 			message.Read = true
 		}
 	}
@@ -88,7 +88,7 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 
 	// Send the message to the recipient if they are online and has connection
-	if online && recipient.Conn != nil {
+	if online && len(recipient.Conns) != 0 {
 		// Write JSON data to the WebSocket connection of the recipient
 		sendMessageToWebSocket(recipient, event.GET_MESSAGES, messageResponse)
 
@@ -180,7 +180,7 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 	for _, member := range members {
 		// Get the recipient's client from the Clients map
 		recipient, online := GetClient(member.UserName)
-		if online && recipient.Conn != nil {
+		if online && len(recipient.Conns) != 0 {
 			// Write JSON data to the WebSocket connection of the recipient
 			sendMessageToWebSocket(recipient, event.GET_MESSAGES, jsonData)
 
@@ -224,7 +224,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 
 		// Get the recipient's client from the Clients map
 		recipient, online := GetClient(typing.Recipient)
-		if online && recipient.Conn != nil {
+		if online && len(recipient.Conns) != 0 {
 
 			typing.Recipient = user.Username
 
@@ -266,7 +266,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 		for _, member := range members {
 			// Get the recipient's client from the Clients map
 			recipient, online := GetClient(member.UserName)
-			if online && recipient.Conn != nil {
+			if online && len(recipient.Conns) != 0 {
 				// Write JSON data to the WebSocket connection of the recipient
 				sendMessageToWebSocket(recipient, event.TYPING, jsonData)
 			}
@@ -306,8 +306,8 @@ func OpenChat(RevEvent types.Event, user *types.User) {
 
 func CloseChat(user *types.User) {
 	cmutex.Lock()
-	Clients[user.Username].ChatOpened = ""
-	Clients[user.Username].ChatOpenedIsGroup = false
+	clients[user.Username].ChatOpened = ""
+	clients[user.Username].ChatOpenedIsGroup = false
 	cmutex.Unlock()
 }
 
@@ -339,8 +339,8 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		}
 
 		cmutex.Lock()
-		Clients[user.Username].ChatOpened = payload.Recipient
-		Clients[user.Username].ChatOpenedIsGroup = false
+		clients[user.Username].ChatOpened = payload.Recipient
+		clients[user.Username].ChatOpenedIsGroup = false
 		cmutex.Unlock()
 
 		// Check if the chat exists
@@ -356,8 +356,8 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		}
 
 		cmutex.Lock()
-		Clients[user.Username].ChatOpened = payload.Recipient
-		Clients[user.Username].ChatOpenedIsGroup = true
+		clients[user.Username].ChatOpened = payload.Recipient
+		clients[user.Username].ChatOpenedIsGroup = true
 		cmutex.Unlock()
 	}
 	if chatID != 0 {

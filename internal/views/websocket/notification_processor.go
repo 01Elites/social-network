@@ -23,22 +23,22 @@ func ProcessNotifications(user *types.User) {
 	for {
 		select {
 		case FollowRequest := <-FollowRequestChan:
-			if err := sendMessageToWebSocket(Clients[FollowRequest.ToUser], "NOTIFICATION", FollowRequest); err != nil {
+			if err := sendMessageToWebSocket(clients[FollowRequest.ToUser], "NOTIFICATION", FollowRequest); err != nil {
 				log.Println("Error sending follow request notification to WebSocket:", err)
 				return
 			}
 		case GroupInvite := <-GroupInviteChan:
-			if err := sendMessageToWebSocket(Clients[GroupInvite.ToUser], "NOTIFICATION", GroupInvite); err != nil {
+			if err := sendMessageToWebSocket(clients[GroupInvite.ToUser], "NOTIFICATION", GroupInvite); err != nil {
 				log.Println("Error sending Group Invite to WebSocket:", err)
 				return
 			}
 		case JoinRequest := <-JoinRequestChan:
-			if err := sendMessageToWebSocket(Clients[JoinRequest.ToUser], "NOTIFICATION", JoinRequest); err != nil {
+			if err := sendMessageToWebSocket(clients[JoinRequest.ToUser], "NOTIFICATION", JoinRequest); err != nil {
 				log.Println("Error sending Join Request to WebSocket:", err)
 				return
 			}
 		case Event := <-EventChan:
-			if err := sendMessageToWebSocket(Clients[Event.ToUser], "NOTIFICATION", Event); err != nil {
+			if err := sendMessageToWebSocket(clients[Event.ToUser], "NOTIFICATION", Event); err != nil {
 				log.Println("Error sending Event to WebSocket:", err)
 				return
 			}
@@ -47,10 +47,10 @@ func ProcessNotifications(user *types.User) {
 }
 
 func SendNotificationToChannel(notification types.Notification, notificationChan chan types.Notification) {
-	if len(Clients) == 0 {
+	if len(clients) == 0 {
 		return
 	}
-	if Clients[notification.ToUser] == nil {
+	if clients[notification.ToUser] == nil {
 		log.Println("User not online", notification.ToUser)
 		return
 	}

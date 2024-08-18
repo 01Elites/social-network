@@ -22,31 +22,41 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
   const [messages, setMessages] = createSignal<any[]>([]);
   const useWebsocket = useContext(WebSocketContext) as WebsocketHook;
 
-  useWebsocket.send(
-    {
-      event: "CHAT_OPENED",
-      payload: {
-        recipient: props.chatState?.chatWith,
-        is_group: true,
-      }
-    });
+  useWebsocket.send({
+    event: "CHAT_OPENED",
+    payload: {
+      recipient: props.chatState?.chatWith,
+      is_group: true,
+    }
+  });
 
   useWebsocket.bind('GET_MESSAGES', (data) => {
-    // console.log('Received messages:', messages());
     setMessages(prevMessages => [...prevMessages, data]);
   });
+
+  const sendMessage = () => {
+    if (message().trim() === '') return;
+    useWebsocket.send({
+      event: 'SEND_MESSAGE',
+      payload: {
+        recipient: props.chatState?.chatWith,
+        message: message(),
+      },
+    });
+    setMessage(''); // Clear the input field after sending the message
+  };
 
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
       <div class="overflow-y-scroll grow">
         {messages().length > 0 &&
-          messages().map((message, index) => {
-            if (message.messages[0].sender == userDetails()!.user_name)
-              return <GroupChatMessage message={message.messages[0].message} type="sent" />
-            else {
-              return <GroupChatMessage message={message.messages[0].message} sender={message.messages[0].sender } type="received" />
-            }
-          })
+          messages().map((msg, index) => (
+            <GroupChatMessage
+              message={msg.messages[0].message}
+              sender={msg.messages[0].sender}
+              type={msg.messages[0].sender === userDetails()!.user_name ? "sent" : "received"}
+            />
+          ))
         }
       </div>
 
@@ -65,24 +75,22 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
         <TextFieldInput
           type='text'
           id='message'
+          value={message()}
           placeholder='Type a message'
-          onChange={(event: { currentTarget: { value: any } }) => {
+          onChange={(event: { currentTarget: { value: string } }) => {
             setMessage(event.currentTarget.value);
+          }}
+          onKeyPress={(event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              sendMessage();
+            }
           }}
         />
         <Message_Icon
           darkBack={false}
           class='ml-2 self-center'
-          onClick={() => {
-            // send the message
-            useWebsocket.send({
-              event: 'SEND_MESSAGE',
-              payload: {
-                recipient: props.chatState?.chatWith,
-                message: message(),
-              },
-            });
-          }}
+          onClick={sendMessage}
         />
       </TextField>
     </div>

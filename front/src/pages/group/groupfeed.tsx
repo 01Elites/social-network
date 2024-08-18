@@ -13,6 +13,7 @@ import NewEventCell from './neweventcell';
 import GroupContacts from "./groupcontacts";
 import GroupChatPage from '~/components/GroupChat';
 import { Post } from '~/types/Post';
+import NewGroupPostCell from '~/components/Feed/NewGroupPostCell';
 
 type GroupPostFeedProps = {
   groupID: string;
@@ -99,8 +100,8 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         value='posts'
       >
         <div class={cn('flex flex-col gap-4 p-2')}>
+          <NewGroupPostCell setPosts={setPosts}  groupID={props.groupID} />
           <div class={cn('flex flex-col gap-4 p-2')}>
-
             <FeedPosts path={`/group/${props.groupID}/posts`} posts={posts} setPosts={setPosts} />
           </div>
         </div>

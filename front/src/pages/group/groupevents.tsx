@@ -13,7 +13,7 @@ import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import { showToast } from '../../components/ui/toast';
 import { GroupEvent } from '~/types/group/index';
-import {EventsFeed} from "../events/eventsfeed";
+import { EventsFeed } from "../events/groupeventsfeed";
 
 interface FeedPostsProps {
   groupID: string;
@@ -21,7 +21,7 @@ interface FeedPostsProps {
 
 export default function GroupEventsFeed(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  const [events, setEvents] = createSignal<GroupEvent[]>(); 
+  const [events, setEvents] = createSignal<GroupEvent[]>();
   createEffect(() => {
     if (!userDetails()) return;
     fetchWithAuth(config.API_URL + `/group/${props.groupID}/events`)
@@ -49,6 +49,7 @@ export default function GroupEventsFeed(props: FeedPostsProps): JSXElement {
       });
   });
   return (<>
-  < EventsFeed events={events()}/>
+    < EventsFeed events={events()} />
   </>
-)}
+  )
+}

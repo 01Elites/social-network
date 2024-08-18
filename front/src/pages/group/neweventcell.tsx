@@ -5,7 +5,7 @@ import { UserDetailsHook } from '~/hooks/userDetails';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import CreateEvent from './createevent';
-import GroupEventsFeed from './groupeventsfeed';
+import GroupEventsFeed from './groupevents';
 
 interface eventParams {
   groupTitle: string | undefined;

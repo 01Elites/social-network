@@ -53,6 +53,7 @@ export default function NewGroupPreview(props: NewGroupPreviewProps): JSXElement
             variant: 'success',
           });
           props.setOpen(false);
+          window.location.reload()
         }
       })
       .catch((error) => {

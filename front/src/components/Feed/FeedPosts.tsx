@@ -1,8 +1,10 @@
 import {
+  Accessor,
   createEffect,
   createSignal,
   For,
   JSXElement,
+  Setter,
   Show,
   useContext,
 } from 'solid-js';
@@ -20,22 +22,23 @@ import { PostCommentsDialog } from './PostCommentsDialog';
 
 interface FeedPostsProps {
   class?: string;
+  posts?: Accessor<Post[] | undefined>
+  setPosts?: Setter<Post[] | undefined>
   path: string;
 }
 
 export default function FeedPosts(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  const [posts, setPosts] = createSignal<Post[]>();
 
   function updatePost(updatedPost: Post) {
-    const updatedPosts = posts()?.map((post) =>
+    const updatedPosts = props.posts?.()?.map((post) =>
       post.post_id === updatedPost.post_id ? updatedPost : post,
     );
-    setPosts(updatedPosts);
+    props.setPosts?.(updatedPosts);
   }
   createEffect(() => {
     if (!userDetails()) {
-      setPosts(null as any);
+      props.setPosts?.(null as any);
       return;
     };
 
@@ -43,11 +46,11 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
       .then(async (res) => {
         const body = await res.json();
         if (res.status === 404) {
-          setPosts([]);
+          props.setPosts?.([]);
           return;
         }
         if (res.ok) {
-          setPosts(body);
+          props.setPosts?.(body);
           return;
         }
         throw new Error(
@@ -67,14 +70,14 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
     <div class={cn('flex flex-col gap-4', props.class)}>
       <PostCommentsDialog />
       <Show
-        when={posts()}
+        when={props.posts?.()}
         fallback={
           <Repeat count={10}>
             <FeedPostCellSkeleton />
           </Repeat>
         }
       >
-        <Show when={posts()?.length === 0}>
+        <Show when={props.posts?.()?.length === 0}>
           <h1 class='text-center font-bold text-muted-foreground'>
             Hmmm, we don't seem to have any posts :(
           </h1>
@@ -82,7 +85,7 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
             Maybe you could post some
           </p>
         </Show>
-        <For each={posts()}>
+        <For each={props.posts?.()}>
           {(post) => <FeedPostCell post={post} updatePost={updatePost} />}
         </For>
       </Show>

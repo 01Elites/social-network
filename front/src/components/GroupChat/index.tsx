@@ -4,55 +4,59 @@ import UserDetailsContext from '~/contexts/UserDetailsContext';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { WebsocketHook } from '~/hooks/WebsocketHook';
 import { UserDetailsHook } from '~/hooks/userDetails';
-import { ChatState } from '~/pages/home';
+import { GroupChatState } from '~/pages/group/groupfeed';
 import Message_Icon from '../ui/icons/message_icon';
-import ChatMessage from './chatMessage';
+import GroupChatMessage from './groupchatmessage';
 import { Button } from '../ui/button';
 import { cn } from '~/lib/utils';
 
 interface FeedProps {
   class?: string;
-  chatState?: ChatState;
-  setChatState?: Setter<ChatState>
+  chatState?: GroupChatState;
+  setChatState?: Setter<GroupChatState>
 }
 
-export default function ChatPage(props: FeedProps): JSXElement {
+export default function GroupChatPage(props: FeedProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const [message, setMessage] = createSignal<string>('');
   const [messages, setMessages] = createSignal<any[]>([]);
   const useWebsocket = useContext(WebSocketContext) as WebsocketHook;
 
-  useWebsocket.send(
-    {
-      event: "CHAT_OPENED",
-      payload: {
-        recipient: props.chatState?.chatWith,
-        is_group: false,
-      }
-    });
+  useWebsocket.send({
+    event: "CHAT_OPENED",
+    payload: {
+      recipient: props.chatState?.chatWith,
+      is_group: true,
+    }
+  });
 
   useWebsocket.bind('GET_MESSAGES', (data) => {
-    console.log('Received messages:', messages());
     setMessages(prevMessages => [...prevMessages, data]);
   });
 
+  const sendMessage = () => {
+    if (message().trim() === '') return;
+    useWebsocket.send({
+      event: 'SEND_MESSAGE',
+      payload: {
+        recipient: props.chatState?.chatWith,
+        message: message(),
+      },
+    });
+    setMessage(''); // Clear the input field after sending the message
+  };
+
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
-      <div class="flex justify-center items-center h-12 bg-primary-foreground text-primary-background">
-        <a href={`/profile/${props.chatState?.chatWith}`}
-          class='items-center text-base font-bold '
-        >{props.chatState?.chatWith}
-        </a>
-      </div>
       <div class="overflow-y-scroll grow">
         {messages().length > 0 &&
-          messages().map((message, index) => {
-            if (message.messages[0].sender == userDetails()!.user_name)
-              return <ChatMessage message={message.messages[0].message} type="sent" />
-            else {
-              return <ChatMessage message={message.messages[0].message} type="received" />
-            }
-          })
+          messages().map((msg, index) => (
+            <GroupChatMessage
+              message={msg.messages[0].message}
+              sender={msg.messages[0].sender}
+              type={msg.messages[0].sender === userDetails()!.user_name ? "sent" : "received"}
+            />
+          ))
         }
       </div>
 
@@ -71,24 +75,22 @@ export default function ChatPage(props: FeedProps): JSXElement {
         <TextFieldInput
           type='text'
           id='message'
+          value={message()}
           placeholder='Type a message'
-          onChange={(event: { currentTarget: { value: any } }) => {
+          onChange={(event: { currentTarget: { value: string } }) => {
             setMessage(event.currentTarget.value);
+          }}
+          onKeyPress={(event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              sendMessage();
+            }
           }}
         />
         <Message_Icon
           darkBack={false}
           class='ml-2 self-center'
-          onClick={() => {
-            // send the message
-            useWebsocket.send({
-              event: 'SEND_MESSAGE',
-              payload: {
-                recipient: props.chatState?.chatWith,
-                message: message(),
-              },
-            });
-          }}
+          onClick={sendMessage}
         />
       </TextField>
     </div>

@@ -11,6 +11,9 @@ import { User } from '~/types/User';
 import { Button } from '~/components/ui/button';
 import NewEventCell from './neweventcell';
 import GroupContacts from "./groupcontacts";
+import GroupChatPage from '~/components/GroupChat';
+import { Post } from '~/types/Post';
+import NewGroupPostCell from '~/components/Feed/NewGroupPostCell';
 
 type GroupPostFeedProps = {
   groupID: string;
@@ -20,13 +23,22 @@ type GroupPostFeedProps = {
   explore: User[] | undefined;
   members: User[] | undefined;
 };
-
+export type GroupChatState = {
+  isOpen: boolean; // Whether the chat window is open
+  chatWith: string; // The recipient's username
+};
 export type requester = {
   user: User;
   creation_date: string;
 };
 export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
   var [buttonData, setButtonData] = createSignal<{ [key: string]: string }>({});
+  const [groupChatState, setGroupChatState] = createSignal<GroupChatState>({
+    isOpen: true,
+    chatWith: props.groupID
+  });
+  const [posts, setPosts] = createSignal<Post[]>();
+
   function sendRequestApi(username: string) {
     if (buttonData() === null) {
       return
@@ -47,7 +59,14 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         return
       }
     })
+
+    // Open the group chat after sending the request
+    setGroupChatState({
+      isOpen: true,
+      chatWith: props.groupID
+    });
   }
+
   return (
     <Tabs aria-label='Main navigation' class='tabs'>
       <Tabs.List class='tabs__list'>
@@ -81,12 +100,17 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         value='posts'
       >
         <div class={cn('flex flex-col gap-4 p-2')}>
+          <NewGroupPostCell setPosts={setPosts}  groupID={props.groupID} />
           <div class={cn('flex flex-col gap-4 p-2')}>
-            <FeedPosts path={`/group/${props.groupID}/posts`} />
+            <FeedPosts path={`/group/${props.groupID}/posts`} posts={posts} setPosts={setPosts} />
           </div>
         </div>
       </Tabs.Content>
-      <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="chat">NOTHING!!!</Tabs.Content>
+
+
+      <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="chat">
+        <GroupChatPage class='grow place-content-end overflow-hidden' chatState={groupChatState()} setChatState={setGroupChatState} />
+      </Tabs.Content>
 
       <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="events">
         <NewEventCell groupTitle={props.groupTitle} groupID={props.groupID} />

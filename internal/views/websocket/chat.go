@@ -3,12 +3,13 @@ package websocket
 import (
 	"encoding/json"
 	"log"
-	database "social-network/internal/database/querys"
-	"social-network/internal/views/websocket/types"
-	"social-network/internal/views/websocket/types/event"
 	"strconv"
 	"strings"
 	"time"
+
+	database "social-network/internal/database/querys"
+	"social-network/internal/views/websocket/types"
+	"social-network/internal/views/websocket/types/event"
 )
 
 // SendMessage sends a message to a recipient and updates the chat in the database
@@ -50,13 +51,15 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 			log.Println("Error creating chat:", err)
 			return
 		}
+		AddUserToUserList(user.ID, recipientID, types.List.DirectMessages)
+		AddUserToUserList(recipientID, user.ID, types.List.DirectMessages)
 	}
 
 	// Get the recipient's client from the Clients map and check if it is online
 	recipient, online := GetClient(message.Recipient)
 	if online {
 		// Check if the recipient's chat is opened
-		if recipient.ChatOpened == user.Username && recipient.Conn != nil {
+		if recipient.ChatOpened == user.Username && len(recipient.Conns) != 0 {
 			message.Read = true
 		}
 	}
@@ -77,28 +80,13 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 
 	messageResponse.Messages = []types.Chat{message}
 
-	// // Convert the message struct to JSON
-	// jsonData, err := json.Marshal(messageResponse)
-	// if err != nil {
-	// 	log.Println(err, "failed to marshal JSON data")
-	// 	return
-	// }
-
-	// Write JSON data to the WebSocket connection of the user
+	// send the message to the sender
 	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 
 	// Send the message to the recipient if they are online and has connection
-	if online && recipient.Conn != nil {
-		// Write JSON data to the WebSocket connection of the recipient
+	if online && len(recipient.Conns) != 0 {
 		sendMessageToWebSocket(recipient, event.GET_MESSAGES, messageResponse)
-
-		// Update the notification field of the recipient in the UserList
-		// if !message.Read {
-		// 	updateNotification(events.Clients[recipientdb.ID], user.ID, true)
-		// }
-
 	}
-
 }
 
 // SendMessageToGroup sends a message to a group and updates the chat in the database
@@ -159,15 +147,9 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 
 	messageResponse.Messages = []types.Chat{message}
 
-	// Convert the message struct to JSON
-	jsonData, err := json.Marshal(messageResponse)
-	if err != nil {
-		log.Println(err, "failed to marshal JSON data")
-		return
-	}
 
 	// Write JSON data to the WebSocket connection of the user
-	sendMessageToWebSocket(user, event.GET_MESSAGES, jsonData)
+	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 
 	// Send the message to the group members if they are online and has
 	// connection
@@ -178,17 +160,19 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 	}
 
 	for _, member := range members {
+		if member.UserName == user.Username {
+			continue
+		}
 		// Get the recipient's client from the Clients map
 		recipient, online := GetClient(member.UserName)
-		if online && recipient.Conn != nil {
+		if online && len(recipient.Conns) != 0 {
 			// Write JSON data to the WebSocket connection of the recipient
-			sendMessageToWebSocket(recipient, event.GET_MESSAGES, jsonData)
+			sendMessageToWebSocket(recipient, event.GET_MESSAGES, messageResponse)
 
 			// Update the notification field of the recipient in the UserList
 			// if !message.Read {
 			// 	updateNotification(events.Clients[recipientdb.ID], user.ID, true)
 			// }
-
 		}
 	}
 }
@@ -224,7 +208,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 
 		// Get the recipient's client from the Clients map
 		recipient, online := GetClient(typing.Recipient)
-		if online && recipient.Conn != nil {
+		if online && len(recipient.Conns) != 0 {
 
 			typing.Recipient = user.Username
 
@@ -266,7 +250,7 @@ func Typing(RevEvent types.Event, user *types.User, IsGroup bool) {
 		for _, member := range members {
 			// Get the recipient's client from the Clients map
 			recipient, online := GetClient(member.UserName)
-			if online && recipient.Conn != nil {
+			if online && len(recipient.Conns) != 0 {
 				// Write JSON data to the WebSocket connection of the recipient
 				sendMessageToWebSocket(recipient, event.TYPING, jsonData)
 			}
@@ -306,8 +290,8 @@ func OpenChat(RevEvent types.Event, user *types.User) {
 
 func CloseChat(user *types.User) {
 	cmutex.Lock()
-	Clients[user.Username].ChatOpened = ""
-	Clients[user.Username].ChatOpenedIsGroup = false
+	clients[user.Username].ChatOpened = ""
+	clients[user.Username].ChatOpenedIsGroup = false
 	cmutex.Unlock()
 }
 
@@ -339,8 +323,8 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		}
 
 		cmutex.Lock()
-		Clients[user.Username].ChatOpened = payload.Recipient
-		Clients[user.Username].ChatOpenedIsGroup = false
+		clients[user.Username].ChatOpened = payload.Recipient
+		clients[user.Username].ChatOpenedIsGroup = false
 		cmutex.Unlock()
 
 		// Check if the chat exists
@@ -356,8 +340,8 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		}
 
 		cmutex.Lock()
-		Clients[user.Username].ChatOpened = payload.Recipient
-		Clients[user.Username].ChatOpenedIsGroup = true
+		clients[user.Username].ChatOpened = payload.Recipient
+		clients[user.Username].ChatOpenedIsGroup = true
 		cmutex.Unlock()
 	}
 	if chatID != 0 {
@@ -371,19 +355,14 @@ func GetMessages(RevEvent types.Event, user *types.User) {
 		var messageResponse struct {
 			Messages []types.Chat `json:"messages"`
 		}
-
-		// messageResponse.Messages = messages
-
-		// if len(messages) != 0 {
-		// 	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
-		// }
-
 		if len(messages) != 0 {
 			for i := range messages {
 				messageResponse.Messages = messages[i : i+1]
 				sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 			}
+			// once front end is ready to handle multiple messages at once uncomment this
+			// messageResponse.Messages = messages
+			// sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 		}
-		// updateNotification(Clients[user.ID], recipientID, false)
 	}
 }

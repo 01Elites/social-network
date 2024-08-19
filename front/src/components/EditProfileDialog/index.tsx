@@ -161,12 +161,7 @@ function ProfileEditDialog(): JSXElement {
               onChange={handleImageUpload}
             />
             <Avatar class='size-20'>
-              <Show
-                when={userUploadedImage()}
-                fallback={
-                  <AvatarImage src={userDetails()?.avatar}></AvatarImage>
-                }
-              >
+              <Show when={userUploadedImage()}>
                 <AvatarImage src={URL.createObjectURL(userUploadedImage()!)} />
               </Show>
               <AvatarFallback class='text-xl'>
@@ -193,7 +188,7 @@ function ProfileEditDialog(): JSXElement {
             onChange={setNickName}
             value={userNickName()}
           >
-            <TextFieldLabel for='nickname'>NickName</TextFieldLabel>
+            <TextFieldLabel for='nickname'>Nickname</TextFieldLabel>
             <TextFieldInput
               type='text'
               id='nickname'

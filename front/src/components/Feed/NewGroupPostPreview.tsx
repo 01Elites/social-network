@@ -1,4 +1,4 @@
-import { createEffect, createSignal, JSXElement, useContext } from 'solid-js';
+import { createEffect, createSignal, JSXElement, Setter, useContext } from 'solid-js';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -15,33 +15,54 @@ import { UserDetailsHook } from '~/hooks/userDetails';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
 import { TextField, TextFieldTextArea } from '../ui/text-field';
-// import NewPostPrivacy from './NewPostPrivacy';
 
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import config from '~/config';
 import { fetchWithAuth } from '~/extensions/fetch';
 import { showToast } from '../ui/toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { Post } from '~/types/Post';
 
 interface NewPostPreviewProps {
   open: boolean;
+  setPosts: Setter<Post[] | undefined>;
   setOpen: (open: boolean) => void;
-  groupID: int ;
+  groupID: string ;
 }
 
-type NewPostPrivacyOptions = 'public' | 'private' | 'almost_private';
+type NewPostPrivacyOptions = 'public'
 
 export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
   const [uploadedImage, setUploadedImage] = createSignal<File | null>(null);
   const [postText, setPostText] = createSignal<string>('');
 
-  // const [postPrivacyOpen, setPostPrivacyOpen] = createSignal(false);
   const [postPrivacy, setPostPrivacy] =
     createSignal<NewPostPrivacyOptions>('public');
   const [selectedUsers, setSelectedUsers] = createSignal<String[]>([]);
 
   const [formProcessing, setFormProcessing] = createSignal(false);
+
+  async function addNewPost(id: string) {
+    fetchWithAuth(`${config.API_URL}/post/${id}`, {
+      method: 'GET',
+    }).then(async (response) => {
+      const resp_json = await response.json();
+      props.setPosts?.((prev) => {
+        if (prev) {
+          return [resp_json, ...prev];
+        }
+        return [resp_json];
+      });
+    }).catch(async (error) => {
+      showToast({
+        title: 'Could not get post',
+        description: 'An error occurred while getting posting your content',
+        variant: 'error',
+      });
+      console.error('Error fetching post:', error);
+    });
+  }
 
   async function makePost() {
     setFormProcessing(true);
@@ -52,7 +73,7 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
       image: '',
       privacy: postPrivacy(),
       usernames: selectedUsers(),
-      group_id: props.groupID,
+      group_id: Number(props.groupID),
     };
 
     if (uploadedImage()) {
@@ -70,18 +91,20 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
     })
       .then(async (response) => {
         setFormProcessing(false);
+        const resp_json = await response.json();
         if (!response.ok) {
-          const errMsg = await response.json();
           showToast({
             title: 'Could not post',
-            description: errMsg.reason
-              ? errMsg.reason
+            description: resp_json.reason
+              ? resp_json.reason
               : 'An error occurred while posting your content',
             variant: 'error',
           });
         } else {
           props.setOpen(false);
+          addNewPost(resp_json.id);
         }
+        fetchWithAuth
       })
       .catch((error) => {
         setFormProcessing(false);
@@ -111,15 +134,6 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
-      {/* <NewPostPrivacy
-        onlyFollowersCallback={() => setPostPrivacy('private')}
-        onlySelectedCallback={(selectedUsers) => {
-          setPostPrivacy('almost_private');
-          setSelectedUsers(selectedUsers);
-        }}
-        open={postPrivacyOpen()}
-        setOpen={setPostPrivacyOpen}
-      /> */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
@@ -187,16 +201,7 @@ export default function NewGroupPostPreview(props: NewPostPreviewProps): JSXElem
         <Separator />
         <DialogFooter class='!justify-between gap-4'>
           <Tooltip>
-            {/* <TooltipTrigger
-              as={Button<'button'>}
-              variant='secondary'
-              disabled={formProcessing()}
-              onClick={() => setPostPrivacyOpen(true)}
-            >
-              {postPrivacy() === 'public' && 'Post Privacy'}
-              {postPrivacy() === 'private' && 'Only My Followers'}
-              {postPrivacy() === 'almost_private' && 'Only Selected Users'}
-            </TooltipTrigger> */}
+
             <TooltipContent>
               <p>
                 Who do you wnat to see your post? we show it to everyone be

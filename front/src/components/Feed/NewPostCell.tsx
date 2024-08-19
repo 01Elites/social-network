@@ -1,4 +1,4 @@
-import { createSignal, JSXElement, useContext } from 'solid-js';
+import { Accessor, createSignal, JSXElement, Setter, useContext } from 'solid-js';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { UserDetailsHook } from '~/hooks/userDetails';
 
@@ -6,14 +6,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import NewPostPreview from './NewPostPreview';
 import config from '~/config';
+import { Post } from '~/types/Post';
 
-export default function NewPostCell(): JSXElement {
+interface NewPostCellProps {
+  class?: string;
+  setPosts: Setter<Post[] | undefined>;
+}
+export default function NewPostCell(props: NewPostCellProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   const [postPreviewOpen, setPostPreviewOpen] = createSignal(false);
   return (
     <div class='flex gap-2 rounded border-[1px] p-2'>
-      <NewPostPreview setOpen={setPostPreviewOpen} open={postPreviewOpen()} />
+      <NewPostPreview setOpen={setPostPreviewOpen} open={postPreviewOpen()} setPosts={props.setPosts} />
       <Avatar>
         <AvatarImage src={`${config.API_URL}/image/${userDetails()?.avatar}`} />
         <AvatarFallback>

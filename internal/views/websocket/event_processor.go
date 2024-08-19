@@ -11,19 +11,20 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func ProcessEvents(user *types.User) {
+func ProcessEvents(conn *websocket.Conn,user *types.User) {
 	// Send all the notifications in the database to the user
-	go ProcessNotifications(user)
 	defer func() {
-		SetClientOffline(user)
+		SetClientOffline(user, conn)
+		updateUserInUserList(user, types.State.Offline)
 	}()
 	for {
 		// Read message from WebSocket connection
-		messageType, rawMessage, err := user.Conn.ReadMessage()
-		// fmt.Println(user)
+		messageType, rawMessage, err := conn.ReadMessage()
 		if err != nil {
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+				return
+			}
 			log.Println("Error reading message from WebSocket:", err)
-			// fmt.Println("user after", user)
 			return
 		}
 
@@ -70,11 +71,10 @@ func ProcessEvents(user *types.User) {
 			GetUserList(user)
 		case event.GET_NOTIFICATIONS:
 			// Send all the notifications in the database to the user
+			go ProcessNotifications(user)
 			if err := SendUsersNotifications(user.ID); err != nil {
 				log.Printf("Error sending notifications: %v", err)
 			}
-		// case event.GET_MESSAGES:
-		// 	// GetMessages(message, user)
 		case event.NOTIFICATION_READ:
 			Notification(message, user)
 		default:

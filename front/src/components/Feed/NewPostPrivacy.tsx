@@ -41,6 +41,14 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
     });
   });
 
+  function handleCheckboxChange(user: string) {
+    if (selectedUsers().includes(user)) {
+      setSelectedUsers(selectedUsers().filter((u) => u !== user));
+    } else {
+      setSelectedUsers([...selectedUsers(), user]);
+    }
+  }
+
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>
       <DialogContent class=''>
@@ -59,44 +67,31 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
                   <TableRow>
                     <TableCell class='w-2'>
                       <Checkbox
-                        onChange={() => {
-                          if (selectedUsers().includes(user.user_name)) {
-                            setSelectedUsers(
-                              selectedUsers().filter((u) => u !== user.user_name),
-                            );
-                          } else {
-                            setSelectedUsers([...selectedUsers(), user.user_name]);
-                          }
-                        }}
-                        id={`npptchk-${user}`}
+                        checked={selectedUsers().includes(user.user_name)}
+                        onChange={() => handleCheckboxChange(user.user_name)}
+                        id={`npptchk-${user.user_name}`}
                       />
                     </TableCell>
-                    <TableCell class='w-2'>
-                      <Avatar>
-                        <AvatarImage
-                          loading='lazy'
-                          src={user.avatar}
-                        />
-                        <AvatarFallback>{user.user_name[0].toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell
-                      class='cursor-pointer'
-                      onClick={() => {
-                        document
-                          .getElementById(`npptchk-${user}-input`)
-                          ?.click();
-                      }}
-                    >
-                      {user.user_name}
-                    </TableCell>
+                    <div onClick={() => handleCheckboxChange(user.user_name)}>
+                      <TableCell class='w-2'>
+                        <Avatar>
+                          <AvatarImage
+                            loading='lazy'
+                            src={config.API_URL + '/image/' + user.avatar}
+                          />
+                          <AvatarFallback>{user.user_name[0].toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                      </TableCell>
+                      <TableCell class='cursor-pointer'>
+                        {user.user_name}
+                      </TableCell>
+                    </div>
                   </TableRow>
                 )}
               </For>
             </TableBody>
           </Table>
         </div>
-
         <Separator />
 
         <DialogFooter class='gap-2'>

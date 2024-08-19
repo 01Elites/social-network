@@ -10,6 +10,7 @@ import (
 	"social-network/internal/models"
 	"social-network/internal/views/middleware"
 	"social-network/internal/views/websocket"
+	"social-network/internal/views/websocket/types"
 )
 
 // FollowHandler creates a follow request for a user. It expects a JSON body with the following format:
@@ -169,6 +170,6 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
-
+	websocket.AddUserToUserList(response.Follower, response.Followee, types.List.Following)
 	w.WriteHeader(http.StatusOK)
 }

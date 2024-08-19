@@ -70,34 +70,33 @@ export default function ChatPage(props: FeedProps): JSXElement {
         </a>
       </div>
       <div class="overflow-y-scroll grow">
+        <Button onClick={() => {
+          console.log('Close chat');
+          props.setChatState!({
+            isOpen: false,
+            chatWith: '',
+          });
+          useWebsocket.send({
+            event: 'CHAT_CLOSED',
+            payload: {},
+          });
+        }}>Close</Button>
         {messages().length > 0 &&
           messages().map((message, index) => {
-            if (message.messages[0].sender == userDetails()!.user_name) {
+            if (message.messages[0].sender == userDetails()!.user_name){
               return <ChatMessage message={message.messages[0].message} type="sent" />
-            } else {
+             } else {
               return <ChatMessage message={message.messages[0].message} type="received" />
             }
           })
         }
       </div>
-      <div id="emoji-picker" class="items-end self-end hidden h-32 w-96 overflow-y-scroll"><EmojiPicker onEmojiClick={pickEmoji} /></div>
-      <TextField class='flex flex-row w-full content-end items-end self-end align-bottom p-3'>
-        <Button
-          class='self-center hover:cursor-pointer mr-2'
-          onClick={() => {
-            console.log('Close chat');
-            props.setChatState!({
-              isOpen: false,
-              chatWith: '',
-            });
-            useWebsocket.send({
-              event: 'CHAT_CLOSED',
-              payload: {},
-            });
-          }}>Close</Button>
+        <div id="emoji-picker" class="items-end self-end hidden h-44 w-96 overflow-y-scroll"><EmojiPicker onEmojiClick={pickEmoji}/></div>
+      <TextField class='flex flex-row w-full content-end items-end self-end align-bottom'>
         <TextFieldInput
           type='text'
           id='message'
+          class='w-lbw'
           value={message()}
           placeholder='Type a message'
           onChange={(event: { currentTarget: { value: any } }) => {

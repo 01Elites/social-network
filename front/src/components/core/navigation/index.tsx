@@ -130,7 +130,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
             </Show>
             </>)}</For>
             <Show when={bellColor() ===false}
-              fallback={<IconBellActive />}>
+              fallback={<IconBellActive class='size-5'/>}>
               <IconBell class='size-5' />
             </Show>
             <span class='hidden md:block'>Notifications</span>

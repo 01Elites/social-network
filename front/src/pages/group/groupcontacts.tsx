@@ -37,7 +37,7 @@ export default function GroupContacts(props: HomeContactsProps): JSXElement {
                 <div>{member.last_name}</div>
               </div>
             </a>
-            <FollowRequest username={member.user_name} status={member.follow_status} privacy={member.profile_privacy} />
+            <FollowRequest username={member.user_name} status={member.follow_status} privacy={member.profile_privacy} profilePage={false}/>
           </Card>
         )}
       </For>

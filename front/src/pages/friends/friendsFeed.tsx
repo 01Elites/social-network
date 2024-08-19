@@ -61,7 +61,7 @@ export default function FriendsFeed(props: {
                   <div>{follower.last_name}</div>
                 </div>
               </a>
-              <FollowRequest username={follower.user_name} status={follower.follow_status} privacy={follower.profile_privacy} />
+              <FollowRequest username={follower.user_name} status={follower.follow_status} privacy={follower.profile_privacy} profilePage={false} />
 
             </Card>
           )}
@@ -92,7 +92,7 @@ export default function FriendsFeed(props: {
                   <div>{following.last_name}</div>
                 </div>
               </a>
-              <FollowRequest username={following.user_name} status={following.follow_status} privacy={following.profile_privacy} />
+              <FollowRequest username={following.user_name} status={following.follow_status} privacy={following.profile_privacy} profilePage={false}/>
             </Card>
           )}
         </For>
@@ -179,7 +179,7 @@ export default function FriendsFeed(props: {
                   <div>{explore.last_name}</div>
                 </div>
               </a>
-              <FollowRequest username={explore.user_name} status={explore.follow_status} privacy={explore.profile_privacy} />
+              <FollowRequest username={explore.user_name} status={explore.follow_status} privacy={explore.profile_privacy} profilePage={false} />
             </Card>
           )}
         </For>

@@ -129,6 +129,9 @@ func GetPostsFeed(loggeduser models.User) ([]models.Post, error) {
 				log.Printf("database failed to scan allowed users: %v\n", err)
 				return nil, err
 			}
+			if loggeduser.UserID == p.User.UserID {
+				isAllowed = true
+			}
 			if isAllowed {
 				p.User.UserID = ""
 				posts = append(posts, p)

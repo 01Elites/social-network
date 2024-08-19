@@ -12,6 +12,7 @@ type FollowRequestParams = {
   username: string | undefined;
   status: string;
   privacy: string;
+  profilePage: boolean;
 }
 export default function FollowRequest(props: FollowRequestParams): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
@@ -44,6 +45,9 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
           }
         } else if (buttonData() === "Unfollow") {
           setButtonData("Follow")
+          if (props.profilePage) {
+            window.location.reload()
+          }
         } else if (buttonData() === "Requested") {
           setButtonData("Follow")
         }
@@ -58,7 +62,7 @@ export default function FollowRequest(props: FollowRequestParams): JSXElement {
   return (<>
     <Show when={userDetails()?.user_name != props.username}>
       <Button class="flex flex-row grow" variant="default" onClick={sendRequestApi}>
-        <Show when={props.status === "not_following"} fallback={<Unfollow_Icon />}>
+        <Show when={buttonData() == "Follow"} fallback={<Unfollow_Icon />}>
           <Follow_Icon />
         </Show>{buttonData()}
       </Button>

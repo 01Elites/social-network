@@ -244,11 +244,11 @@ export default function NotificationsFeed(): JSXElement {
                           class="text-base font-bold hover:underline">
                           {notification().metadata.group.title}
                         </A>
-                        <div class="flex flex-wrap gap-6">
+                        <div class="flex flex-wrap gap-5">
                           <Button
                             id={"option1" + String(notification().metadata.event.id)}
                             variant='ghost'
-                            class="p-2"
+                            class="p-0"
                             onClick={() => {
                               let elem = document.getElementById(notification().metadata.event.id + notification().metadata.event.title); elem?.remove();
                               ; notifications?.markRead(notification().notification_id, true);

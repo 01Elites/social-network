@@ -94,7 +94,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		notification := database.OrganizeGroupEventRequest(member.UserName, groupTitle, event.GroupID, groupEvent)
 		notification.ID = notificationID
-		websocket.SendNotificationToChannel(notification, websocket.JoinRequestChan)
+		websocket.SendNotificationToChannel(notification, websocket.EventChan)
 	}
 	w.WriteHeader(http.StatusOK)
 }

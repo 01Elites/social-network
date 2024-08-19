@@ -113,6 +113,7 @@ export default function ProfileFeed(props: {
                   username={follower.user_name}
                   status={follower.follow_status}
                   privacy={follower.profile_privacy}
+                  profilePage={false}
                 />
               </Card>
             )}
@@ -155,6 +156,7 @@ export default function ProfileFeed(props: {
                   username={following.user_name}
                   status={following.follow_status}
                   privacy={following.profile_privacy}
+                  profilePage={false}
                 />
               </Card>
             )}

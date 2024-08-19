@@ -48,6 +48,7 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
         props.targetGroup().ismember = false
         props.targetGroup().request_made = false
         console.log('GroupExited');
+        window.location.reload()
       }
       return;
     } else {

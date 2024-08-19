@@ -265,10 +265,6 @@ func GetGroupRequests(groupID int) ([]models.Requester, error) {
 	return requesters, nil
 }
 
-func GetAllGroups() {
-
-}
-
 // get the id of all the groups in database
 func GetAllGroupIDs() ([]int, error) {
 	var groupIDs []int

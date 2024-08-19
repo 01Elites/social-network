@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
@@ -269,5 +270,17 @@ func GetEventsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(events)
+	events = helpers.ArrangeEvents(events)
+	var arrangedEvents []models.Event
+	for _, event := range events {
+		if event.EventTime.After(time.Now()){
+			arrangedEvents = append(arrangedEvents, event)
+		}
+	}
+	for _, event := range events {
+		if event.EventTime.Before(time.Now()){
+			arrangedEvents = append(arrangedEvents, event)
+		}
+	}
+	json.NewEncoder(w).Encode(arrangedEvents)
 }

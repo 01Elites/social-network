@@ -195,6 +195,9 @@ export default function Navigation(props: NavigationProps): JSXElement {
                     userCtx!.setUserDetails(null);
                     // .connect() closes open connection
                     (wsCtx as WebsocketHookPrivate).connect();
+                    if (location.pathname !== '/') {
+                      navigate('/');
+                    }
                   });
                 }}
               >

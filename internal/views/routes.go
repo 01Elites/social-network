@@ -12,6 +12,7 @@ import (
 	"social-network/internal/views/post"
 	"social-network/internal/views/profile"
 	"social-network/internal/views/websocket"
+	"social-network/internal/views/events"
 )
 
 // SetupRoutes sets up the routes for the web application.
@@ -50,4 +51,7 @@ func SetupRoutes() {
 
 	/************************ Friends ****************************/
 	friends.SetupFriendsRoutes()
+
+	/************************ Events ****************************/
+	events.SetupEventsRoutes()
 }

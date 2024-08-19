@@ -11,8 +11,7 @@ import { Show } from 'solid-js';
 import { handleInvite } from '../group/request';
 import { A } from '@solidjs/router';
 import { handleRequest } from '../group/creatorsrequest';
-import { handleEventOption } from '../events/eventsfeed';
-import Tooltip from '@corvu/tooltip'
+import { handleEventOption } from '../events/groupeventsfeed';
 import { useContext } from 'solid-js';
 import NotificationsContext from '~/contexts/NotificationsContext';
 import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
@@ -233,10 +232,10 @@ export default function NotificationsFeed(): JSXElement {
                             Details
                           </PopoverTrigger>
                           <PopoverContent>
-                              <p class="z-100 max-w-15 block flex flex-wrap gap-2 place-items-center break-all"> {notification().metadata.event.description}
-                              </p>
-                              {moment(notification().metadata.event.event_time).calendar()}
-                              <p>created by {notification().metadata.event.creator}</p>
+                            <p class="z-100 max-w-15 block flex flex-wrap gap-2 place-items-center break-all"> {notification().metadata.event.description}
+                            </p>
+                            {moment(notification().metadata.event.event_time).calendar()}
+                            <p>created by {notification().metadata.event.creator}</p>
                           </PopoverContent>
                         </Popover>
                       </div>

@@ -5,7 +5,7 @@ import { UserDetailsHook } from '~/hooks/userDetails';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import CreateEvent from './createevent';
-import GroupEventsFeed from './groupeventsfeed';
+import GroupEventsFeed from './groupevents';
 
 interface eventParams {
   groupTitle: string | undefined;
@@ -33,6 +33,6 @@ export default function NewEventCell(props: eventParams): JSXElement {
       >
         Create New Event
       </Button>
-    </div><GroupEventsFeed groupID={props.groupID} /></>
+    </div><div class="ml-3"><GroupEventsFeed groupID={props.groupID}/></div></>
   );
 }

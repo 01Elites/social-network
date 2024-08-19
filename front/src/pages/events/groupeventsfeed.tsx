@@ -28,17 +28,17 @@ export function EventsFeed(props: eventProps): JSXElement{
   return (<>
   <Show when={props.events?.length === 0}>
   <h1 class='text-center font-bold text-muted-foreground'>
-    Hmmm, we don't seem to have any props.events :(
+    Hmmm, we don't seem to have any events :(
   </h1>
   <p class='text-center text-muted-foreground'>
     Maybe you could post some{' '}
   </p>
 </Show>
-<div class='flex flex flex-wrap m-4'>
+<div class='flex flex-wrap -ml-3'>
 <For each={props.events}>
   {(event) => (
     <div>
-      <div class='flex flex-col mr-4 mb-4' id={event.title}>
+      <div class='flex flex-col mr-3 mb-4' id={event.title}>
       <Card class="flex flex-col p-3 w-96 h-36">
       <Tooltip
           placement="bottom"

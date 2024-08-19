@@ -63,6 +63,12 @@ func RespondToInvite(response models.GroupResponse, userID string) (int, error) 
 			log.Printf("database: Failed to add group member: %v", err)
 			return 0, err // Return error if failed to insert group member
 		}
+		query := `UPDATE group_requests SET status = $1 WHERE group_id = $2 AND requester_id = $3 AND status = 'pending'`
+		_, err := DB.Query(context.Background(), query, response.Status, response.GroupID, userID)
+		if err != nil && err.Error() != "no rows in result set" {
+			log.Printf("database: Failed to update response in database: %v", err)
+			return 0, err // Return error if failed to insert post
+		}
 	}
 	return inviteID, nil
 }
@@ -171,6 +177,12 @@ func RespondToRequest(response models.GroupResponse) (int, error) {
 		if err != nil {
 			log.Printf("database: Failed to add group member: %v", err)
 			return 0, err // Return error if failed to insert post
+		}
+		query := `UPDATE group_invitations SET status = $1 WHERE group_id = $2 AND receiver_id = $3 AND status = 'pending'`
+		_, err := DB.Query(context.Background(), query, response.Status, response.GroupID, response.RequesterID)
+		if err != nil && err.Error() != "no rows in result set" {
+			log.Printf("database: Failed to update response in database: %v", err)
+			return 0, err // Return error if failed to update response
 		}
 	}
 	return requestID, nil

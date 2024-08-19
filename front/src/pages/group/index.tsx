@@ -6,8 +6,6 @@ import type { Group } from '~/types/group';
 import Layout from '~/Layout';
 import GroupDetails from './details';
 import GroupFeed from './groupfeed';
-import NewGroupPostCell from "~/components/Feed/NewGroupPostCell";
-import GroupContacts from "./groupcontacts";
 import { showToast } from '~/components/ui/toast';
 
 export type GroupParams = {
@@ -43,7 +41,6 @@ export default function GroupPage(): JSXElement {
       </Show>
       <Show when={targetGroup()?.ismember}>
         <div class='col-span-5 overflow-y-auto'>
-          <NewGroupPostCell targetGroup={() => targetGroup() as Group} />
           <GroupFeed groupTitle={targetGroup()?.title}
             groupID={groupID as string}
             creator={targetGroup()?.iscreator as boolean}

@@ -12,6 +12,7 @@ import { cn } from '~/lib/utils';
 import { FiSmile } from 'solid-icons/fi'
 import { EmojiPicker } from 'solid-emoji-picker';
 import { IoArrowBackCircle } from 'solid-icons/io'
+import IconSmile from '../ui/icons/IconSmile';
 
 interface FeedProps {
   class?: string;
@@ -65,20 +66,20 @@ export default function ChatPage(props: FeedProps): JSXElement {
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
       {/* <div class="flex h-12 bg-primary-foreground text-primary-background"> */}
-        <div class='flex justify-left self-start'><IoArrowBackCircle size="40" onClick={() => {
-          console.log('Close chat');
-          props.setChatState!({
-            isOpen: false,
-            chatWith: '',
-          });
-          useWebsocket.send({
-            event: 'CHAT_CLOSED',
-            payload: {},
-          });
-        }}
-        class="hover:cursor-pointer"/></div>
+      <div class='flex justify-left self-start'><IoArrowBackCircle size="40" onClick={() => {
+        console.log('Close chat');
+        props.setChatState!({
+          isOpen: false,
+          chatWith: '',
+        });
+        useWebsocket.send({
+          event: 'CHAT_CLOSED',
+          payload: {},
+        });
+      }}
+        class="hover:cursor-pointer" /></div>
       {/* </div> */}
-        <div class='flex flex-col justify-center place-items-center text-center'>
+      <div class='flex flex-col justify-center place-items-center text-center'>
         <a href={`/profile/${props.chatState?.chatWith}`}
           class='text-base font-bold '
         >{props.chatState?.chatWith}
@@ -86,9 +87,9 @@ export default function ChatPage(props: FeedProps): JSXElement {
       <div class="overflow-y-scroll grow">
         {messages().length > 0 &&
           messages().map((message, index) => {
-            if (message.messages[0].sender == userDetails()!.user_name){
+            if (message.messages[0].sender == userDetails()!.user_name) {
               return <ChatMessage message={message.messages[0].message} type="sent" />
-             } else {
+            } else {
               return <ChatMessage message={message.messages[0].message} type="received" />
             }
           })
@@ -127,11 +128,10 @@ export default function ChatPage(props: FeedProps): JSXElement {
             }
           }}
         />
-        <Button
-          title='emoji picker'
-          class="emoji-button ml-2" onclick={openEmojiPicker}>
-          <FiSmile size="30" />
-        </Button>
+
+        {/* <FiSmile size="30" class="self-center emoji-button ml-2 cursor-pointer" onclick={openEmojiPicker} /> */}
+
+        <IconSmile class="size-6 self-center cursor-pointer ml-2" onClick={openEmojiPicker} />
         <Message_Icon
           darkBack={false}
           class='self-center hover:cursor-pointer ml-2'

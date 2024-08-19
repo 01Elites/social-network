@@ -108,7 +108,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
       </Tabs.Content>
 
 
-      <Tabs.Content class="tabs__content overflow-y-scroll h-[80vh]" value="chat">
+      <Tabs.Content class="tabs__content h-[80vh]" value="chat">
         <GroupChatPage class='grow place-content-end overflow-hidden' chatState={groupChatState()} setChatState={setGroupChatState} />
       </Tabs.Content>
 

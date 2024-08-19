@@ -33,6 +33,6 @@ export default function NewEventCell(props: eventParams): JSXElement {
       >
         Create New Event
       </Button>
-    </div><GroupEventsFeed groupID={props.groupID} /></>
+    </div><div class="ml-3"><GroupEventsFeed groupID={props.groupID}/></div></>
   );
 }

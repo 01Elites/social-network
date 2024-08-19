@@ -96,7 +96,6 @@ export default function ChatPage(props: FeedProps): JSXElement {
             });
           }}>Close</Button>
         <TextFieldInput
-          value={message()}
           type='text'
           id='message'
           value={message()}

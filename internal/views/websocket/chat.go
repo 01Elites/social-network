@@ -84,7 +84,7 @@ func SendMessage(RevEvent types.Event, user *types.User) {
 	sendMessageToWebSocket(user, event.GET_MESSAGES, messageResponse)
 
 	// Send the message to the recipient if they are online and has connection
-	if online && len(recipient.Conns) != 0 {
+	if online && len(recipient.Conns) != 0  && recipient.ChatOpened == user.Username {
 		sendMessageToWebSocket(recipient, event.GET_MESSAGES, messageResponse)
 	}
 }
@@ -165,7 +165,7 @@ func SendMessageToGroup(RevEvent types.Event, user *types.User) {
 		}
 		// Get the recipient's client from the Clients map
 		recipient, online := GetClient(member.UserName)
-		if online && len(recipient.Conns) != 0 {
+		if online && len(recipient.Conns) != 0 && recipient.ChatOpened == message.Recipient {
 			// Write JSON data to the WebSocket connection of the recipient
 			sendMessageToWebSocket(recipient, event.GET_MESSAGES, messageResponse)
 

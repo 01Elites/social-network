@@ -69,11 +69,25 @@ export default function ChatPage(props: FeedProps): JSXElement {
           });
         }}>Close</Button>
         <TextFieldInput
+          value={message()}
           type='text'
           id='message'
           placeholder='Type a message'
           onChange={(event: { currentTarget: { value: any } }) => {
             setMessage(event.currentTarget.value);
+          }}
+          onKeyUp={(event) => {
+            if (event.key != "Enter")
+              return
+            useWebsocket.send({
+              event: 'SEND_MESSAGE',
+              payload: {
+                recipient: props.chatState?.chatWith,
+                message: message(),
+              },
+            });
+            setMessage('') // Reset message field
+            event.currentTarget.value = message()
           }}
         />
         <Message_Icon
@@ -88,6 +102,7 @@ export default function ChatPage(props: FeedProps): JSXElement {
                 message: message(),
               },
             });
+            setMessage('') // Reset message field
           }}
         />
       </TextField>

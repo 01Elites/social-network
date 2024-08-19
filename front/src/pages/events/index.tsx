@@ -15,7 +15,7 @@ function EventsPage(): JSXElement {
 
   createEffect(() => {
     // Fetch user Friends
-    fetchWithAuth(config.API_URL + '/myEvents').then(async (res) => {
+    fetchWithAuth(config.API_URL + '/myevents').then(async (res) => {
       const body = await res.json();
       if (res.ok) {
         setPendingEvents(body.pending)
@@ -30,7 +30,7 @@ function EventsPage(): JSXElement {
   });
   return (
     <Layout>
-      <section class='flex h-full gap-4'>
+      <section class='flex h-full flex-col gap-4'>
         <h1 class='text-xl font-bold'>Events</h1>
         <Tabs aria-label='Main navigation' class='tabs'>
       <Tabs.List class='tabs__list'>
@@ -38,7 +38,7 @@ function EventsPage(): JSXElement {
           Pending ({pendingEvents()?.length || 0})
         </Tabs.Trigger>
         <Tabs.Trigger class='tabs__trigger' value='upcoming'>
-          Upcoming ({upcomingEvents?.length || 0})
+          Upcoming ({upcomingEvents()?.length || 0})
         </Tabs.Trigger>
         <Tabs.Trigger class='tabs__trigger' value='past'>
           Past ({pastEvents()?.length || 0})
@@ -65,22 +65,4 @@ function EventsPage(): JSXElement {
 }
 
 export default EventsPage;
-
-
-// export default function FriendsPage(): JSXElement {
-
-
-//   return (
-//     <Layout>
-//       <section class='flex h-full flex-col gap-4'>
-//         <h1 class='text-xl font-bold'>Friends</h1>
-//         <Show when={targetFriends()}>
-//           <div class='grid grid-cols-1'>
-//             <FriendsFeed targetFriends={() => targetFriends() as Friends} />
-//           </div>
-//         </Show>
-//       </section>
-//     </Layout>
-//   );
-// }
 

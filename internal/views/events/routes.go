@@ -5,6 +5,6 @@ import (
 	"social-network/internal/views/middleware"
 )
 
-func SetupFriendsRoutes() {
+func SetupEventsRoutes() {
 	http.HandleFunc("GET /api/myevents", middleware.AllowCORS(middleware.CheckAuth((MyEventsHandler))))
 }

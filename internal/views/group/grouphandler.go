@@ -273,12 +273,12 @@ func GetEventsHandler(w http.ResponseWriter, r *http.Request) {
 	events = helpers.ArrangeEvents(events)
 	var arrangedEvents []models.Event
 	for _, event := range events {
-		if event.EventTime.Before(time.Now()){
+		if event.EventTime.After(time.Now()){
 			arrangedEvents = append(arrangedEvents, event)
 		}
 	}
 	for _, event := range events {
-		if event.EventTime.After(time.Now()){
+		if event.EventTime.Before(time.Now()){
 			arrangedEvents = append(arrangedEvents, event)
 		}
 	}

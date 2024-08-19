@@ -103,6 +103,14 @@ export default function ChatPage(props: FeedProps): JSXElement {
           onChange={(event: { currentTarget: { value: any } }) => {
             setMessage(event.currentTarget.value);
           }}
+          onKeyPress={(e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              const input = document.getElementById('message') as HTMLInputElement;
+              setMessage(input.value); // Ensure the latest input value is captured
+              sendMessage();
+            }
+          }}
         />
         <Button
           title='emoji picker'

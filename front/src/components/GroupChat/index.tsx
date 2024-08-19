@@ -35,13 +35,11 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
   useWebsocket.bind('GET_MESSAGES', (data) => {
     setMessages(prevMessages => [...prevMessages, data]);
   });
+
   function pickEmoji(emoji: { emoji: any }) {
-    let input = document.getElementById('message')! as HTMLInputElement;
-    if (input) {
-      input.value += emoji.emoji
-    }
-    setMessage(input?.value);
+    setMessage(prev => prev + emoji.emoji);
   }
+
   function openEmojiPicker() {
     const emojiPicker = document.getElementById('emoji-picker');
     if (emojiPicker) {
@@ -50,19 +48,20 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
   }
 
   const sendMessage = () => {
-    if (message().trim() === '') return;
+    const msg = message().trim();
+    if (msg === '') return;
     useWebsocket.send({
       event: 'SEND_MESSAGE',
       payload: {
         recipient: props.chatState?.chatWith,
-        message: message(),
+        message: msg,
       },
     });
     setMessage(''); // Clear the input field after sending the message
   };
 
   return (
-    <div class={cn(props.class, "flex flex-col h-full")}>
+    <div class={cn(props.class, "flex flex-col h-full p-3")}>
       <div class="overflow-y-scroll grow">
         {messages().length > 0 &&
           messages().map((msg, index) => (
@@ -74,19 +73,10 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
           ))
         }
       </div>
-      <div id="emoji-picker" class="items-end self-end hidden h-32 w-96 overflow-y-scroll"><EmojiPicker onEmojiClick={pickEmoji} /></div>
+      <div id="emoji-picker" class="items-end self-end hidden h-32 w-96 overflow-y-scroll">
+        <EmojiPicker onEmojiClick={pickEmoji} />
+      </div>
       <TextField class='flex flex-row w-full content-end items-end self-end align-bottom'>
-        {/* <Button onClick={() => {
-          console.log('Close chat');
-          props.setChatState!({
-            isOpen: false,
-            chatWith: '',
-          });
-          useWebsocket.send({
-            event: 'CHAT_CLOSED',
-            payload: {},
-          });
-        }}>Close</Button> */}
         <TextFieldInput
           type='text'
           id='message'
@@ -98,13 +88,16 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
           onKeyPress={(e: KeyboardEvent) => {
             if (e.key === 'Enter') {
               e.preventDefault();
+              const input = document.getElementById('message') as HTMLInputElement;
+              setMessage(input.value); // Ensure the latest input value is captured
               sendMessage();
             }
           }}
         />
         <Button
           title='emoji picker'
-          class="emoji-button ml-2" onclick={openEmojiPicker}>
+          class="emoji-button ml-2"
+          onClick={openEmojiPicker}>
           <FiSmile size="30" />
         </Button>
         <Message_Icon

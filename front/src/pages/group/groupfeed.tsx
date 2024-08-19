@@ -100,7 +100,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
         value='posts'
       >
         <div class={cn('flex flex-col gap-4 p-2')}>
-          <NewGroupPostCell setPosts={setPosts}  groupID={props.groupID} />
+          <NewGroupPostCell setPosts={setPosts} groupID={props.groupID} />
           <div class={cn('flex flex-col gap-4 p-2')}>
             <FeedPosts path={`/group/${props.groupID}/posts`} posts={posts} setPosts={setPosts} />
           </div>
@@ -122,7 +122,7 @@ export default function GroupFeed(props: GroupPostFeedProps): JSXElement {
             <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
               <a
                 href={`/profile/${explore().user_name}`}
-                class='flex flex-col items-center text-base font-bold text-blue-500'
+                class='flex flex-col items-center text-base font-bold'
               >
                 <Avatar class='w-[5rem] h-[5rem] mb-2'>
                   <AvatarFallback>

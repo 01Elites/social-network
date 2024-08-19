@@ -60,7 +60,7 @@ export default function GroupsFeed(props: GroupFeedProps): JSXElement {
               <Card class="flex w-44 flex-col items-center space-y-4 p-3">
                 <a
                   href={`/group/${group.id}`}
-                  class="flex flex-col items-center text-base font-bold text-blue-500"
+                  class="flex flex-col items-center text-base font-bold "
                 >
                   <Avatar class="mb-3 h-20 w-20">
                     <AvatarImage />
@@ -79,7 +79,7 @@ export default function GroupsFeed(props: GroupFeedProps): JSXElement {
               <Card class="flex w-44 flex-col items-center space-y-4 p-3">
                 <a
                   href={`/group/${group.id}`}
-                  class="flex flex-col items-center text-base font-bold text-blue-500"
+                  class="flex flex-col items-center text-base font-bold "
                 >
                   <Avatar class="mb-3 h-20 w-20">
                     <AvatarImage />
@@ -99,7 +99,7 @@ export default function GroupsFeed(props: GroupFeedProps): JSXElement {
               <Card class="flex w-44 flex-col items-center space-y-4 p-3">
                 <a
                   href={`/group/${group.id}`}
-                  class="flex flex-col items-center text-base font-bold text-blue-500"
+                  class="flex flex-col items-center text-base font-bold "
                 >
                   <Avatar class="mb-3 h-20 w-20">
                     <AvatarImage />

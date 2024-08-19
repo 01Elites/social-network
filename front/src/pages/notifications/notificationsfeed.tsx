@@ -53,7 +53,7 @@ export default function NotificationsFeed(): JSXElement {
                       <div class="flex flex-col items-start justify-center space-y-1">
                         <div><a
                           href={`/profile/${notification().metadata.requester.user_name}`}
-                          class="text-base font-bold text-blue-500 hover:underline"
+                          class="text-base font-bold  hover:underline"
                         >
                           {notification().metadata.requester.first_name} {notification().metadata.requester.last_name}
                         </a></div>
@@ -105,7 +105,7 @@ export default function NotificationsFeed(): JSXElement {
                       </Avatar>
                       <div class="flex flex-col items-start justify-center space-y-1">
                         <div>{<a
-                          href={"/profile/" + notification().metadata.invited_by.user.user_name} class="text-base font-bold text-blue-500 hover:underline">
+                          href={"/profile/" + notification().metadata.invited_by.user.user_name} class="text-base font-bold  hover:underline">
                           {notification().metadata.invited_by.user.first_name}  {notification().metadata.invited_by.user.last_name}</a>}
                           &nbspinvited you to join:  {<A
                             href={"/group/" + notification().metadata.id} class="text-base font-bold hover:underline">
@@ -171,7 +171,7 @@ export default function NotificationsFeed(): JSXElement {
                       </Avatar>
                       <div class="flex flex-col items-start justify-center space-y-1">
                         <div><a
-                          href={"/profile/" + notification().metadata.requester.user.user_name} class='text-base font-bold text-blue-500 hover:underline'>
+                          href={"/profile/" + notification().metadata.requester.user.user_name} class='text-base font-bold  hover:underline'>
                           {notification().metadata.requester.user.first_name}  {notification().metadata.requester.user.last_name} </a>
                           Requested to join: {<A
                             href={"/group/" + notification().metadata.id} class="text-base font-bold hover:underline">

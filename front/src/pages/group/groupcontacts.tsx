@@ -19,7 +19,7 @@ export default function GroupContacts(props: HomeContactsProps): JSXElement {
           <Card class='m-2 flex w-44 flex-col items-center space-y-4 p-3'>
             <a
               href={`/profile/${member.user_name}`}
-              class='flex flex-col items-center text-base font-bold hover:underline text-blue-500'
+              class='flex flex-col items-center text-base font-bold hover:underline'
             >
               <Avatar class='w-[5rem] h-[5rem] mb-2'>
                 <AvatarFallback>

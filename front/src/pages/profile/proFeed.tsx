@@ -99,7 +99,7 @@ export default function ProfileFeed(props: {
               <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
                 <a
                   href={`/profile/${follower.user_name}`}
-                  class='flex flex-col items-center text-base font-bold text-blue-500 hover:underline'
+                  class='flex flex-col items-center text-base font-bold hover:underline'
                 >
                   <Avatar class='mb-3 h-20 w-20'>
                     <AvatarImage src={follower.avatar} />
@@ -141,7 +141,7 @@ export default function ProfileFeed(props: {
               <Card class='flex w-44 flex-col items-center space-y-4 p-3'>
                 <a
                   href={`/profile/${following.user_name}`}
-                  class='flex flex-col items-center text-base font-bold text-blue-500 hover:underline'
+                  class='flex flex-col items-center text-base font-bold  hover:underline'
                 >
                   <Avatar class='mb-3 h-20 w-20'>
                     <AvatarImage src={following.avatar} />

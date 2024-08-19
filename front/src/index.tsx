@@ -21,6 +21,7 @@ import HomePage from './pages/home';
 import Profile from './pages/profile';
 import { useNotifications } from './hooks/NotificationsHook';
 import NotificationsContext from './contexts/NotificationsContext';
+import ErrPage from './pages/404';
 
 const root = document.getElementById('root');
 
@@ -60,6 +61,7 @@ function App() {
       <Route path='/friends' component={FriendsPage} />
       <Route path='/events' component={EventsPage} />
       <Route path='/profile/:username' component={Profile} />
+      <Route path="*404" component={ErrPage} />
     </Router>
   );
 }

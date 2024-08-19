@@ -71,10 +71,19 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "failed to create event options", http.StatusNotFound)
 		return
 	}
+
+	user, err := database.GetUserPostFeedProfile(userID)
+	if err != nil {
+		helpers.HTTPError(w, "failed to get user profile", http.StatusNotFound)
+		return
+	}
+
 	groupEvent := types.EventDetails{
 		ID:      eventID,
 		Title:   event.Title,
 		Options: options,
+		Description: event.Description,
+		Creator: user.FirstName + " " + user.LastName,
 		EventTime: event.EventTime,
 	}
 	for i, member := range groupMembers {

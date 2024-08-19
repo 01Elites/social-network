@@ -9,6 +9,14 @@ import Message_Icon from '../ui/icons/message_icon';
 import ChatMessage from './chatMessage';
 import { Button } from '../ui/button';
 import { cn } from '~/lib/utils';
+import { FiSmile } from 'solid-icons/fi'
+import {
+  EmojiPicker,
+  useEmojiComponents,
+  useEmojiData,
+  Emoji,
+  loadEmojiData
+} from 'solid-emoji-picker';
 
 interface FeedProps {
   class?: string;
@@ -32,9 +40,21 @@ export default function ChatPage(props: FeedProps): JSXElement {
     });
 
   useWebsocket.bind('GET_MESSAGES', (data) => {
-    console.log('Received messages:', messages());
     setMessages(prevMessages => [...prevMessages, data]);
   });
+  function pickEmoji(emoji) {
+    var input = document.getElementById('message')
+    if (input) {
+      input.value += emoji.emoji
+    }
+    setMessage(emoji.emoji);
+  }
+  function openEmojiPicker() {
+    const emojiPicker = document.getElementById('emoji-picker');
+    if (emojiPicker) {
+      emojiPicker.classList.toggle('hidden');
+    }
+  }
 
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
@@ -47,15 +67,15 @@ export default function ChatPage(props: FeedProps): JSXElement {
       <div class="overflow-y-scroll grow">
         {messages().length > 0 &&
           messages().map((message, index) => {
-            if (message.messages[0].sender == userDetails()!.user_name)
+            if (message.messages[0].sender == userDetails()!.user_name){
               return <ChatMessage message={message.messages[0].message} type="sent" />
-            else {
+             } else {
               return <ChatMessage message={message.messages[0].message} type="received" />
             }
           })
         }
       </div>
-
+        <div id="emoji-picker" class="items-end self-end hidden h-32 w-96 overflow-y-scroll"><EmojiPicker onEmojiClick={pickEmoji}/></div>
       <TextField class='flex flex-row w-full content-end items-end self-end align-bottom'>
         <Button onClick={() => {
           console.log('Close chat');
@@ -76,9 +96,12 @@ export default function ChatPage(props: FeedProps): JSXElement {
             setMessage(event.currentTarget.value);
           }}
         />
+            <button class="emoji-button size-12" onclick={openEmojiPicker}>
+            <FiSmile size="34"/>
+            </button>
         <Message_Icon
           darkBack={false}
-          class='ml-2 self-center'
+          class='self-center hover:cursor-pointer'
           onClick={() => {
             // send the message
             useWebsocket.send({
@@ -88,9 +111,12 @@ export default function ChatPage(props: FeedProps): JSXElement {
                 message: message(),
               },
             });
+            document.getElementById('message')!.value = '';
           }}
         />
       </TextField>
     </div>
   );
 }
+
+    

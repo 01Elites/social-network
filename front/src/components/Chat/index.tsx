@@ -11,6 +11,7 @@ import { Button } from '../ui/button';
 import { cn } from '~/lib/utils';
 import { FiSmile } from 'solid-icons/fi'
 import { EmojiPicker } from 'solid-emoji-picker';
+import { IoArrowBackCircle } from 'solid-icons/io'
 
 interface FeedProps {
   class?: string;
@@ -63,14 +64,26 @@ export default function ChatPage(props: FeedProps): JSXElement {
 
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
-      <div class="flex justify-center items-center h-12 bg-primary-foreground text-primary-background">
+      {/* <div class="flex h-12 bg-primary-foreground text-primary-background"> */}
+        <div class='flex justify-left self-start'><IoArrowBackCircle size="40" onClick={() => {
+          console.log('Close chat');
+          props.setChatState!({
+            isOpen: false,
+            chatWith: '',
+          });
+          useWebsocket.send({
+            event: 'CHAT_CLOSED',
+            payload: {},
+          });
+        }}
+        class="hover:cursor-pointer"/></div>
+      {/* </div> */}
+        <div class='flex flex-col justify-center place-items-center text-center'>
         <a href={`/profile/${props.chatState?.chatWith}`}
-          class='items-center text-base font-bold '
+          class='text-base font-bold '
         >{props.chatState?.chatWith}
-        </a>
-      </div>
+        </a></div>
       <div class="overflow-y-scroll grow">
-
         {messages().length > 0 &&
           messages().map((message, index) => {
             if (message.messages[0].sender == userDetails()!.user_name){

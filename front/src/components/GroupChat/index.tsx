@@ -76,7 +76,7 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
       </div>
       <div id="emoji-picker" class="items-end self-end hidden h-32 w-96 overflow-y-scroll"><EmojiPicker onEmojiClick={pickEmoji} /></div>
       <TextField class='flex flex-row w-full content-end items-end self-end align-bottom'>
-        <Button onClick={() => {
+        {/* <Button onClick={() => {
           console.log('Close chat');
           props.setChatState!({
             isOpen: false,
@@ -86,7 +86,7 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
             event: 'CHAT_CLOSED',
             payload: {},
           });
-        }}>Close</Button>
+        }}>Close</Button> */}
         <TextFieldInput
           type='text'
           id='message'
@@ -95,16 +95,18 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
           onChange={(event: { currentTarget: { value: string } }) => {
             setMessage(event.currentTarget.value);
           }}
-          onKeyPress={(event: KeyboardEvent) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
+          onKeyPress={(e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
               sendMessage();
             }
           }}
         />
-        <button class="emoji-button size-12" onclick={openEmojiPicker}>
-          <FiSmile size="34" />
-        </button>
+        <Button
+          title='emoji picker'
+          class="emoji-button ml-2" onclick={openEmojiPicker}>
+          <FiSmile size="30" />
+        </Button>
         <Message_Icon
           darkBack={false}
           class='ml-2 self-center'

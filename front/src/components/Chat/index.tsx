@@ -10,13 +10,7 @@ import ChatMessage from './chatMessage';
 import { Button } from '../ui/button';
 import { cn } from '~/lib/utils';
 import { FiSmile } from 'solid-icons/fi'
-import {
-  EmojiPicker,
-  useEmojiComponents,
-  useEmojiData,
-  Emoji,
-  loadEmojiData
-} from 'solid-emoji-picker';
+import { EmojiPicker } from 'solid-emoji-picker';
 
 interface FeedProps {
   class?: string;
@@ -42,12 +36,12 @@ export default function ChatPage(props: FeedProps): JSXElement {
   useWebsocket.bind('GET_MESSAGES', (data) => {
     setMessages(prevMessages => [...prevMessages, data]);
   });
-  function pickEmoji(emoji) {
-    var input = document.getElementById('message')
+  function pickEmoji(emoji : {emoji: any}) {
+    var input = document.getElementById('message')! as HTMLInputElement;
     if (input) {
       input.value += emoji.emoji
     }
-    setMessage(emoji.emoji);
+    setMessage(input?.value);
   }
   function openEmojiPicker() {
     const emojiPicker = document.getElementById('emoji-picker');
@@ -55,6 +49,17 @@ export default function ChatPage(props: FeedProps): JSXElement {
       emojiPicker.classList.toggle('hidden');
     }
   }
+  const sendMessage = () => {
+    if (message().trim() === '') return;
+    useWebsocket.send({
+      event: 'SEND_MESSAGE',
+      payload: {
+        recipient: props.chatState?.chatWith,
+        message: message(),
+      },
+    });
+    setMessage(''); // Clear the input field after sending the message
+  };
 
   return (
     <div class={cn(props.class, "flex flex-col h-full")}>
@@ -91,6 +96,7 @@ export default function ChatPage(props: FeedProps): JSXElement {
         <TextFieldInput
           type='text'
           id='message'
+          value={message()}
           placeholder='Type a message'
           onChange={(event: { currentTarget: { value: any } }) => {
             setMessage(event.currentTarget.value);
@@ -102,17 +108,7 @@ export default function ChatPage(props: FeedProps): JSXElement {
         <Message_Icon
           darkBack={false}
           class='self-center hover:cursor-pointer'
-          onClick={() => {
-            // send the message
-            useWebsocket.send({
-              event: 'SEND_MESSAGE',
-              payload: {
-                recipient: props.chatState?.chatWith,
-                message: message(),
-              },
-            });
-            document.getElementById('message')!.value = '';
-          }}
+          onClick={sendMessage}
         />
       </TextField>
     </div>

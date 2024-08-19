@@ -12,7 +12,7 @@ type FollowRequestParams = {
   username: string | undefined;
   status: string;
   privacy: string;
-  profilePage: boolean;
+  profilePage?: boolean;
 }
 export default function FollowRequest(props: FollowRequestParams): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;

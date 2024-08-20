@@ -95,10 +95,10 @@ export default function ChatPage(props: FeedProps): JSXElement {
           })
         }
       </div>
-      <div id="emoji-picker" class="items-end self-end hidden h-44 w-96 overflow-y-scroll"><EmojiPicker onEmojiClick={pickEmoji} /></div>
+      <div id="emoji-picker" class="items-end self-end hidden h-64 md:h-80 w-30 md:w-72 overflow-y-scroll"><EmojiPicker onEmojiClick={pickEmoji} /></div>
       <TextField class='flex flex-row w-full content-end items-end self-end align-bottom'>
         <Button
-          class='self-center hover:cursor-pointer mr-2'
+          class='self-center hover:cursor-pointer mr-2 hidden md:flex'
           onClick={() => {
             console.log('Close chat');
             props.setChatState!({
@@ -131,7 +131,7 @@ export default function ChatPage(props: FeedProps): JSXElement {
 
         {/* <FiSmile size="30" class="self-center emoji-button ml-2 cursor-pointer" onclick={openEmojiPicker} /> */}
 
-        <IconSmile class="size-6 self-center cursor-pointer ml-2" onClick={openEmojiPicker} />
+        <IconSmile class="size-6 self-center cursor-pointer ml-2 " onClick={openEmojiPicker} />
         <Message_Icon
           darkBack={false}
           class='self-center hover:cursor-pointer ml-2'

@@ -97,7 +97,7 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
 
   return (
     <section class={cn('flex flex-col gap-3', props.class)}>
-      <h1 class='text-xl font-bold'>Contacts</h1>
+      <h1 class='text-xl font-bold hidden md:flex'>Contacts</h1>
       <section class='flex flex-col gap-2 overflow-y-scroll'>
         {/* Skeleton for guests */}
         <Show when={!userDetails()}>
@@ -128,7 +128,7 @@ export default function HomeContacts(props: HomeContactsProps): JSXElement {
           <For each={sections()}>
             {(section) => (
               <>
-                <h1 class='text-md font-semibold text-primary/80'>{section.name}</h1>
+                <h1 class='text-md font-semibold text-primary/80 hidden md:flex'>{section.name}</h1>
                 < Show when={section.users.length > 0} fallback={
                   <Repeat count={4}>
                     <div class='flex items-center gap-3'>

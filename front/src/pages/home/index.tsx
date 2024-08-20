@@ -19,12 +19,12 @@ export default function HomePage(): JSXElement {
 
   return (
     <Layout>
-      <section class='flex h-full gap-4'>
+      <section class='h-full gap-4 flex'>
         {/* <HomeEvents class='hidden w-5/12 max-w-60 overflow-hidden md:flex' /> */}
-        <Show when={chatState().isOpen} fallback={<Feed class='grow overflow-hidden' />}>
-          <ChatPage class='grow place-content-end overflow-hidden' chatState={chatState()} setChatState={setChatState} />
+        <Show when={chatState().isOpen} fallback={<Feed class='grow' />}>
+          <ChatPage class='grow' chatState={chatState()} setChatState={setChatState} />
         </Show>
-        <HomeContacts class='hidden w-1/3 max-w-52 overflow-hidden md:flex' setChatState={setChatState} />
+        <HomeContacts class='max-w-14 mt-7 md:mt-0 md:flex md:w-1/3 md:max-w-52 ' setChatState={setChatState} />
       </section>
     </Layout>
   );

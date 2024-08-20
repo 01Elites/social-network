@@ -12,7 +12,7 @@ import (
 func AllowCORS(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
-		if origin == "http://localhost:3000" || origin == "http://localhost:8081" {
+		if origin == "http://localhost:3000" || origin == "http://localhost:8081" || origin == "http://localhost:8080" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization")
@@ -27,7 +27,6 @@ func AllowCORS(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r)
 	}
 }
-
 
 type contextKey string
 

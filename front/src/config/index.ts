@@ -4,8 +4,8 @@ interface Config {
 }
 
 const config: Config = {
-  API_URL: 'http://localhost:8081/api',
-  WS_URL: 'ws://localhost:8081/api/ws', // WebSocket URL
+  API_URL: 'http://localhost:8080/api',
+  WS_URL: 'ws://localhost:8080/api/ws', // WebSocket URL
 };
 
 export default config;

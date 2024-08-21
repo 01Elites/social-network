@@ -10,7 +10,10 @@ import (
 
 func main() {
 	// Load environment variables from .env file
+	// For Auth
 	helpers.LoadEnv(".env")
+
+	helpers.LoadEnv("internal/database/.env")
 
 	// Apply database migrations
 	err := querys.ApplyMigrations()
@@ -26,5 +29,5 @@ func main() {
 
 	// Print a message indicating that the server is live
 	log.Println("\033[1;33mServer is Live at http://localhost:8081...\033[0m")
-	log.Fatalln(http.ListenAndServe(":8081", nil))
+	log.Fatalln(http.ListenAndServe("0.0.0.0:8081", nil))
 }

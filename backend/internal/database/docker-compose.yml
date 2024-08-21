@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  social-db:
+    build: .
+    container_name: elite_postgres
+    volumes:
+      - social-db-data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:5432"
+
+volumes:
+  social-db-data:

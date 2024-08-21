@@ -1,0 +1,11 @@
+:8080 {
+    handle /api* {
+        reverse_proxy social-backend:8081 {
+            transport http {
+            }
+        }
+    }
+    handle {
+        reverse_proxy social-frontend:3000
+    }
+}

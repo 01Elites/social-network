@@ -1,4 +1,4 @@
-import { JSXElement, Show, useContext } from 'solid-js';
+import { createEffect, JSXElement, Show, useContext } from 'solid-js';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
@@ -28,6 +28,27 @@ interface FeedPostCellProps {
 
 export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+  let imageRef!: HTMLImageElement;
+
+  // load image with auth headers
+  createEffect(() => {
+    if (!props.post.image) {
+      return;
+    }
+    fetchWithAuth(`${config.API_URL}/image/${props.post.image}`).then(
+      async (res) => {
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(
+            body.reason ?? 'An error occurred while fetching the image',
+          );
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        imageRef.src = url;
+      },
+    );
+  });
 
   function isLiked() {
     return props.post.likers_usernames?.includes(
@@ -88,10 +109,11 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
         <AspectRatio ratio={16 / 9}>
           {/* TODO: Load image with headers, use a userRef hook to update the image after fetching with `fetchWithAuth` */}
           <img
+            ref={imageRef}
             alt='post image'
             class='size-full rounded-md rounded-b-none object-cover'
             loading='lazy'
-            src={`${config.API_URL}/image/${props.post.image}`}
+            // src={`${config.API_URL}/image/${props.post.image}`}
           />
         </AspectRatio>
       </Show>

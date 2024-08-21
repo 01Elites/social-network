@@ -16,6 +16,7 @@ import { useContext } from 'solid-js';
 import NotificationsContext from '~/contexts/NotificationsContext';
 import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
+import { showToast } from '~/components/ui/toast';
 
 export default function NotificationsFeed(): JSXElement {
   // const [test, setnotification] = createSignal<NotificationsHook>();
@@ -303,7 +304,13 @@ function handleFollowRequest(response: string, follower: string) {
       }
     })
     .catch((err) => {
+      showToast({
+        title: 'Error responding to request',
+        description: err.message,
+        variant: 'error', 
+      });
       console.log('Error responding to request');
+      return;
     });
   const elem = document.getElementById(follower + "follow");
   elem?.remove();

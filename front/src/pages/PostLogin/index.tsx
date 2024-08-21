@@ -1,4 +1,4 @@
-import { A, useNavigate, useParams } from '@solidjs/router';
+import { A, useParams } from '@solidjs/router';
 import { createEffect, createSignal, JSXElement, Show } from 'solid-js';
 import { buttonVariants } from '~/components/ui/button';
 
@@ -15,7 +15,6 @@ function deleteCookie(name: string) {
 }
 
 export default function PostLogin(): JSXElement {
-  const navigator = useNavigate();
   const [tokenError, setTokenError] = createSignal<string>(useParams().error);
 
   // extract token from cookie

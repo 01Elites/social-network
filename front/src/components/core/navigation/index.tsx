@@ -1,5 +1,12 @@
 import { A, useLocation, useNavigate } from '@solidjs/router';
-import { createSignal, For, JSXElement, Show, useContext } from 'solid-js';
+import {
+  createEffect,
+  createSignal,
+  For,
+  JSXElement,
+  Show,
+  useContext,
+} from 'solid-js';
 import { showLogin } from '~/components/LoginDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button, buttonVariants } from '~/components/ui/button';
@@ -25,13 +32,11 @@ import NotificationsContext from '~/contexts/NotificationsContext';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { useNotifications } from '~/hooks/NotificationsHook';
+import useLoginProviders from '~/hooks/LoginProvidersHook';
 import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 import { cn } from '~/lib/utils';
-import { NotificationsPage, showNotifications } from '~/pages/notifications';
+import { showNotifications } from '~/pages/notifications';
 import { showSettings } from '~/pages/settings';
-import { BsCircleFill } from 'solid-icons/bs'
-import { useUserDetails } from '~/hooks/userDetails';
 
 interface NavigationProps {
   children: JSXElement;
@@ -50,9 +55,17 @@ export default function Navigation(props: NavigationProps): JSXElement {
   const notificationsCtx = useContext(NotificationsContext);
   const wsCtx = useContext(WebSocketContext);
 
-  const [bellColor, setBellColor] = createSignal(false);
+  const loginProviders = useLoginProviders();
+  loginProviders.postLogin();
+
+  createEffect(() => {
+    if (!userCtx?.userDetails()) {
+      showLogin();
+    }
+  });
+
   const location = useLocation();
-    // eh writing the same line every where? sucks
+  // eh writing the same line every where? sucks
   function cpFill(path: string) {
     return location.pathname === path ? 'white' : undefined;
   }
@@ -61,11 +74,6 @@ export default function Navigation(props: NavigationProps): JSXElement {
     return location.pathname === path ? 'default' : 'ghost';
   }
 
-  function showNotificationPage() {
-    showNotifications();
-    setBellColor(false);
-  }
-  
   // Define the navItems array with default item based on currentPath match
   const [navItems] = createSignal<NavItem[]>([
     {
@@ -123,22 +131,17 @@ export default function Navigation(props: NavigationProps): JSXElement {
             variant='ghost'
             class='mt-auto w-fit justify-start gap-2 md:w-full'
             color='red'
-            onClick={showNotificationPage}
+            onClick={showNotifications}
           >
-            <For each={notificationsCtx?.store}>
-          {(notification) => (
-            <>
-            <Show when={!notification.read}>
-              {/* <div class="hidden">{counter = counter+1}</div> */}
-              {setBellColor(true)}
-            </Show>
-            </>)}</For>
-            <Show when={bellColor() ===false}
-              fallback={<IconBellActive class='size-5'/>}>
-              <IconBell class='size-5' />
+            <Show
+              when={notificationsCtx?.store.find(
+                (notification) => notification.read === false,
+              )}
+              fallback={<IconBell class='size-5' />}
+            >
+              <IconBellActive class='size-5' />
             </Show>
             <span class='hidden md:block'>Notifications</span>
-
           </Button>
         </Show>
         <Button
@@ -169,7 +172,9 @@ export default function Navigation(props: NavigationProps): JSXElement {
           <DropdownMenu>
             <DropdownMenuTrigger class='flex w-full flex-row items-center justify-center gap-2 px-2 md:justify-start'>
               <Avatar>
-                <AvatarImage src={`${config.API_URL}/image/${userCtx!.userDetails()?.avatar}`}></AvatarImage>
+                <AvatarImage
+                  src={`${config.API_URL}/image/${userCtx!.userDetails()?.avatar}`}
+                ></AvatarImage>
                 <AvatarFallback>
                   {userCtx!.userDetails()?.first_name.charAt(0).toUpperCase()}
                 </AvatarFallback>

@@ -565,7 +565,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal("Error reading response body:", err)
 		http.Error(w, "Error reading response body", http.StatusInternalServerError)
@@ -598,7 +598,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	userInfoBody, err := ioutil.ReadAll(resp.Body)
+	userInfoBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal("Error reading user info response:", err)
 		http.Error(w, "Error reading user info response", http.StatusInternalServerError)
@@ -621,6 +621,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: Update this
 	username, err := database.GenerateUniqueUsername(userInfo["given_name"].(string), userInfo["family_name"].(string))
 	if err != nil {
 		log.Fatalf("Failed to generate unique username: %v", err)

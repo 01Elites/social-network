@@ -267,16 +267,16 @@ func AddUserSession(userID string, sessionID string) error {
 	return nil
 }
 
-	// delete the previous session of the user if exists
-	func DeleteUserSessions(userID string) error {
-		query := `DELETE FROM public.session WHERE user_id = $1`
-		_, err := DB.Exec(context.Background(), query, userID)
-		if err != nil {
-			log.Printf("Failed to delete user session: %v\n", err)
-			return err
-		}
-		return nil
+// delete the previous session of the user if exists
+func DeleteUserSessions(userID string) error {
+	query := `DELETE FROM public.session WHERE user_id = $1`
+	_, err := DB.Exec(context.Background(), query, userID)
+	if err != nil {
+		log.Printf("Failed to delete user session: %v\n", err)
+		return err
 	}
+	return nil
+}
 
 // func DeleteUserSession(sessionID string) error {
 // 	// Delete user session from database
@@ -484,6 +484,7 @@ func GenerateUniqueUsername(firstName, lastName string) (string, error) {
 	username := baseUsername
 	counter := 1
 
+	// TODO: Check this to make sure it never breaks
 	// Check if the username exists and generate new variations if necessary
 	for {
 		exists, err := usernameExists(username)

@@ -204,7 +204,4 @@ $RECYCLE.BIN/
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Go,Node,Linux,macOS,Windows
 
 # environment variables
-.env
 *.env
-*/*.env
-internal/database/.env

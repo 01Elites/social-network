@@ -105,7 +105,7 @@ func ValidateUserProfileData(data *models.UserProfile) error {
 	}
 	// Validate Gender
 	switch data.Gender {
-	case models.Gender.Female, models.Gender.Male:
+	case models.Gender.Female, models.Gender.Male, models.Gender.Alien, models.Gender.Engineer:
 		// valid
 	default:
 		return fmt.Errorf("invalid gender: %v", data.Gender)

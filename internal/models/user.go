@@ -26,9 +26,13 @@ var ProfilePrivacy = struct {
 var Gender = struct {
 	Male   string
 	Female string
+	Alien  string
+	Engineer string
 }{
 	Male:   "male",
 	Female: "female",
+	Alien:  "alien",
+	Engineer: "engineer",
 }
 
 // GiteaUser struct defines the structure for storing user information from Gitea
@@ -38,6 +42,7 @@ type GiteaUser = struct {
 	Email     string `json:"email"`
 	AvatarURL string `json:"avatar_url"`
 }
+
 // User struct defines the structure for storing user information
 type User struct {
 	UserID    string          `db:"user_id"`
@@ -85,5 +90,7 @@ type PostFeedProfile struct {
 	Avatar         string `db:"image" json:"avatar,omitempty"`
 }
 
-var Code string
-var Token string
+var (
+	Code  string
+	Token string
+)

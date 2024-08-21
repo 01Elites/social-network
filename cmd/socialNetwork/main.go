@@ -3,14 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
-	 "social-network/internal/database/querys"
+	"social-network/internal/database/querys"
 	"social-network/internal/helpers"
 	"social-network/internal/views"
 )
 
 func main() {
 	// Load environment variables from .env file
-	helpers.LoadEnv("internal/database/.env")
+	helpers.LoadEnv(".env")
 
 	// Apply database migrations
 	err := querys.ApplyMigrations()

@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   db:
+    image: postgres:latest
     build: .
     container_name: elite_postgres
     environment:

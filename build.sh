@@ -15,6 +15,6 @@ cleanup() {
 
 # Start Docker containers
 echo "Starting Docker containers..."
-docker pull postgres
-docker pull caddy
+# docker pull postgres
+# docker pull caddy
 docker-compose up

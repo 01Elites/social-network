@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   caddy:
+    image: caddy:latest
     build:
       context: .
       dockerfile: Dockerfile.caddy

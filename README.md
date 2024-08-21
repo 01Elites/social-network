@@ -15,7 +15,7 @@ Welcome to our version of social-network Project!
 
 -   [Getting Started](#getting-started)
 -   [Usage](#usage)
--   [Directory Structure](#directory-structure)
+-   [Preview](#preview)
 -   [Authors](#authors)
 
 ## Getting Started
@@ -41,7 +41,12 @@ bash build.sh
 or vist: https://elite-network.extbh.dev/
 
 
-### Directory Structure
+### Preview
+<details>
+<summary>preview</summary>
+<img src="/home/amali/Desktop/github/social-network/SN.gif" />
+</details>
+
 <details>
 <summary>tree map</summary>
 

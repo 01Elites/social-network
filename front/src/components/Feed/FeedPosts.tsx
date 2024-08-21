@@ -1,7 +1,6 @@
 import {
   Accessor,
   createEffect,
-  createSignal,
   For,
   JSXElement,
   Setter,
@@ -11,9 +10,9 @@ import {
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
+import { UserDetailsHook } from '~/hooks/userDetails';
 import { cn } from '~/lib/utils';
 import { Post } from '~/types/Post';
-import { UserDetailsHook } from '~/hooks/userDetails';
 import Repeat from '../core/repeat';
 import { showToast } from '../ui/toast';
 import FeedPostCell from './FeedPostCell';
@@ -22,8 +21,8 @@ import { PostCommentsDialog } from './PostCommentsDialog';
 
 interface FeedPostsProps {
   class?: string;
-  posts?: Accessor<Post[] | undefined>
-  setPosts?: Setter<Post[] | undefined>
+  posts?: Accessor<Post[] | undefined>;
+  setPosts?: Setter<Post[] | undefined>;
   path: string;
 }
 
@@ -31,16 +30,18 @@ export default function FeedPosts(props: FeedPostsProps): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
 
   function updatePost(updatedPost: Post) {
-    const updatedPosts = props.posts?.()?.map((post) =>
-      post.post_id === updatedPost.post_id ? updatedPost : post,
-    );
+    const updatedPosts = props
+      .posts?.()
+      ?.map((post) =>
+        post.post_id === updatedPost.post_id ? updatedPost : post,
+      );
     props.setPosts?.(updatedPosts);
   }
   createEffect(() => {
     if (!userDetails()) {
       props.setPosts?.(null as any);
       return;
-    };
+    }
 
     fetchWithAuth(config.API_URL + props.path)
       .then(async (res) => {

@@ -59,7 +59,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
   loginProviders.postLogin();
 
   createEffect(() => {
-    if (!userCtx?.userDetails()) {
+    if (!userCtx?.proccessing() && !userCtx?.userDetails()) {
       showLogin();
     }
   });

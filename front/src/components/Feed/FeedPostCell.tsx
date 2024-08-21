@@ -2,8 +2,8 @@ import { JSXElement, Show, useContext } from 'solid-js';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import { Post } from '~/types/Post';
 import { UserDetailsHook } from '~/hooks/userDetails';
+import { Post } from '~/types/Post';
 import TextBreaker from '../core/textbreaker';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
@@ -86,6 +86,7 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
     <div class='space-y-4 overflow-hidden rounded border-[0.5px] pb-4 shadow-lg'>
       <Show when={props.post.image}>
         <AspectRatio ratio={16 / 9}>
+          {/* TODO: Load image with headers, use a userRef hook to update the image after fetching with `fetchWithAuth` */}
           <img
             alt='post image'
             class='size-full rounded-md rounded-b-none object-cover'

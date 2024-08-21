@@ -1,4 +1,4 @@
-import { createSignal, onMount } from 'solid-js';
+import { Accessor, createSignal, onMount } from 'solid-js';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '../../config';
 import User from '../../types/User';
@@ -8,8 +8,10 @@ function useUserDetails(): UserDetailsHook {
   const [userDetailsError, setUserDetailsError] = createSignal<string | null>(
     null,
   );
+  const [proccessing, setProccessing] = createSignal(false);
 
   async function fetchUserDetails(): Promise<void> {
+    setProccessing(true);
     try {
       const response = await fetchWithAuth(config.API_URL + '/profile');
 
@@ -30,9 +32,11 @@ function useUserDetails(): UserDetailsHook {
     } catch (err) {
       setUserDetailsError((err as Error).message);
     }
+    setProccessing(false);
   }
 
   async function updateUserDetails(partialDetails: Partial<User>) {
+    setProccessing(true);
     try {
       const response = await fetchWithAuth(config.API_URL + '/api/profile', {
         method: 'PATCH',
@@ -49,6 +53,7 @@ function useUserDetails(): UserDetailsHook {
     } catch (err) {
       setUserDetailsError((err as Error).message);
     }
+    setProccessing(false);
   }
 
   onMount(fetchUserDetails);
@@ -59,15 +64,17 @@ function useUserDetails(): UserDetailsHook {
     userDetailsError,
     fetchUserDetails,
     updateUserDetails,
+    proccessing,
   };
 }
 
 interface UserDetailsHook {
-  userDetails: () => User | null;
+  userDetails: Accessor<User | null>;
   setUserDetails: (details: User | null) => void;
-  userDetailsError: () => string | null;
+  userDetailsError: Accessor<string | null>;
   fetchUserDetails: () => Promise<void>;
   updateUserDetails: (partialDetails: Partial<User>) => Promise<void>;
+  proccessing: Accessor<boolean>;
 }
 
 export type { UserDetailsHook };

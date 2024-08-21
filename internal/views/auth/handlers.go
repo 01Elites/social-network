@@ -346,7 +346,7 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 		NickName:       gitea_user.Login,
 		ProfilePrivacy: "public",
 		Avatar:         fileName,
-		Gender:         "male",
+		Gender:         "engineer",
 		FirstName:      strings.Split(gitea_user.FullName, " ")[0],
 		LastName:       strings.Split(gitea_user.FullName, " ")[1],
 	}
@@ -495,7 +495,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 		NickName:       userInfo["login"].(string),
 		ProfilePrivacy: "public",
 		Avatar:         fileName, // Use the generated filename
-		Gender:         "male",
+		Gender:         "engineer",
 		FirstName:      Fullname[0],
 		LastName:       Fullname[1],
 	}
@@ -655,7 +655,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		NickName:       userInfo["given_name"].(string),
 		ProfilePrivacy: "public",
 		Avatar:         fileName,
-		Gender:         "male",
+		Gender:         "alien",
 		FirstName:      userInfo["given_name"].(string),
 		LastName:       userInfo["family_name"].(string),
 	}

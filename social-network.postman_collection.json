@@ -21,11 +21,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/auth/signup",
+					"raw": "localhost:8080/api/auth/signup",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"auth",
@@ -50,11 +50,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/auth/signin",
+					"raw": "localhost:8080/api/auth/signin",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"auth",
@@ -70,11 +70,11 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/auth/logout",
+					"raw": "localhost:8080/api/auth/logout",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"auth",
@@ -90,11 +90,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/profile",
+					"raw": "localhost:8080/api/profile",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"profile"
@@ -118,11 +118,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/profile",
+					"raw": "localhost:8080/api/profile",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"profile"
@@ -146,11 +146,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/create_group",
+					"raw": "localhost:8080/create_group",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"create_group"
 					]
@@ -173,11 +173,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/create_post",
+					"raw": "localhost:8080/create_post",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"create_post"
 					]
@@ -191,11 +191,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/post/3",
+					"raw": "localhost:8080/api/post/3",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"post",
@@ -211,11 +211,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/post/3/comments",
+					"raw": "localhost:8080/api/post/3/comments",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"post",
@@ -241,11 +241,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/create_comment",
+					"raw": "localhost:8080/create_comment",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"create_comment"
 					]
@@ -259,11 +259,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/posts",
+					"raw": "localhost:8080/posts",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"posts"
 					]
@@ -277,11 +277,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/post/1",
+					"raw": "localhost:8080/api/post/1",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"post",

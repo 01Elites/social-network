@@ -21,11 +21,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/auth/signup",
+					"raw": "localhost:8080/api/auth/signup",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"auth",
@@ -60,11 +60,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/auth/signin",
+					"raw": "localhost:8080/api/auth/signin",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"auth",
@@ -90,11 +90,11 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/auth/logout",
+					"raw": "localhost:8080/api/auth/logout",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"auth",
@@ -110,11 +110,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/profile",
+					"raw": "localhost:8080/api/profile",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"profile"
@@ -148,11 +148,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/group",
+					"raw": "localhost:8080/api/group",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"group"
@@ -186,11 +186,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/post",
+					"raw": "localhost:8080/api/post",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"post"
@@ -215,11 +215,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/post/5",
+					"raw": "localhost:8080/api/post/5",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"post",
@@ -245,11 +245,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/post/1/comments",
+					"raw": "localhost:8080/api/post/1/comments",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"post",
@@ -285,11 +285,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/post/1/comments",
+					"raw": "localhost:8080/api/post/1/comments",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"post",
@@ -316,11 +316,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/posts",
+					"raw": "localhost:8080/api/posts",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"posts"
@@ -357,11 +357,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/group/",
+					"raw": "localhost:8080/api/group/",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"group",
@@ -387,11 +387,11 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/like/3",
+					"raw": "localhost:8080/api/like/3",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"like",
@@ -427,11 +427,11 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8081/api/profile/e8ebb95a-2994-43db-a69e-59a61f22c1f6/posts",
+					"raw": "localhost:8080/api/profile/e8ebb95a-2994-43db-a69e-59a61f22c1f6/posts",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"profile",
@@ -457,11 +457,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/followrequest/084a0df7-4d5f-44b5-ae3a-ed098812ae76",
+					"raw": "localhost:8080/api/followrequest/084a0df7-4d5f-44b5-ae3a-ed098812ae76",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"followrequest",
@@ -486,11 +486,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/followresponse/c6268010-7abd-4470-b185-3ef14c58c5ea",
+					"raw": "localhost:8080/api/followresponse/c6268010-7abd-4470-b185-3ef14c58c5ea",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"followresponse",
@@ -525,11 +525,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/invitation",
+					"raw": "localhost:8080/api/invitation",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"invitation"
@@ -563,11 +563,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/group_request",
+					"raw": "localhost:8080/api/group_request",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"group_request"
@@ -601,11 +601,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/invitationresponse",
+					"raw": "localhost:8080/api/invitationresponse",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"invitationresponse"
@@ -639,11 +639,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/group_response",
+					"raw": "localhost:8080/api/group_response",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"group_response"

@@ -458,7 +458,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 
 	if userInfo["email"] == nil || userInfo["name"] == nil || userInfo["login"] == nil || userInfo["avatar_url"] == nil {
 		// Construct the redirect URL with a message or status
-		redirectURL := fmt.Sprintf("http://localhost:3000?error=%s", url.QueryEscape("private_data"))
+		redirectURL := fmt.Sprintf("http://localhost:3000/auth/providers/postLogin?error=%s", url.QueryEscape("private_data"))
 
 		// Redirect to the frontend with the error message
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)

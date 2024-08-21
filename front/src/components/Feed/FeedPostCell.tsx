@@ -107,13 +107,10 @@ export default function FeedPostCell(props: FeedPostCellProps): JSXElement {
     <div class='space-y-4 overflow-hidden rounded border-[0.5px] pb-4 shadow-lg'>
       <Show when={props.post.image}>
         <AspectRatio ratio={16 / 9}>
-          {/* TODO: Load image with headers, use a userRef hook to update the image after fetching with `fetchWithAuth` */}
           <img
             ref={imageRef}
             alt='post image'
             class='size-full rounded-md rounded-b-none object-cover'
-            loading='lazy'
-            // src={`${config.API_URL}/image/${props.post.image}`}
           />
         </AspectRatio>
       </Show>

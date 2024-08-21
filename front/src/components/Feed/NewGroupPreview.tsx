@@ -1,4 +1,4 @@
-import { createSignal, JSXElement, useContext } from 'solid-js';
+import { createSignal, JSXElement } from 'solid-js';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -9,16 +9,18 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 import { TextField, TextFieldTextArea } from '~/components/ui/text-field';
-import { fetchWithAuth } from '~/extensions/fetch';
-import config from '~/config';
 import { showToast } from '~/components/ui/toast';
+import config from '~/config';
+import { fetchWithAuth } from '~/extensions/fetch';
 
 interface NewGroupPreviewProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
 
-export default function NewGroupPreview(props: NewGroupPreviewProps): JSXElement {
+export default function NewGroupPreview(
+  props: NewGroupPreviewProps,
+): JSXElement {
   const [groupName, setGroupName] = createSignal<string>('');
   const [groupDescription, setGroupDescription] = createSignal<string>('');
   const [formProcessing, setFormProcessing] = createSignal(false);
@@ -53,7 +55,7 @@ export default function NewGroupPreview(props: NewGroupPreviewProps): JSXElement
             variant: 'success',
           });
           props.setOpen(false);
-          window.location.reload()
+          window.location.reload();
         }
       })
       .catch((error) => {
@@ -77,11 +79,9 @@ export default function NewGroupPreview(props: NewGroupPreviewProps): JSXElement
           </DialogDescription>
         </DialogHeader>
 
-        <TextField>
+        <TextField value={groupName()} onChange={(e) => setGroupName(e)}>
           <TextFieldTextArea
             placeholder='Group Name'
-            value={groupName()}
-            onChange={(e) => setGroupName(e.target.value)}
             class='resize-none'
             minLength={1}
             maxLength={13}
@@ -89,11 +89,12 @@ export default function NewGroupPreview(props: NewGroupPreviewProps): JSXElement
           />
         </TextField>
 
-        <TextField>
+        <TextField
+          value={groupDescription()}
+          onChange={(e) => setGroupDescription(e)}
+        >
           <TextFieldTextArea
             placeholder='Group Description'
-            value={groupDescription()}
-            onChange={(e) => setGroupDescription(e.target.value)}
             class='resize-none'
             minLength={1}
             maxLength={200}
@@ -104,7 +105,11 @@ export default function NewGroupPreview(props: NewGroupPreviewProps): JSXElement
         <DialogFooter class='!justify-between gap-4'>
           <Button
             class='gap-2'
-            disabled={formProcessing()}
+            disabled={
+              formProcessing() ||
+              !groupName().trim() ||
+              !groupDescription().trim()
+            }
             onClick={createGroup}
           >
             {formProcessing() ? 'Creating...' : 'Create Group'}

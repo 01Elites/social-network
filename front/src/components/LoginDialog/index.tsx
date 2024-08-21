@@ -8,9 +8,6 @@ import {
 } from '~/components/ui/dialog';
 
 import logo from '~/assets/logo.svg';
-import rebootLogo from '~/assets/reboot_01_logo.png';
-import githubLogo from '~/assets/github_logo.png';
-import googleLogo from '~/assets/google_logo.png';
 import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 
 import moment from 'moment';
@@ -24,8 +21,11 @@ import {
 import { showToast } from '~/components/ui/toast';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import WebSocketContext from '~/contexts/WebSocketContext';
 import { fetchWithAuth } from '~/extensions/fetch';
+import useLoginProviders from '~/hooks/LoginProvidersHook';
 import { UserDetailsHook } from '~/hooks/userDetails';
+import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
@@ -36,14 +36,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import WebSocketContext from '~/contexts/WebSocketContext';
-import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
-import useLoginProviders from '~/hooks/LoginProvidersHook';
 
-const loginMessages = [
-  'Welcome back! 🌟',
-  "We've missed you! 🤩",
-];
+const loginMessages = ['Welcome back! 🌟', "We've missed you! 🤩"];
 
 const signUpMessages = [
   'Join the Elite community today! 🌟',
@@ -59,9 +53,7 @@ function showLogin() {
 // let ReadingSessionId = 0;
 
 function LoginDialog(): JSXElement {
-  const userDetailsCtx = useContext(
-    UserDetailsContext,
-  ) as UserDetailsHook;
+  const userDetailsCtx = useContext(UserDetailsContext) as UserDetailsHook;
 
   const wsCtx = useContext(WebSocketContext) as WebsocketHookPrivate;
 
@@ -107,7 +99,7 @@ function LoginDialog(): JSXElement {
         );
       })
       .catch((error: Error) => {
-        setFormProcessing(false)
+        setFormProcessing(false);
         showToast({
           title: 'An error occurred',
           description: error.message,
@@ -166,7 +158,6 @@ function LoginDialog(): JSXElement {
 
   // // Call this function when the page loads
   // handleLoginRedirect();
-
 
   // -------- Signup Dialog --------
   const [signupFirstName, setSignupFirstName] = createSignal('');
@@ -481,7 +472,12 @@ function LoginDialog(): JSXElement {
             <div class='flex flex-row gap-2'>
               <For each={loginProviders.providers}>
                 {(provider) => (
-                  <Button variant='outline' class='gap-4 flex-1' onClick={provider.onClick}>
+                  <Button
+                    disabled={formProcessing()}
+                    variant='outline'
+                    class='flex-1 gap-4'
+                    onClick={provider.onClick}
+                  >
                     <img src={provider.icon} class='h-5'></img>
                     {provider.name}
                   </Button>

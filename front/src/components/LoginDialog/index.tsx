@@ -1,4 +1,4 @@
-import { JSXElement, Show, createSignal, useContext } from 'solid-js';
+import { For, JSXElement, Show, createSignal, useContext } from 'solid-js';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +38,7 @@ import {
 } from '../ui/select';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
+import useLoginProviders from '~/hooks/LoginProvidersHook';
 
 const loginMessages = [
   'Welcome back! 🌟',
@@ -55,7 +56,7 @@ function showLogin() {
   setLoginOpen(true);
 }
 
-let ReadingSessionId = 0;
+// let ReadingSessionId = 0;
 
 function LoginDialog(): JSXElement {
   const userDetailsCtx = useContext(
@@ -67,6 +68,8 @@ function LoginDialog(): JSXElement {
   const [loginFormOpen, setLoginFormOpen] = createSignal(true);
 
   const [formProcessing, setFormProcessing] = createSignal(false);
+
+  const loginProviders = useLoginProviders();
 
   // -------- Login Dialog --------
   const [loginEmail, setLoginEmail] = createSignal('');
@@ -104,6 +107,7 @@ function LoginDialog(): JSXElement {
         );
       })
       .catch((error: Error) => {
+        setFormProcessing(false)
         showToast({
           title: 'An error occurred',
           description: error.message,
@@ -112,51 +116,56 @@ function LoginDialog(): JSXElement {
       });
   }
 
-  function handleLoginWithGithub() {
-    window.location.href = config.API_URL + "/auth/github/login";
-  }
+  // function handleLoginWithGithub() {
+  //   window.location.href = config.API_URL + "/auth/github/login";
 
-  function handleLoginWithReboot() {
-    window.location.href = config.API_URL + "/auth/gitea/login";
-  }
+  // }
 
-  function handleLoginWithGoogle() {
-    window.location.href = config.API_URL + "/auth/google/login";
-  }
+  // function handleLoginWithReboot() {
+  //   window.location.href = config.API_URL + "/auth/gitea/login";
+  // }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const error = urlParams.get('error');
+  // function handleLoginWithGoogle() {
+  //   window.location.href = config.API_URL + "/auth/google/login";
+  // }
 
-  if (error === 'private_data') {
-    alert("Your profile data is private. Please make it public or choose another provider.");
-  }
+  // const urlParams = new URLSearchParams(window.location.search);
+  // const error = urlParams.get('error');
 
-  function handleLoginRedirect() {
-    if (ReadingSessionId === 0) {
-      const token = getCookieValue('SN_SESSION');
-      console.log(token);
-      if (token) {
-        localStorage.setItem('SN_TOKEN', token);
-        deleteCookie('SN_SESSION');
-        ReadingSessionId = 1;
-      }
-    }
-  }
+  // if (error === 'private_data') {
+  //   showToast({
+  //     title: "Can't Login with Github",
+  //     description: "Your profile data is private. Please make it public or choose another provider.",
+  //     variant: 'error',
+  //   })
+  // }
 
-  function getCookieValue(name: string) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() as string;
-    return null;
-  }
+  // function handleLoginRedirect() {
+  //   if (ReadingSessionId === 0) {
+  //     const token = getCookieValue('SN_SESSION');
+  //     console.log(token);
+  //     if (token) {
+  //       localStorage.setItem('SN_TOKEN', token);
+  //       deleteCookie('SN_SESSION');
+  //       ReadingSessionId = 1;
+  //     }
+  //   }
+  // }
 
-  function deleteCookie(name: string) {
-    // Set the cookie's expiration date to a past date to delete it
-    document.cookie = `${name}=; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Path=/; SameSite=Strict; Secure`;
-  }
+  // function getCookieValue(name: string) {
+  //   const value = `; ${document.cookie}`;
+  //   const parts = value.split(`; ${name}=`);
+  //   if (parts.length === 2) return parts.pop()?.split(';').shift() as string;
+  //   return null;
+  // }
 
-  // Call this function when the page loads
-  handleLoginRedirect();
+  // function deleteCookie(name: string) {
+  //   // Set the cookie's expiration date to a past date to delete it
+  //   document.cookie = `${name}=; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Path=/; SameSite=Strict; Secure`;
+  // }
+
+  // // Call this function when the page loads
+  // handleLoginRedirect();
 
 
   // -------- Signup Dialog --------
@@ -469,7 +478,18 @@ function LoginDialog(): JSXElement {
           }
         >
           <form class='flex flex-col gap-4' onSubmit={handleLoginForm}>
-            <Button
+            <div class='flex flex-row gap-2'>
+              <For each={loginProviders.providers}>
+                {(provider) => (
+                  <Button variant='outline' class='gap-4 flex-1' onClick={provider.onClick}>
+                    <img src={provider.icon} class='h-5'></img>
+                    {provider.name}
+                  </Button>
+                )}
+              </For>
+            </div>
+
+            {/* <Button
               variant='outline'
               class='gap-4'
               onClick={handleLoginWithReboot}
@@ -495,7 +515,7 @@ function LoginDialog(): JSXElement {
             >
               <img alt='' src={googleLogo} class='h-5'></img>
               Login with Google
-            </Button>
+            </Button> */}
             <TextField
               class='grid w-full items-center gap-1.5'
               onChange={setLoginEmail}

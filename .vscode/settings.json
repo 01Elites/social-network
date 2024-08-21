@@ -23,6 +23,9 @@
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
       "package.json": "package-lock.json, tsconfig.json, ui.config.json, vite.config.ts, tailwind.config.js, postcss.config.cjs, .prettierrc",
+    },
+    "[dotenv]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
     }
   }
   

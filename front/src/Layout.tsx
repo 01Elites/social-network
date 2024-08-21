@@ -8,12 +8,16 @@ import WebSocketContext from './contexts/WebSocketContext';
 import { useWebsocket } from './hooks/WebsocketHook';
 import { NotificationsPage } from './pages/notifications';
 import { SettingsPage } from './pages/settings';
+import useLoginProviders from './hooks/LoginProvidersHook';
 
 type LayoutProps = {
   children: JSXElement;
 };
 
 export default function Layout(props: LayoutProps): JSXElement {
+  const loginProviders = useLoginProviders();
+
+  loginProviders.postLogin();
   return (
     <>
       <Navigation>{props.children}</Navigation>

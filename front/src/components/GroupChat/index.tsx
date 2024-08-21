@@ -1,21 +1,20 @@
+import { EmojiPicker } from 'solid-emoji-picker';
 import { createSignal, JSXElement, Setter, useContext } from 'solid-js';
 import { TextField, TextFieldInput } from '~/components/ui/text-field';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { WebsocketHook } from '~/hooks/WebsocketHook';
 import { UserDetailsHook } from '~/hooks/userDetails';
+import { cn } from '~/lib/utils';
 import { GroupChatState } from '~/pages/group/groupfeed';
 import Message_Icon from '../ui/icons/message_icon';
 import GroupChatMessage from './groupchatmessage';
-import { Button } from '../ui/button';
-import { cn } from '~/lib/utils';
-import { EmojiPicker } from 'solid-emoji-picker';
-import { FiSmile } from 'solid-icons/fi';
+import IconSmile from '../ui/icons/IconSmile';
 
 interface FeedProps {
   class?: string;
   chatState?: GroupChatState;
-  setChatState?: Setter<GroupChatState>
+  setChatState?: Setter<GroupChatState>;
 }
 
 export default function GroupChatPage(props: FeedProps): JSXElement {
@@ -25,19 +24,19 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
   const useWebsocket = useContext(WebSocketContext) as WebsocketHook;
 
   useWebsocket.send({
-    event: "CHAT_OPENED",
+    event: 'CHAT_OPENED',
     payload: {
       recipient: props.chatState?.chatWith,
       is_group: true,
-    }
+    },
   });
 
   useWebsocket.bind('GET_MESSAGES', (data) => {
-    setMessages(prevMessages => [...prevMessages, data]);
+    setMessages((prevMessages) => [...prevMessages, data]);
   });
 
   function pickEmoji(emoji: { emoji: any }) {
-    setMessage(prev => prev + emoji.emoji);
+    setMessage((prev) => prev + emoji.emoji);
   }
 
   function openEmojiPicker() {
@@ -61,22 +60,28 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
   };
 
   return (
-    <div class={cn(props.class, "flex flex-col h-full p-3")}>
-      <div class="overflow-y-scroll grow">
+    <div class={cn(props.class, 'flex h-full flex-col p-3')}>
+      <div class='grow overflow-y-scroll'>
         {messages().length > 0 &&
           messages().map((msg, index) => (
             <GroupChatMessage
               message={msg.messages[0].message}
               sender={msg.messages[0].sender}
-              type={msg.messages[0].sender === userDetails()!.user_name ? "sent" : "received"}
+              type={
+                msg.messages[0].sender === userDetails()!.user_name
+                  ? 'sent'
+                  : 'received'
+              }
             />
-          ))
-        }
+          ))}
       </div>
-      <div id="emoji-picker" class="items-end self-end hidden h-32 w-96 overflow-y-scroll">
+      <div
+        id='emoji-picker'
+        class='hidden h-32 w-96 items-end self-end overflow-y-scroll'
+      >
         <EmojiPicker onEmojiClick={pickEmoji} />
       </div>
-      <TextField class='flex flex-row w-full content-end items-end self-end align-bottom'>
+      <TextField class='flex w-full flex-row content-end items-end self-end align-bottom'>
         <TextFieldInput
           type='text'
           id='message'
@@ -88,18 +93,18 @@ export default function GroupChatPage(props: FeedProps): JSXElement {
           onKeyPress={(e: KeyboardEvent) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              const input = document.getElementById('message') as HTMLInputElement;
+              const input = document.getElementById(
+                'message',
+              ) as HTMLInputElement;
               setMessage(input.value); // Ensure the latest input value is captured
               sendMessage();
             }
           }}
         />
-        <Button
-          title='emoji picker'
-          class="emoji-button ml-2"
-          onClick={openEmojiPicker}>
-          <FiSmile size="30" />
-        </Button>
+        <IconSmile
+          class='ml-2 size-6 cursor-pointer self-center'
+          onClick={openEmojiPicker}
+        />
         <Message_Icon
           darkBack={false}
           class='ml-2 self-center'

@@ -202,6 +202,11 @@ body: JSON.stringify({
 })
 .then(async (res) => {
   if (res.ok) {
+    if (event.options[0].option_id == option) {
+      option1Count++;
+    } else {
+      option2Count++;
+    }
     var button1 = document.getElementById("option1" + String(event.id));
 button1?.setAttribute('disabled', '');
 button1 ? button1.innerHTML = `${event.options[0].option_name} (${option1Count})` : null;
@@ -220,9 +225,4 @@ button2 ? button2.innerHTML = `${event.options[1].option_name} (${option2Count})
   });
   return;
 });
-if (event.options[0].option_id == option) {
-  option1Count++;
-} else {
-  option2Count++;
-}
 }

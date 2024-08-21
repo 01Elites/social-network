@@ -56,7 +56,7 @@ function ProfileEditDialog(): JSXElement {
   const [userPrivate, setPrivate] = createSignal(
     userDetails()?.profile_privacy === 'private',
   );
-  const [userGender, setGender] = createSignal<'female' | 'male' | 'undefined'>(
+  const [userGender, setGender] = createSignal<'female' | 'male' | 'engineer' | 'alien' | 'undefined'>(
     userDetails()?.gender || 'undefined',
   );
   const [userAbout, setAbout] = createSignal(userDetails()?.about);
@@ -240,7 +240,7 @@ function ProfileEditDialog(): JSXElement {
               itemComponent={(props) => (
                 <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>
               )}
-              options={['male', 'female']}
+              options={['male', 'female', 'engineer', 'alien']}
               defaultValue={userGender()}
             >
               <SelectTrigger aria-label='profile privacy' class='w-full'>

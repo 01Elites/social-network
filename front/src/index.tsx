@@ -8,20 +8,21 @@ import { render } from 'solid-js/web';
 
 import '~/extensions';
 
+import NotificationsContext from './contexts/NotificationsContext';
 import UserDetailsContext from './contexts/UserDetailsContext';
 import WebSocketContext from './contexts/WebSocketContext';
+import { useNotifications } from './hooks/NotificationsHook';
 import { useWebsocket } from './hooks/WebsocketHook';
 import { useUserDetails } from './hooks/userDetails';
 import './index.css';
+import ErrPage from './pages/404';
+import PostLogin from './pages/PostLogin';
 import EventsPage from './pages/events';
 import FriendsPage from './pages/friends';
 import Group from './pages/group';
 import GroupsPage from './pages/groups';
 import HomePage from './pages/home';
 import Profile from './pages/profile';
-import { useNotifications } from './hooks/NotificationsHook';
-import NotificationsContext from './contexts/NotificationsContext';
-import ErrPage from './pages/404';
 
 const root = document.getElementById('root');
 
@@ -49,7 +50,6 @@ function App() {
                   {props.children}
                 </NotificationsContext.Provider>
               </WebSocketContext.Provider>
-
             </UserDetailsContext.Provider>
           </ColorModeProvider>
         </>
@@ -61,7 +61,8 @@ function App() {
       <Route path='/friends' component={FriendsPage} />
       <Route path='/events' component={EventsPage} />
       <Route path='/profile/:username' component={Profile} />
-      <Route path="*404" component={ErrPage} />
+      <Route path='/auth/providers/postLogin' component={PostLogin} />
+      <Route path='*404' component={ErrPage} />
     </Router>
   );
 }

@@ -32,7 +32,6 @@ import NotificationsContext from '~/contexts/NotificationsContext';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import WebSocketContext from '~/contexts/WebSocketContext';
 import { fetchWithAuth } from '~/extensions/fetch';
-import useLoginProviders from '~/hooks/LoginProvidersHook';
 import { WebsocketHookPrivate } from '~/hooks/WebsocketHook';
 import { cn } from '~/lib/utils';
 import { showNotifications } from '~/pages/notifications';
@@ -54,9 +53,6 @@ export default function Navigation(props: NavigationProps): JSXElement {
   const userCtx = useContext(UserDetailsContext);
   const notificationsCtx = useContext(NotificationsContext);
   const wsCtx = useContext(WebSocketContext);
-
-  const loginProviders = useLoginProviders();
-  loginProviders.postLogin();
 
   createEffect(() => {
     if (!userCtx?.proccessing() && !userCtx?.userDetails()) {

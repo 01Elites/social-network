@@ -108,30 +108,6 @@ function LoginDialog(): JSXElement {
       });
   }
 
-  // function handleLoginWithGithub() {
-  //   window.location.href = config.API_URL + "/auth/github/login";
-
-  // }
-
-  // function handleLoginWithReboot() {
-  //   window.location.href = config.API_URL + "/auth/gitea/login";
-  // }
-
-  // function handleLoginWithGoogle() {
-  //   window.location.href = config.API_URL + "/auth/google/login";
-  // }
-
-  // const urlParams = new URLSearchParams(window.location.search);
-  // const error = urlParams.get('error');
-
-  // if (error === 'private_data') {
-  //   showToast({
-  //     title: "Can't Login with Github",
-  //     description: "Your profile data is private. Please make it public or choose another provider.",
-  //     variant: 'error',
-  //   })
-  // }
-
   // function handleLoginRedirect() {
   //   if (ReadingSessionId === 0) {
   //     const token = getCookieValue('SN_SESSION');

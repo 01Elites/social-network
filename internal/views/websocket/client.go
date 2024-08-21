@@ -25,21 +25,18 @@ func GetClient(userName string) (*types.User, bool) {
 }
 
 func SetClientOffline(user *types.User, conn *websocket.Conn) {
-	// Remove the client from the Clients map
+	// Logging to verify the function execution
 	fmt.Printf("\nSetClientOffline %s\n\n", user.Username)
+	// Locking the user mutex to safely update the user's connections
 	user.Mutex.Lock()
 	defer user.Mutex.Unlock()
-	if _, exists := user.Conns[conn]; exists {
-		delete(user.Conns, conn)
-	}
 
-	if len(user.Conns) == 0 {
-		cmutex.Lock()
-		defer cmutex.Unlock()
-		if _, ok := clients[user.Username]; ok {
-			delete(clients, user.Username)
-		}
-	}
+	// Removing the websocket connection from the user's connection map
+	delete(user.Conns, conn)
+
+	// Removing the user from the clients map
+	delete(clients, user.Username)
+
 }
 
 func SetClientOnline(userID string, conn *websocket.Conn) (*types.User, error) {
@@ -120,8 +117,11 @@ func buildUserListSection(sectionName string, usernames []string) types.Section 
 		}
 		if _, ok := clients[username]; ok {
 			userDetails.State = types.State.Online
+			fmt.Println("User is online", username)
 		} else {
 			userDetails.State = types.State.Offline
+			fmt.Println("User is offline", username)
+
 		}
 		listSection.Users = append(listSection.Users, userDetails)
 	}

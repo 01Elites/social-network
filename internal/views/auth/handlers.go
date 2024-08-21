@@ -368,7 +368,7 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
-	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+	http.Redirect(w, r, "http://localhost:3000/auth/providers/postLogin", http.StatusFound)
 }
 
 // gihtub login handler
@@ -517,7 +517,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
-	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+	http.Redirect(w, r, "http://localhost:3000/auth/providers/postLogin", http.StatusFound)
 }
 
 func ExtractAccessToken(body string) string {
@@ -678,5 +678,5 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
-	http.Redirect(w, r, "http://localhost:3000", http.StatusFound)
+	http.Redirect(w, r, "http://localhost:300/auth/providers/postLogin", http.StatusFound)
 }

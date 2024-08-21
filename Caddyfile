@@ -1,11 +1,6 @@
 :8080 {
     handle /api* {
-        reverse_proxy backend:8081 {
-            transport http {
-                # Enables WebSocket support
-                protocols h1 h2c
-            }
-        }
+        reverse_proxy backend:8081
     }
     handle {
         reverse_proxy frontend:3000

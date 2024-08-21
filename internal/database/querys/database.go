@@ -56,7 +56,7 @@ func ApplyMigrations() error {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
-
+	fmt.Println(dbHost, dbPort, dbUser, dbPassword, dbName,"dbHost, dbPort, dbUser, dbPassword, dbName")
 	// Create the PostgreSQL connection string
 	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
 

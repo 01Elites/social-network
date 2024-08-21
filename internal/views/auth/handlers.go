@@ -265,7 +265,7 @@ var oauth2Config *oauth2.Config
 
 func getOAuth2Config() *oauth2.Config {
 	if oauth2Config == nil {
-		helpers.LoadEnv("internal/database/.env")
+		helpers.LoadEnv(".env")
 
 		oauth2Config = &oauth2.Config{
 			ClientID:     os.Getenv("GITIEA_CLIENT_ID"),
@@ -374,7 +374,7 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 // gihtub login handler
 func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
 	// Ensure environment variables are loaded
-	helpers.LoadEnv("internal/database/.env")
+	helpers.LoadEnv(".env")
 
 	models.Code = r.URL.Query().Get("code")
 	if models.Code == "" {
@@ -530,7 +530,7 @@ func ExtractAccessToken(body string) string {
 }
 
 func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	helpers.LoadEnv("internal/database/.env")
+	helpers.LoadEnv(".env")
 	models.Code = r.URL.Query().Get("code")
 	if models.Code == "" {
 		authURL := "https://accounts.google.com/o/oauth2/auth"

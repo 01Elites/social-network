@@ -42,11 +42,15 @@ services:
       - "8081:8081"
     networks:
       - app-network
+    environment:
+      DB_HOST: elite_postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: elite-network
 
   db:
-    build:
-      context: ./internal/database
-      dockerfile: Dockerfile
+    image: postgres:latest
     container_name: elite_postgres
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -55,7 +59,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "${DB_PORT}:5432"
+      - "2025:5432"
     networks:
       - app-network
     healthcheck:

@@ -3,7 +3,6 @@ import { splitProps, ValidComponent } from 'solid-js';
 import * as ImagePrimitive from '@kobalte/core/image';
 import { PolymorphicProps } from '@kobalte/core/polymorphic';
 
-import getRandomColor from '~/lib/randomColors';
 import { cn } from '../..//lib/utils';
 
 type AvatarRootProps<T extends ValidComponent = 'span'> =
@@ -52,7 +51,7 @@ const AvatarFallback = <T extends ValidComponent = 'span'>(
   const [local, others] = splitProps(props as AvatarFallbackProps, ['class']);
   return (
     <ImagePrimitive.Fallback
-      style={{ 'background-color': getRandomColor() }}
+      //style={{ 'background-color': getRandomColor() }}
       class={cn(
         'flex size-full items-center justify-center rounded-full bg-muted',
         local.class,

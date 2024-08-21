@@ -10,17 +10,9 @@ import Message_Icon from '~/components/ui/icons/message_icon';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { UserDetailsHook } from '~/hooks/userDetails';
+import getRandomColor from '~/lib/randomColors';
 import User from '~/types/User';
 import FollowRequest from './followRequest';
-
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
 
 export default function ProfileDetails(props: {
   targetUser: () => User;
@@ -123,14 +115,16 @@ export default function ProfileDetails(props: {
             </div>
           }
         >
-          <Button
-            class='m-4 w-full'
-            variant='default'
-            onClick={showEditProfile}
-          >
-            Edit Profile
-          </Button>
-          <ProfileEditDialog />
+          <div>
+            <Button
+              class='m-4 w-full'
+              variant='default'
+              onClick={showEditProfile}
+            >
+              Edit Profile
+            </Button>
+            <ProfileEditDialog />
+          </div>
         </Show>
       </div>
     </div>

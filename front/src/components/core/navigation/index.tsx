@@ -51,7 +51,6 @@ export default function Navigation(props: NavigationProps): JSXElement {
   const wsCtx = useContext(WebSocketContext);
 
   const [bellColor, setBellColor] = createSignal(false);
-  let counter = 0;
   const location = useLocation();
     // eh writing the same line every where? sucks
   function cpFill(path: string) {
@@ -62,6 +61,11 @@ export default function Navigation(props: NavigationProps): JSXElement {
     return location.pathname === path ? 'default' : 'ghost';
   }
 
+  function showNotificationPage() {
+    showNotifications();
+    setBellColor(false);
+  }
+  
   // Define the navItems array with default item based on currentPath match
   const [navItems] = createSignal<NavItem[]>([
     {
@@ -119,7 +123,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
             variant='ghost'
             class='mt-auto w-fit justify-start gap-2 md:w-full'
             color='red'
-            onClick={showNotifications}
+            onClick={showNotificationPage}
           >
             <For each={notificationsCtx?.store}>
           {(notification) => (
@@ -134,8 +138,7 @@ export default function Navigation(props: NavigationProps): JSXElement {
               <IconBell class='size-5' />
             </Show>
             <span class='hidden md:block'>Notifications</span>
-            {/* <Show when={counter>0}><div class="rounded-full size-6 bg-white text-black">{(counter)}</div>
-            </Show> */}
+
           </Button>
         </Show>
         <Button

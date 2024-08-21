@@ -3,7 +3,7 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "[typescriptreact]": {
-      "editor.defaultFormatter": "vscode.typescript-language-features",
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
       "editor.formatOnSave": true,
       "editor.tabSize": 2,
       "editor.insertSpaces": true

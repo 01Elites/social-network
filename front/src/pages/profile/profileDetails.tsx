@@ -108,7 +108,7 @@ export default function ProfileDetails(props: {
                 {/* <Button variant='default'>
                   <Globe_Icon class='w-5 justify-center' />
                 </Button> */}
-                <Button variant='default'>
+                <Button disabled={true} variant='default'>
                   <Message_Icon darkBack={true} class='w-5 justify-center' />
                 </Button>
               </div>

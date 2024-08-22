@@ -19,6 +19,7 @@ export default function PostLogin(): JSXElement {
 
   // extract token from cookie
   createEffect(() => {
+    if (tokenError()) return;
     const token = getCookieValue('SN_SESSION');
     if (!token) {
       setTokenError('Token not found');

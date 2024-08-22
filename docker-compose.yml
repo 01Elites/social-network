@@ -1,77 +1,40 @@
-version: '3.8'
-
 services:
-  caddy:
-    image: caddy:latest
-    build:
-      context: .
-      dockerfile: Dockerfile.caddy
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
-  frontend:
-    image: node:22
-    working_dir: /app
+  social-db:
+    build: ./backend/internal/database
+    env_file:
+      - ./backend/internal/database/.env
     volumes:
-      - ./front:/app
-    command: >
-      sh -c "npm install && npm run build && npx serve -s dist -l 3000"
-    ports:
-      - "3000:3000"
-    networks:
-      - app-network
+      - social-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  backend:
-    image: golang:latest
-    depends_on:
-      - db
-    working_dir: /app
-    volumes:
-      - .:/app
-    command: go run cmd/socialNetwork/main.go
-    ports:
-      - "8081:8081"
-    networks:
-      - app-network
-    environment:
-      DB_HOST: elite_postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: elite-network
-
-  db:
-    image: postgres:latest
-    container_name: elite_postgres
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_DB: ${DB_NAME}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "2025:5432"
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 5s
 
-networks:
-  app-network:
-    name: app-network
-    driver: bridge
+  social-backend:
+    build: ./backend
+    container_name: social-backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      social-db:
+        condition: service_healthy
+  
+  social-frontend:
+    build: ./front
+    depends_on:
+      - social-backend
+
+  social-caddy:
+    build: ./caddy
+    # We only access Caddy so only expose Caddy ports
+    ports:
+      - "8080:8080"
+      - "8081:8080"
+    depends_on:
+      - social-backend
+      - social-frontend
 
 volumes:
-  pgdata:
+  social-db-data:

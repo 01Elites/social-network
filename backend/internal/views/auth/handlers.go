@@ -265,8 +265,6 @@ var oauth2Config *oauth2.Config
 
 func getOAuth2Config() *oauth2.Config {
 	if oauth2Config == nil {
-		helpers.LoadEnv(".env")
-
 		oauth2Config = &oauth2.Config{
 			ClientID:     os.Getenv("GITIEA_CLIENT_ID"),
 			ClientSecret: os.Getenv("GITIEA_CLIENT_SECRET"),
@@ -368,14 +366,11 @@ func GiteaCallback(w http.ResponseWriter, r *http.Request) {
 
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
-	http.Redirect(w, r, "http://localhost:8080/auth/providers/postLogin", http.StatusFound)
+	http.Redirect(w, r, "/auth/providers/postLogin", http.StatusFound)
 }
 
 // gihtub login handler
 func HandleGithubLogin(w http.ResponseWriter, r *http.Request) {
-	// Ensure environment variables are loaded
-	helpers.LoadEnv(".env")
-
 	models.Code = r.URL.Query().Get("code")
 	if models.Code == "" {
 		params := url.Values{}
@@ -458,7 +453,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 
 	if userInfo["email"] == nil || userInfo["name"] == nil || userInfo["login"] == nil || userInfo["avatar_url"] == nil {
 		// Construct the redirect URL with a message or status
-		redirectURL := fmt.Sprintf("http://localhost:8080/auth/providers/postLogin?error=%s", url.QueryEscape("private_data"))
+		redirectURL := fmt.Sprintf("/auth/providers/postLogin?error=%s", url.QueryEscape("private_data"))
 
 		// Redirect to the frontend with the error message
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
@@ -517,7 +512,7 @@ func HandleGithubCallback(w http.ResponseWriter, r *http.Request) {
 
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
-	http.Redirect(w, r, "http://localhost:8080/auth/providers/postLogin", http.StatusFound)
+	http.Redirect(w, r, "/auth/providers/postLogin", http.StatusFound)
 }
 
 func ExtractAccessToken(body string) string {
@@ -530,7 +525,6 @@ func ExtractAccessToken(body string) string {
 }
 
 func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	helpers.LoadEnv(".env")
 	models.Code = r.URL.Query().Get("code")
 	if models.Code == "" {
 		authURL := "https://accounts.google.com/o/oauth2/auth"
@@ -614,7 +608,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 	if userInfo["email"] == nil || userInfo["given_name"] == nil || userInfo["family_name"] == nil || userInfo["picture"] == nil {
 		// Construct the redirect URL with a message or status
-		redirectURL := fmt.Sprintf("http://localhost:8080?error=%s", url.QueryEscape("private_data"))
+		redirectURL := fmt.Sprintf("/auth/providers/postLogin?error=%s", url.QueryEscape("private_data"))
 
 		// Redirect to the frontend with the error message
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)
@@ -678,5 +672,5 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 	session.SetAutherizationHeader(w, sessionUUID)
 	session.SetSessionCookie(w, sessionUUID)
-	http.Redirect(w, r, "http://localhost:8080/auth/providers/postLogin", http.StatusFound)
+	http.Redirect(w, r, "/auth/providers/postLogin", http.StatusFound)
 }

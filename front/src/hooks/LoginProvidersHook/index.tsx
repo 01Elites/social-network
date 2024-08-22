@@ -15,21 +15,21 @@ export default function useLoginProviders(): LoginProvidersHook {
       name: 'Reboot',
       icon: giteaImage,
       onClick: () => {
-        window.location.href = config.API_URL + '/auth/gitea/login';
+        window.location.replace(config.API_URL + '/auth/gitea/login');
       },
     },
     {
       name: 'Github',
       icon: githubImage,
       onClick: () => {
-        window.location.href = config.API_URL + '/auth/github/login';
+        window.location.replace(config.API_URL + '/auth/github/login');
       },
     },
     {
       name: 'Google',
       icon: googleImage,
       onClick: () => {
-        window.location.href = config.API_URL + '/auth/google/login';
+        window.location.replace(config.API_URL + '/auth/google/login');
       },
     },
   ];

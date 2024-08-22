@@ -608,7 +608,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 	if userInfo["email"] == nil || userInfo["given_name"] == nil || userInfo["family_name"] == nil || userInfo["picture"] == nil {
 		// Construct the redirect URL with a message or status
-		redirectURL := fmt.Sprintf("http://localhost:8080?error=%s", url.QueryEscape("private_data"))
+		redirectURL := fmt.Sprintf("http://localhost:8080/auth/providers/postLogin?error=%s", url.QueryEscape("private_data"))
 
 		// Redirect to the frontend with the error message
 		http.Redirect(w, r, redirectURL, http.StatusSeeOther)

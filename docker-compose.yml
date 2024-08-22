@@ -17,23 +17,21 @@ services:
     container_name: social-backend
     env_file:
       - ./backend/.env
-    # ports:
-    #   - "8081:8081"
     depends_on:
       social-db:
         condition: service_healthy
   
   social-frontend:
     build: ./front
-    # ports:
-    #   - "3000:3000"
     depends_on:
       - social-backend
 
   social-caddy:
     build: ./caddy
+    # We only access Caddy so only expose Caddy ports
     ports:
       - "8080:8080"
+      - "8081:8080"
     extra_hosts:
         - "host.docker.internal:host-gateway"
     depends_on:

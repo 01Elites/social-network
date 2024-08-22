@@ -1,9 +1,9 @@
 import { A } from '@solidjs/router';
 import moment from 'moment';
 import { JSXElement, Show } from 'solid-js';
+import config from '~/config';
 import User from '~/types/User';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import config from '~/config';
 
 interface PostAuthorCellProps {
   author: User;
@@ -15,14 +15,18 @@ export default function PostAuthorCell(props: PostAuthorCellProps): JSXElement {
     <div class='flex items-center gap-2'>
       <Avatar>
         <AvatarFallback>
-          <Show when={props.author.avatar} fallback={
-            props.author.first_name.charAt(0).toUpperCase()
-          }><img
+          <Show
+            when={props.author.avatar}
+            fallback={props.author.first_name.charAt(0).toUpperCase()}
+          >
+            <img
               alt='avatar'
               class='size-full rounded-md rounded-b-none object-cover'
               loading='lazy'
               src={`${config.API_URL}/image/${props.author.avatar}`}
-            /></Show></AvatarFallback>
+            />
+          </Show>
+        </AvatarFallback>
       </Avatar>
       <div>
         <A

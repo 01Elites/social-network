@@ -1,4 +1,7 @@
 import { createEffect, createSignal, For, JSXElement } from 'solid-js';
+import config from '~/config';
+import { fetchWithAuth } from '~/extensions/fetch';
+import Friends from '~/types/friends';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
@@ -12,9 +15,6 @@ import {
 } from '../ui/dialog';
 import { Separator } from '../ui/separator';
 import { Table, TableBody, TableCell, TableRow } from '../ui/table';
-import Friends from '~/types/friends';
-import { fetchWithAuth } from '~/extensions/fetch';
-import config from '~/config';
 
 interface NewPostPrivacyProps {
   open: boolean;
@@ -62,7 +62,7 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
         <div class='max-h-[200px] overflow-x-auto'>
           <Table class=''>
             <TableBody>
-              <For each={targetFriends()?.following ?? []}>
+              <For each={targetFriends()?.followers ?? []}>
                 {(user) => (
                   <TableRow>
                     <TableCell class='w-2'>
@@ -79,7 +79,9 @@ export default function NewPostPrivacy(props: NewPostPrivacyProps): JSXElement {
                             loading='lazy'
                             src={config.API_URL + '/image/' + user.avatar}
                           />
-                          <AvatarFallback>{user.user_name[0].toUpperCase()}</AvatarFallback>
+                          <AvatarFallback>
+                            {user.user_name[0].toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell class='cursor-pointer'>

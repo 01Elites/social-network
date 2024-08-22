@@ -29,7 +29,7 @@ func CanUserSeeImage(userID, fileName string) (bool, error) {
 	fmt.Println("postID: ", postID)
 	if *postID != 0 {
 		query = `SELECT privacy_type, user_id, group_id FROM post WHERE post_id=$1`
-		if err := DB.QueryRow(context.Background(), query, postID).Scan(&privacyType, &posterID, &groupID); err != nil {
+		if err := DB.QueryRow(context.Background(), query, *postID).Scan(&privacyType, &posterID, &groupID); err != nil {
 			log.Printf("database: Failed to get image details: %v\n", err)
 			return false, err
 		}

@@ -17,6 +17,8 @@ services:
     container_name: social-backend
     env_file:
       - ./backend/.env
+    volumes:
+      - social-backend-data:/social-backend/internal/database/images
     depends_on:
       social-db:
         condition: service_healthy
@@ -38,3 +40,4 @@ services:
 
 volumes:
   social-db-data:
+  social-backend-data:

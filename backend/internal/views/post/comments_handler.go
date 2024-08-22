@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
@@ -56,6 +57,15 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// validate the comment content
+	comment.Content = strings.TrimSpace(comment.Content)
+	if comment.Content == "" {
+		log.Printf("Post content is empty\n")
+		helpers.HTTPError(w, "content cannot be empty", http.StatusBadRequest)
+		return
+	}
+	
 	err = database.Create_Comment_in_db(userID, comment)
 	if err != nil {
 		log.Println("Failed to create comment:", err)

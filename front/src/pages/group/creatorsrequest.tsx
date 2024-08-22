@@ -11,6 +11,9 @@ import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
 import { requester } from "~/pages/group/groupfeed";
 import { Card } from '~/components/ui/card';
+import { createEffect, createSignal } from 'solid-js';
+import { useContext } from 'solid-js';
+import NotificationsContext from '~/contexts/NotificationsContext';
 
 interface GroupRequestParams {
   requesters: requester[] | undefined;
@@ -18,6 +21,43 @@ interface GroupRequestParams {
 }
 
 export function GroupRequests(params: GroupRequestParams): JSXElement {
+  const [notificationId, setNotificationId] = createSignal<string>('');
+  const notifications = useContext(NotificationsContext);
+  createEffect(() => {
+    if (notificationId() !== '') {
+      notifications?.markRead(notificationId(), true);
+    }
+  })
+
+function handleRequest(response: string, groupID: string, requester: string) {
+  console.log(response, groupID, requester);
+  fetchWithAuth(`${config.API_URL}/join_group_res`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      requester: requester,
+      group_id: Number(groupID),
+      response: response,
+    })
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        throw new Error(
+          // reason ?? 'An error occurred while responding to request',
+        );
+      }
+      let data = await res.json();
+      setNotificationId(data);
+    })
+    .catch((err) => {
+      showToast({
+        title: 'Error responding to request',
+        description: err.message,
+        variant: 'error',
+      });
+    });
+  const elem = document.getElementById(groupID + requester);
+  elem?.remove();
+}
   return (
     <Index each={params.requesters}>
       {(requester, i) => <> <div class='flex w-full space-x-1 '>
@@ -60,33 +100,4 @@ export function GroupRequests(params: GroupRequestParams): JSXElement {
         </Card></div></>}
     </Index>
   )
-}
-
-export function handleRequest(response: string, groupID: string, requester: string) {
-  console.log(response, groupID, requester);
-  fetchWithAuth(`${config.API_URL}/join_group_res`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      requester: requester,
-      group_id: Number(groupID),
-      response: response,
-    })
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        throw new Error(
-          // reason ?? 'An error occurred while responding to request',
-        );
-      }
-    })
-    .catch((err) => {
-      showToast({
-        title: 'Error responding to request',
-        description: err.message,
-        variant: 'error',
-      });
-    });
-  const elem = document.getElementById(groupID + requester);
-  elem?.remove();
-  
 }

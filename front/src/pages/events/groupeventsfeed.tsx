@@ -19,6 +19,7 @@ import { Button } from '~/components/ui/button';
 import Tooltip from '@corvu/tooltip'
 import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
 import NotificationsContext from '~/contexts/NotificationsContext';
+import { create } from 'domain';
 
 type eventProps = {
   events: GroupEvent[] | undefined
@@ -28,6 +29,11 @@ export function EventsFeed(props: eventProps): JSXElement{
   const [notificationId, setNotificationId] = createSignal<string>('');
   const notifications = useContext(NotificationsContext);
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+  createEffect(() => {
+    if (notificationId() !== '') {
+      notifications?.markRead(notificationId(), true);
+    }
+  })
  function handleEventOption(option: number, event: GroupEvent) {
     console.log(event);
   let option1Count = 0;
@@ -139,9 +145,6 @@ export function EventsFeed(props: eventProps): JSXElement{
                 class='flex-col w-22'
                 onClick={() => {
                   handleEventOption(event.options[0].option_id, event);
-                  setTimeout(() => {
-                  notifications?.markRead(notificationId(), true)
-                  }, 1000)
                 }}
                 
               >
@@ -153,8 +156,8 @@ export function EventsFeed(props: eventProps): JSXElement{
                 class='flex-col w-22'
                 color="red"
                 onClick={() => {
-                  (handleEventOption(event.options[1].option_id, event))
-                }}
+                  handleEventOption(event.options[1].option_id, event);
+                  }}
               >
                 {event.options[1].option_name}
               </Button>

@@ -36,6 +36,24 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
   function markRead(notificationId: string, remove = false): void {
     // mark notification as read
     console.log("marking as read", notificationId)
+    console.log(remove)
+    for (let i=0;i<store.length;i++){
+      if (Number(store[i].notification_id) === Number(notificationId)){
+        console.log(store[i], "doesIt")
+      }
+    }
+    if (remove) {
+      setStore((prev) => {
+        console.log("it reaches here", notificationId)
+        console.log(prev)
+        return prev.filter((n) => Number(n.notification_id) !== Number(notificationId));
+      });
+    }else {    
+    wsCtx.send({
+      event: 'NOTIFICATION_READ',
+      payload: { notification_id: notificationId },
+    });
+  }
     setStore((prev) => {
       return prev.map((n) => {
         if (n.notification_id === notificationId) {
@@ -45,17 +63,6 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
       });
     });
 
-    if (remove) {
-      setStore((prev) => {
-        console.log("it reaches here", notificationId)
-        return prev.filter((n) => n.notification_id !== notificationId);
-      });
-    }
-
-    wsCtx.send({
-      event: 'NOTIFICATION_READ',
-      payload: { notification_id: notificationId },
-    });
   }
 
   const nsUnbind = wsCtx.bind('NOTIFICATION', (data) => {

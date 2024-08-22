@@ -8,9 +8,7 @@ import { IoClose } from 'solid-icons/io';
 import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
 import { Show } from 'solid-js';
-import { handleInvite } from '../group/request';
 import { A } from '@solidjs/router';
-import { handleRequest } from '../group/creatorsrequest';
 import { useContext } from 'solid-js';
 import NotificationsContext from '~/contexts/NotificationsContext';
 import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
@@ -363,4 +361,61 @@ console.log(data)
   });
 });
 return 
+}
+
+
+function handleInvite(response: string, groupID: number, invitee: string) {
+  fetchWithAuth(`${config.API_URL}/invitation_response`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      group_id: Number(groupID),
+      response: response,
+  })})
+  .then(async (res) => {
+    if (!res.ok) {
+      throw new Error(
+        // reason ?? 'An error occurred while responding to request',
+      );
+    }
+  })
+    .catch((err) => {
+      showToast({
+        title: 'Error responding to request',
+        description: err.message,
+        variant: 'error', 
+      });
+      console.log('Error responding to request');
+    });
+    let invite = document.getElementById(groupID + "invite");
+    invite?.remove();
+}
+
+
+function handleRequest(response: string, groupID: string, requester: string) {
+  console.log(response, groupID, requester);
+  fetchWithAuth(`${config.API_URL}/join_group_res`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      requester: requester,
+      group_id: Number(groupID),
+      response: response,
+    })
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        throw new Error(
+          // reason ?? 'An error occurred while responding to request',
+        );
+      }
+      let data = await res.json();
+    })
+    .catch((err) => {
+      showToast({
+        title: 'Error responding to request',
+        description: err.message,
+        variant: 'error',
+      });
+    });
+  const elem = document.getElementById(groupID + requester);
+  elem?.remove();
 }

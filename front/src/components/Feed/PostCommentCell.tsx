@@ -1,4 +1,4 @@
-import { JSXElement, Show, useContext } from 'solid-js';
+import { createEffect, JSXElement, Show, useContext } from 'solid-js';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { Comment } from '~/types/Comment';
@@ -6,6 +6,7 @@ import { UserDetailsHook } from '~/hooks/userDetails';
 import TextBreaker from '../core/textbreaker';
 import PostAuthorCell from '../PostAuthorCell';
 import { AspectRatio } from '../ui/aspect-ratio';
+import { fetchWithAuth } from '~/extensions/fetch';
 
 type PostCommentCellProps = {
   comment: Comment;
@@ -15,16 +16,36 @@ export default function PostCommentCell(
   props: PostCommentCellProps,
 ): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+  let imageRef!: HTMLImageElement;
+
+  createEffect(() => {
+    if (!props.comment.image) {
+      return;
+    }
+    fetchWithAuth(`${config.API_URL}/image/${props.comment.image}`).then(
+      async (res) => {
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(
+            body.reason ?? 'An error occurred while fetching the image',
+          );
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        imageRef.src = url;
+      },
+    );
+  });
 
   return (
     <div class='space-y-4 rounded border-[0.5px] pb-4 shadow-lg'>
       <Show when={props.comment.image}>
         <AspectRatio ratio={16 / 9}>
           <img
+            ref={imageRef}
             alt='comment'
             class='size-full rounded-md rounded-b-none object-cover'
             loading='lazy'
-            src={`${config.API_URL}/image/${props.comment.image}`}
           />
         </AspectRatio>
       </Show>

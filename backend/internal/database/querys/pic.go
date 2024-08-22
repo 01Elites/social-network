@@ -2,6 +2,7 @@ package querys
 
 import (
 	"context"
+	"fmt"
 	"log"
 )
 
@@ -15,13 +16,45 @@ func CanUserSeeImage(userID, fileName string) (bool, error) {
 	if count > 0 {
 		return true, nil
 	}
-	query = `SELECT privacy_type, post_id, user_id, group_id FROM post WHERE image=$1`
+	query = `SELECT post_id FROM comment WHERE image=$1`
+	var postID *int
+	if err := DB.QueryRow(context.Background(), query, fileName).Scan(&postID); err != nil {
+		if err.Error() != "no rows in result set" {
+			log.Printf("database: Failed to check if user can see image: %v\n", err)
+			return false, err
+		}
+	}
 	var privacyType, posterID string
-	var postID, groupID *int
-	if err := DB.QueryRow(context.Background(), query, fileName).Scan(&privacyType, &postID, &posterID, &groupID); err != nil {
-		log.Printf("database: Failed to get image details: %v\n", err)
+	var groupID *int
+	fmt.Println("postID: ", postID)
+	if *postID != 0 {
+		query = `SELECT privacy_type, user_id, group_id FROM post WHERE post_id=$1`
+		if err := DB.QueryRow(context.Background(), query, postID).Scan(&privacyType, &posterID, &groupID); err != nil {
+			log.Printf("database: Failed to get image details: %v\n", err)
+			return false, err
+		}
+		fmt.Println("commmeeennnnttt")
+	} else {
+		query = `SELECT privacy_type, post_id, user_id, group_id FROM post WHERE image=$1`
+		if err := DB.QueryRow(context.Background(), query, fileName).Scan(&privacyType, &postID, &posterID, &groupID); err != nil {
+			log.Printf("database: Failed to get image details: %v\n", err)
+			return false, err
+		}
+		fmt.Println("posttttt")
+	}
+	fmt.Println(postID)
+	canSee, err := CanSeePostImage(userID, posterID, privacyType, postID, groupID)
+	if err != nil {
+		log.Printf("database: Failed to check if user can see image: %v\n", err)
 		return false, err
 	}
+	if canSee {
+		return true, nil
+	}
+	return false, nil
+}
+
+func CanSeePostImage(userID, posterID, privacyType string, postID, groupID *int) (bool, error) {
 	if userID == posterID {
 		return true, nil
 	}

@@ -1,4 +1,6 @@
-import { createEffect, createSignal, JSXElement, useContext } from 'solid-js';
+import moment from 'moment';
+import { createSignal, JSXElement, useContext } from 'solid-js';
+import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -9,25 +11,23 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 import { Separator } from '~/components/ui/separator';
-import UserDetailsContext from '~/contexts/UserDetailsContext';
-import User from '~/types/User';
-import { UserDetailsHook } from '~/hooks/userDetails';
-import PostAuthorCell from '../../components/PostAuthorCell';
-import { AspectRatio } from '../../components/ui/aspect-ratio';
-import { TextField,
-   TextFieldTextArea,
-    TextFieldInput,
-  TextFieldLabel } from '../../components/ui/text-field';
-import moment from 'moment';
-import tailspin from '~/assets/svg-loaders/tail-spin.svg';
 import config from '~/config';
+import UserDetailsContext from '~/contexts/UserDetailsContext';
 import { fetchWithAuth } from '~/extensions/fetch';
+import { UserDetailsHook } from '~/hooks/userDetails';
+import User from '~/types/User';
+import PostAuthorCell from '../../components/PostAuthorCell';
+import {
+  TextField,
+  TextFieldInput,
+  TextFieldTextArea,
+} from '../../components/ui/text-field';
 import { showToast } from '../../components/ui/toast';
 
 interface NewPostPreviewProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  groupID: string
+  groupID: string;
   groupTitle: string | undefined;
 }
 
@@ -78,18 +78,18 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
           });
         } else {
           props.setOpen(false);
+          window.location.reload();
         }
       })
       .catch((error) => {
+        console.log(error)
         setFormProcessing(false);
-        console.error('Error posting:', error);
         showToast({
           title: 'Could not Create Event',
           description: 'An error occurred creating event',
           variant: 'error',
         });
       });
-      window.location.reload();
   }
 
   return (
@@ -98,20 +98,21 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
         <DialogHeader>
           <DialogTitle>Create New Event</DialogTitle>
           <DialogDescription>
-            set a title and description for your event  for '{props.groupTitle}' along with
-             options to choose from.
+            set a title and description for your event for '{props.groupTitle}'
+            along with options to choose from.
           </DialogDescription>
         </DialogHeader>
 
         <PostAuthorCell author={userDetails() as User} date={new Date()} />
         <TextField onChange={setTitle} value={title()}>
-        <TextFieldInput 
-        type="text"
-         id="title"
-         minLength={1}
-         maxLength={15}
-          disabled={formProcessing()}
-        placeholder="event title. (max 15 characters)" />
+          <TextFieldInput
+            type='text'
+            id='title'
+            minLength={1}
+            maxLength={15}
+            disabled={formProcessing()}
+            placeholder='event title. (max 15 characters)'
+          />
         </TextField>
         <TextField onChange={setEventDescription} value={eventDescription()}>
           <TextFieldTextArea
@@ -126,28 +127,26 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
         <Separator />
         <DialogFooter class='!justify-between gap-4'>
           <TextField onChange={setfirstoption} value={firstoption()}>
-        <TextFieldInput 
-        type="text"
-         id="option1"
-         minLength={1}
-         maxLength={10}
-          disabled={formProcessing()}
-        placeholder="option 1" />
-        </TextField>
-        <TextField onChange={setsecondoption} value={secondoption()}>
-        <TextFieldInput 
-        type="text"
-         id="option2"
-         minLength={1}
-         maxLength={10}
-          disabled={formProcessing()}
-        placeholder="option 2" />
-        </TextField>
-        <TextField
-            onChange={setEventTime}
-            value={eventTime()}
-            required
-          >
+            <TextFieldInput
+              type='text'
+              id='option1'
+              minLength={1}
+              maxLength={10}
+              disabled={formProcessing()}
+              placeholder='option 1'
+            />
+          </TextField>
+          <TextField onChange={setsecondoption} value={secondoption()}>
+            <TextFieldInput
+              type='text'
+              id='option2'
+              minLength={1}
+              maxLength={10}
+              disabled={formProcessing()}
+              placeholder='option 2'
+            />
+          </TextField>
+          <TextField onChange={setEventTime} value={eventTime()} required>
             {/* <TextFieldLabel for='dob'></TextFieldLabel> */}
             <TextFieldInput
               class='block' // without it calendar icon gets ruined
@@ -158,15 +157,19 @@ export default function CreateEvent(props: NewPostPreviewProps): JSXElement {
           </TextField>
           <Button
             class='gap-2'
-            disabled={!eventDescription() ||
-              !firstoption()||
-              !secondoption()|| 
-              !title()||
+            disabled={
+              !eventDescription() ||
+              !firstoption() ||
+              !secondoption() ||
+              !title() ||
               !eventTime() ||
-               formProcessing()}
+              formProcessing()
+            }
             onClick={makeEvent}
           >
-            {formProcessing() && <img src={tailspin} class='h-full' alt='processing' />}
+            {formProcessing() && (
+              <img src={tailspin} class='h-full' alt='processing' />
+            )}
             {formProcessing() ? 'Posting...' : 'Create'}
           </Button>
         </DialogFooter>

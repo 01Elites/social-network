@@ -35,6 +35,7 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
   
   function markRead(notificationId: string, remove = false): void {
     // mark notification as read
+    console.log("marking as read", notificationId)
     setStore((prev) => {
       return prev.map((n) => {
         if (n.notification_id === notificationId) {
@@ -46,6 +47,7 @@ function useNotifications(props?: UseNotificationsProps): NotificationsHook {
 
     if (remove) {
       setStore((prev) => {
+        console.log("it reaches here", notificationId)
         return prev.filter((n) => n.notification_id !== notificationId);
       });
     }

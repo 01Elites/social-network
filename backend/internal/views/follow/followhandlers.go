@@ -165,11 +165,12 @@ func RespondToFollowHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update the notification table
-	err = database.UpdateNotificationTable(response.ID, response.Status, "follow_request", userID)
+	notificationId, err := database.UpdateNotificationTable(response.ID, response.Status, "follow_request", userID)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	json.NewEncoder(w).Encode(notificationId)
 	websocket.AddUserToUserList(response.Follower, response.Followee, types.List.Following)
 	w.WriteHeader(http.StatusOK)
 }

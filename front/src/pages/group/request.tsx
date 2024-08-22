@@ -10,6 +10,7 @@ import { IoClose } from 'solid-icons/io';
 import { FaSolidCheck } from 'solid-icons/fa';
 import { A } from '@solidjs/router';
 import { Card } from '~/components/ui/card';
+import { showToast } from '~/components/ui/toast';
 
 export default function RequestToJoin(props: { targetGroup: () => Group}):JSXElement{
   var [buttonData, setButtonData] = createSignal(["", ""]);
@@ -122,6 +123,11 @@ export function handleInvite(response: string, groupID: number, invitee: string)
       }
     })
     .catch((err) => {
+      showToast({
+        title: 'Error responding to request',
+        description: err.message,
+        variant: 'error', 
+      });
       console.log('Error responding to request');
     });
     let invite = document.getElementById(groupID + "invite");

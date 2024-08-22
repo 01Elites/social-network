@@ -11,12 +11,12 @@ import { Show } from 'solid-js';
 import { handleInvite } from '../group/request';
 import { A } from '@solidjs/router';
 import { handleRequest } from '../group/creatorsrequest';
-import { handleEventOption } from '../events/groupeventsfeed';
 import { useContext } from 'solid-js';
 import NotificationsContext from '~/contexts/NotificationsContext';
 import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
 import { showToast } from '~/components/ui/toast';
+import { GroupEvent } from '~/types/group/index';
 
 export default function NotificationsFeed(): JSXElement {
   // const [test, setnotification] = createSignal<NotificationsHook>();
@@ -314,4 +314,53 @@ function handleFollowRequest(response: string, follower: string) {
     });
   const elem = document.getElementById(follower + "follow");
   elem?.remove();
+}
+
+function handleEventOption(option: number, event: GroupEvent) {
+  console.log(event);
+let option1Count = 0;
+let option2Count = 0;
+if (!event.options[0].usernames) {
+option1Count = 0;
+} else {
+option1Count = event.options[0].usernames.length;
+}
+if (!event.options[1].usernames) {
+option2Count = 0;
+} else {
+option2Count = event.options[1].usernames.length;
+}
+fetchWithAuth(`${config.API_URL}/event_response`, {
+method: 'POST',
+body: JSON.stringify({
+  event_id: event.id,
+  option_id: option,
+})
+})
+.then(async (res) => {
+  if (res.ok) {
+    if (event.options[0].option_id == option) {
+      option1Count++;
+    } else {
+      option2Count++;
+    }
+    var button1 = document.getElementById("option1" + String(event.id));
+button1?.setAttribute('disabled', '');
+button1 ? button1.innerHTML = `${event.options[0].option_name} (${option1Count})` : null;
+
+var button2 = document.getElementById("option2" + String(event.id));
+button2?.setAttribute('disabled', '');
+button2 ? button2.innerHTML = `${event.options[1].option_name} (${option2Count})` : null;
+let data = await res.json();
+console.log(data)
+}
+})
+.catch((err) => {
+  showToast({
+    title: 'Error responding to event',
+    description: err.message,
+    variant: 'error', 
+  });
+});
+return 
 }

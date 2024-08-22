@@ -36,14 +36,15 @@ func CancelNotification(relatedID int, notificationType string, userID string) e
 	return nil
 }
 
-func UpdateNotificationTable(relatedID int, status string, notificationType string, userID string) error {
-	query := `UPDATE notifications SET status = $1, read = true WHERE (related_id = $2 AND type = $3 AND user_id = $4 AND status = $5)`
-	_, err := DB.Exec(context.Background(), query, status, relatedID, notificationType, userID, "pending")
+func UpdateNotificationTable(relatedID int, status string, notificationType string, userID string) (int, error) {
+	var notificationId int
+	query := `UPDATE notifications SET status = $1, read = true WHERE (related_id = $2 AND type = $3 AND user_id = $4 AND status = $5) RETURNING notification_id`
+ 	err := DB.QueryRow(context.Background(), query, status, relatedID, notificationType, userID, "pending").Scan(&notificationId)
 	if err != nil {
 		log.Printf("database: Failed to update response in database: %v", err)
-		return err // Return error if failed to insert post
+		return 0, err // Return error if failed to insert post
 	}
-	return nil
+	return notificationId, nil
 }
 
 func GetFollowRequest(requestID int) (*models.Request, error) {

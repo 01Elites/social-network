@@ -159,12 +159,13 @@ func RequestResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = database.UpdateNotificationTable(requestID, response.Status, "join_request", userID)
+	notificationId, err := database.UpdateNotificationTable(requestID, response.Status, "join_request", userID)
 	if err != nil {
 		log.Print(err)
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	json.NewEncoder(w).Encode(notificationId)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -210,11 +211,12 @@ func CancelRequestHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("error getting creator ID")
 		return
 	}
-	err = database.UpdateNotificationTable(requestID, "canceled", "join_request", creatorID)
+	notificationId, err := database.UpdateNotificationTable(requestID, "canceled", "join_request", creatorID)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		log.Println("error updating notification table")
 		return
 	}
+	json.NewEncoder(w).Encode(notificationId)
 	w.WriteHeader(http.StatusOK)
 }

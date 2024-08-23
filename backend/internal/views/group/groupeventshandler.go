@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"strconv"
 
 	database "social-network/internal/database/querys"
 	"social-network/internal/helpers"
@@ -130,8 +131,14 @@ func EventResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "error when responding to request", http.StatusNotFound)
 		return
 	}
-	database.UpdateNotificationTable(response.EventID, "accepted", "event_notification", userID)
+	notificationId, err := database.UpdateNotificationTable(response.EventID, "accepted", "event_notification", userID)
+	if err != nil {
+		helpers.HTTPError(w, "error updating notification", http.StatusNotFound)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
+	log.Print(notificationId)
+	json.NewEncoder(w).Encode(strconv.Itoa(notificationId))
 }
 
 func CancelEventHandler(w http.ResponseWriter, r *http.Request) {

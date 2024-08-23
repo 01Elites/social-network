@@ -143,10 +143,11 @@ func InvitationResponseHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.HTTPError(w, "Failed to respond to invite", http.StatusNotFound)
 		return
 	}
-	err = database.UpdateNotificationTable(inviteID, response.Status, "group_invite", userID)
+	notificationId, err := database.UpdateNotificationTable(inviteID, response.Status, "group_invite", userID)
 	if err != nil {
 		helpers.HTTPError(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	json.NewEncoder(w).Encode(notificationId)
 	w.WriteHeader(http.StatusOK)
 }

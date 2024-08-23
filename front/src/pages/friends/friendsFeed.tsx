@@ -12,13 +12,47 @@ import { fetchWithAuth } from '~/extensions/fetch';
 import config from '~/config';
 import { Show } from 'solid-js';
 import FollowRequest from '../profile/followRequest';
+import { useContext } from 'solid-js';
+import NotificationsContext from '~/contexts/NotificationsContext';
+import { createEffect, createSignal } from 'solid-js';
+
 
 export default function FriendsFeed(props: {
   targetFriends: () => Friends | undefined;
 }): JSXElement {
   const friends = props.targetFriends();
   console.log(friends);
+  const [notificationId, setNotificationId] = createSignal<string>('');
+  const notifications = useContext(NotificationsContext);
+  createEffect(() => {
+    if (notificationId() !== '') {
+      notifications?.markRead(notificationId(), true);
+    }
+  })
 
+ function handleFollowRequest(response: string, follower: string) {
+  fetchWithAuth(`${config.API_URL}/follow_response`, {
+    method: 'POST',
+    body: JSON.stringify({
+      follower: follower,
+      status: response,
+    })
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        throw new Error(
+          // reason ?? 'An error occurred while responding to request',
+        );
+      }
+      let data = await res.json();
+      setNotificationId(data)
+    })
+    .catch((err) => {
+      console.log('Error responding to request');
+    });
+  const elem = document.getElementById(follower);
+  elem?.remove();
+}
   return (
     <Tabs aria-label='Main navigation' class='tabs'>
       <Tabs.List class='tabs__list'>
@@ -188,24 +222,3 @@ export default function FriendsFeed(props: {
   );
 }
 
-export function handleFollowRequest(response: string, follower: string) {
-  fetchWithAuth(`${config.API_URL}/follow_response`, {
-    method: 'POST',
-    body: JSON.stringify({
-      follower: follower,
-      status: response,
-    })
-  })
-    .then(async (res) => {
-      if (!res.ok) {
-        throw new Error(
-          // reason ?? 'An error occurred while responding to request',
-        );
-      }
-    })
-    .catch((err) => {
-      console.log('Error responding to request');
-    });
-  const elem = document.getElementById(follower);
-  elem?.remove();
-}

@@ -18,13 +18,71 @@ import { Card } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
 import Tooltip from '@corvu/tooltip'
 import { RiBusinessCalendarEventLine } from 'solid-icons/ri'
+import NotificationsContext from '~/contexts/NotificationsContext';
+import { create } from 'domain';
 
 type eventProps = {
   events: GroupEvent[] | undefined
 }
 
 export function EventsFeed(props: eventProps): JSXElement{
+  const [notificationId, setNotificationId] = createSignal<string>('');
+  const notifications = useContext(NotificationsContext);
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
+  createEffect(() => {
+    if (notificationId() !== '') {
+      notifications?.markRead(notificationId(), true);
+    }
+  })
+ function handleEventOption(option: number, event: GroupEvent) {
+    console.log(event);
+  let option1Count = 0;
+  let option2Count = 0;
+  if (!event.options[0].usernames) {
+  option1Count = 0;
+  } else {
+  option1Count = event.options[0].usernames.length;
+  }
+  if (!event.options[1].usernames) {
+  option2Count = 0;
+  } else {
+  option2Count = event.options[1].usernames.length;
+  }
+  fetchWithAuth(`${config.API_URL}/event_response`, {
+  method: 'POST',
+  body: JSON.stringify({
+    event_id: event.id,
+    option_id: option,
+  })
+  })
+  .then(async (res) => {
+    if (res.ok) {
+      if (event.options[0].option_id == option) {
+        option1Count++;
+      } else {
+        option2Count++;
+      }
+      var button1 = document.getElementById("option1" + String(event.id));
+  button1?.setAttribute('disabled', '');
+  button1 ? button1.innerHTML = `${event.options[0].option_name} (${option1Count})` : null;
+  
+  var button2 = document.getElementById("option2" + String(event.id));
+  button2?.setAttribute('disabled', '');
+  button2 ? button2.innerHTML = `${event.options[1].option_name} (${option2Count})` : null;
+  let data = await res.json();
+  console.log(data)
+  setNotificationId(data);
+  }
+  })
+  .catch((err) => {
+    showToast({
+      title: 'Error responding to event',
+      description: err.message,
+      variant: 'error', 
+    });
+  });
+  return 
+  }
   return (<>
   <Show when={props.events?.length === 0}>
   <h1 class='text-center font-bold text-muted-foreground'>
@@ -99,7 +157,7 @@ export function EventsFeed(props: eventProps): JSXElement{
                 color="red"
                 onClick={() => {
                   handleEventOption(event.options[1].option_id, event);
-                }}
+                  }}
               >
                 {event.options[1].option_name}
               </Button>
@@ -178,51 +236,4 @@ export function EventsFeed(props: eventProps): JSXElement{
 </For>
 </div>
 </>);
-}
-
-export function handleEventOption(option: number, event: GroupEvent) {
-let option1Count = 0;
-let option2Count = 0;
-if (!event.options[0].usernames) {
-option1Count = 0;
-} else {
-option1Count = event.options[0].usernames.length;
-}
-if (!event.options[1].usernames) {
-option2Count = 0;
-} else {
-option2Count = event.options[1].usernames.length;
-}
-fetchWithAuth(`${config.API_URL}/event_response`, {
-method: 'POST',
-body: JSON.stringify({
-  event_id: event.id,
-  option_id: option,
-})
-})
-.then(async (res) => {
-  if (res.ok) {
-    if (event.options[0].option_id == option) {
-      option1Count++;
-    } else {
-      option2Count++;
-    }
-    var button1 = document.getElementById("option1" + String(event.id));
-button1?.setAttribute('disabled', '');
-button1 ? button1.innerHTML = `${event.options[0].option_name} (${option1Count})` : null;
-
-var button2 = document.getElementById("option2" + String(event.id));
-button2?.setAttribute('disabled', '');
-button2 ? button2.innerHTML = `${event.options[1].option_name} (${option2Count})` : null;
-  }
-  // window.location.reload();
-})
-.catch((err) => {
-  showToast({
-    title: 'Error responding to request',
-    description: err.message,
-    variant: 'error', 
-  });
-  return;
-});
 }

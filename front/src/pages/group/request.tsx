@@ -10,9 +10,20 @@ import { IoClose } from 'solid-icons/io';
 import { FaSolidCheck } from 'solid-icons/fa';
 import { A } from '@solidjs/router';
 import { Card } from '~/components/ui/card';
+import { showToast } from '~/components/ui/toast';
+import { useContext } from 'solid-js';
+import NotificationsContext from '~/contexts/NotificationsContext';
+import { createEffect } from 'solid-js';
 
 export default function RequestToJoin(props: { targetGroup: () => Group}):JSXElement{
   var [buttonData, setButtonData] = createSignal(["", ""]);
+  const [notificationId, setNotificationId] = createSignal<string>('');
+  const notifications = useContext(NotificationsContext);
+  createEffect(() => {
+    if (notificationId() !== '') {
+      notifications?.markRead(notificationId(), true);
+    }
+  })
   console.log(props.targetGroup())
   if (props.targetGroup().iscreator){
     return null
@@ -58,6 +69,35 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
     }
   })
 }
+
+function handleInvite(response: string, groupID: number, invitee: string) {
+  fetchWithAuth(`${config.API_URL}/invitation_response`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      group_id: Number(groupID),
+      response: response,
+  })})
+  .then(async (res) => {
+    if (!res.ok) {
+      throw new Error(
+        // reason ?? 'An error occurred while responding to request',
+      );
+    }
+    let data = await res.json();
+    setNotificationId(data);
+  })
+    .catch((err) => {
+      showToast({
+        title: 'Error responding to request',
+        description: err.message,
+        variant: 'error', 
+      });
+      console.log('Error responding to request');
+    });
+    let invite = document.getElementById(groupID + "invite");
+    invite?.remove();
+}
+
   return (<>
     <Show when={props.targetGroup().invited_by.user.first_name !== ""}>
       <div id={props.targetGroup().id + "invite"}>
@@ -105,25 +145,4 @@ export default function RequestToJoin(props: { targetGroup: () => Group}):JSXEle
 </Button>
 </Show>
      </>)
-}
-
-export function handleInvite(response: string, groupID: number, invitee: string) {
-  fetchWithAuth(`${config.API_URL}/invitation_response`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      group_id: Number(groupID),
-      response: response,
-  })})
-    .then(async (res) => {
-      if (!res.ok) {
-        throw new Error(
-          // reason ?? 'An error occurred while responding to request',
-        );
-      }
-    })
-    .catch((err) => {
-      console.log('Error responding to request');
-    });
-    let invite = document.getElementById(groupID + "invite");
-    invite?.remove();
 }

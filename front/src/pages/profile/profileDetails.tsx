@@ -1,14 +1,21 @@
-import { JSXElement, Show, useContext } from 'solid-js';
+import {
+  createEffect,
+  createSignal,
+  JSXElement,
+  Show,
+  useContext,
+} from 'solid-js';
 import {
   ProfileEditDialog,
   showEditProfile,
 } from '~/components/EditProfileDialog';
 import { AspectRatio } from '~/components/ui/aspect-ratio';
-import { Avatar, AvatarFallback } from '~/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import Message_Icon from '~/components/ui/icons/message_icon';
 import config from '~/config';
 import UserDetailsContext from '~/contexts/UserDetailsContext';
+import { fetchWithAuth } from '~/extensions/fetch';
 import { UserDetailsHook } from '~/hooks/userDetails';
 import getRandomColor from '~/lib/randomColors';
 import User from '~/types/User';
@@ -18,11 +25,30 @@ export default function ProfileDetails(props: {
   targetUser: () => User;
 }): JSXElement {
   const { userDetails } = useContext(UserDetailsContext) as UserDetailsHook;
-  console.log(props.targetUser());
+  const [imageURL, setImageURL] = createSignal<string | undefined>();
+
+  // load image with auth headers
+  createEffect(() => {
+    if (!props.targetUser().avatar) {
+      return;
+    }
+    fetchWithAuth(`${config.API_URL}/image/${props.targetUser().avatar}`).then(
+      async (res) => {
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(
+            body.reason ?? 'An error occurred while fetching the image',
+          );
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        setImageURL(url);
+      },
+    );
+  });
 
   return (
     <div class='flex flex-col'>
-      {' '}
       {/* Left div */}
       <div class='flex flex-col items-center justify-center'>
         <AspectRatio ratio={16 / 9}>
@@ -30,29 +56,17 @@ export default function ProfileDetails(props: {
             class={`absolute inset-0 flex items-end justify-center rounded-lg`}
             style={{
               'background-color': getRandomColor(),
-              'background-image': `url(${config.API_URL}/image/${props.targetUser().avatar})`,
-              'background-size': 'cover',
-              'background-position': 'center',
             }}
           ></div>
         </AspectRatio>
-        <Avatar class='bottom-10 z-10 mb-2 size-[7rem] text-[2rem]'>
+        <Avatar class='bottom-10 z-10 size-[7rem] text-[2rem]'>
+          <AvatarImage src={imageURL()} alt='avatar' />
           <AvatarFallback>
-            <Show
-              when={props.targetUser().avatar}
-              fallback={props.targetUser().first_name.charAt(0).toUpperCase()}
-            >
-              <img
-                alt='avatar'
-                class='size-full rounded-md rounded-b-none object-cover'
-                loading='lazy'
-                src={`${config.API_URL}/image/${props.targetUser().avatar}`}
-              />
-            </Show>
+            {props.targetUser().first_name.charAt(0).toUpperCase()}
+            {props.targetUser().last_name.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div class='flex w-full flex-col items-center'>
-          {' '}
           {/* Username, followers, following */}
           <p class='m-2 text-2xl font-bold'>
             {props.targetUser().first_name} {props.targetUser().last_name}{' '}
@@ -66,22 +80,18 @@ export default function ProfileDetails(props: {
             </p>
           </div>
           <p class='flex justify-center text-sm text-muted-foreground'>
-            {' '}
             Account status: {props.targetUser().profile_privacy}
           </p>
           <Show
             when={userDetails()?.user_name === props.targetUser().user_name}
           >
             <p class='flex justify-center text-sm text-muted-foreground'>
-              {' '}
               Email: {props.targetUser().email}
             </p>
             <p class='flex justify-center text-sm text-muted-foreground'>
-              {' '}
               Username: {props.targetUser().user_name}
             </p>
             <p class='flex justify-center text-sm text-muted-foreground'>
-              {' '}
               Nickname: {props.targetUser().nick_name}
             </p>
           </Show>
@@ -105,9 +115,6 @@ export default function ProfileDetails(props: {
                   privacy={props.targetUser().profile_privacy}
                   profilePage={true}
                 />
-                {/* <Button variant='default'>
-                  <Globe_Icon class='w-5 justify-center' />
-                </Button> */}
                 <Button disabled={true} variant='default'>
                   <Message_Icon darkBack={true} class='w-5 justify-center' />
                 </Button>

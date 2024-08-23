@@ -6,7 +6,16 @@ import (
 )
 
 func CanUserSeeImage(userID, fileName string) (bool, error) {
-	query := `SELECT privacy_type, post_id, user_id, group_id FROM post WHERE image=$1`
+	var count int
+	query := `SELECT COUNT(*) FROM profile WHERE image=$1`
+	if err := DB.QueryRow(context.Background(), query, fileName).Scan(&count); err != nil {
+		log.Printf("database: Failed to check if user can see image: %v\n", err)
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	query = `SELECT privacy_type, post_id, user_id, group_id FROM post WHERE image=$1`
 	var privacyType, posterID string
 	var postID, groupID *int
 	if err := DB.QueryRow(context.Background(), query, fileName).Scan(&privacyType, &postID, &posterID, &groupID); err != nil {
